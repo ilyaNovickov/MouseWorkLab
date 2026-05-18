@@ -14,6 +14,11 @@ namespace MouseStdLib
             this.size = size;
         }
 
+        public ImageMatrix(byte[] matrix, int width, int height) : this(matrix, new Size(width, height))
+        {
+
+        }
+
         public ImageMatrix(byte[,] matrix)
         {
             this.size = new Size(matrix.GetLength(0), matrix.GetLength(1));
