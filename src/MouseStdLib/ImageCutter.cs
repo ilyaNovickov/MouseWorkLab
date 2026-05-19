@@ -29,7 +29,7 @@ namespace MouseStdLib
 
             Point dstPosition = new Point(position.X + size.Width, position.Y + size.Height);
 
-            if (dstPosition.X < 0 && dstPosition.X > src.Width && dstPosition.Y < 0 && dstPosition.Y > src.Height)
+            if ( (dstPosition.X < 0 || dstPosition.X > src.Width) && (dstPosition.Y < 0 || dstPosition.Y > src.Height) )
             {
                 byte[] bytes = new byte[size.Width * size.Height];
                 Span<byte> bytesSpan = new Span<byte>(bytes);
