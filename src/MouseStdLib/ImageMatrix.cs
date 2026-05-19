@@ -10,13 +10,30 @@ namespace MouseStdLib
         private byte[] matrix;
         private Size size;
 
-        public ImageMatrix(byte[] matrix, Size size)
+        public ImageMatrix(byte[] matrix, Size size) : this(matrix, size, false)
         {
-            this.matrix = (byte[])matrix.Clone();
+
+        }
+
+        public ImageMatrix(byte[] matrix, int width, int height) : this(matrix, new Size(width, height), false)
+        {
+
+        }
+
+        internal ImageMatrix(byte[] matrix, Size size, bool owning)
+        {
+            if (owning)
+            {
+                this.matrix = matrix;
+            }
+            else
+            {
+                this.matrix = (byte[])matrix.Clone();
+            }
             this.size = size;
         }
 
-        public ImageMatrix(byte[] matrix, int width, int height) : this(matrix, new Size(width, height))
+        internal ImageMatrix(byte[] matrix, int width, int height, bool owning) : this(matrix, new Size(width, height), owning)
         {
 
         }

@@ -25,7 +25,7 @@ namespace MouseStdLib
         public IMatrix Cut(IMatrix src, Point position, Size size, bool fillZero = true)
         {
             if (size.Width == 0 || size.Height == 0)
-                return new ImageMatrix(new byte[0, 0]);
+                return new ImageMatrix([], 0, 0, true);
 
             Point dstPosition = new Point(position.X + size.Width, position.Y + size.Height);
 
@@ -38,7 +38,7 @@ namespace MouseStdLib
                     @byte = fillZero ? byte.MinValue : byte.MaxValue;
                 }
 
-                return new ImageMatrix(bytes, size);
+                return new ImageMatrix(bytes, size, true);
             }
 
             byte[,] dst = new byte[size.Height, size.Width];
