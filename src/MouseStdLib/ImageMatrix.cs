@@ -46,12 +46,6 @@ namespace MouseStdLib
             return ref matrix[y * Width + x];
         }
 
-        // [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.NoInlining)]
-        // public ref byte AtUnsafe(int x, int y)
-        // {
-        //     return ref Unsafe.Add(ref matrix, y * Width + x).First();
-        // }
-
         public ref byte AtWithCheck(int x, int y)
         {
             if (0 > y || y >= Height)

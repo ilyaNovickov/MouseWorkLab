@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="MouseBaseLib/MouseBaseLib.csproj" />
   <Project Path="MouseStdLib/MouseStdLib.csproj" Id="fdf7568a-5f27-4186-9af6-2a0383c6e101" />
+  <Project Path="Tests/MouseLibTests/MouseLibTests.csproj" Id="8af24dab-93d1-4031-a49d-f123b5d37dc3" />
 </Solution>
