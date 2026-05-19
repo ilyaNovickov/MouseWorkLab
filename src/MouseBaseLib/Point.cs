@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace MouseBaseLib
@@ -35,6 +36,11 @@ namespace MouseBaseLib
             this.Y += dy;
         }
 
+        public Point ShiftImmutable(int dx, int dy)
+        {
+            return new Point(X + dx, Y + dy);
+        }
+
         public object Clone()
         {
             return new Point(this.X, this.Y);
@@ -53,6 +59,50 @@ namespace MouseBaseLib
                 default:
                     return this.ToString()!;
             }
+        }
+
+        public static Point operator +(Point point, Size size)
+        {
+            //return new Point(point.X + size.Width, point.Y + size.Height);
+            return point.ShiftImmutable(size.Width, size.Height);
+        }
+
+        public static Point operator +(Size size, Point point)
+        {
+            return point + size;
+        }
+    
+        public static Point operator +(Point point, (int x, int y) turple)
+        {
+            //return new Point(point.X + turple.x, point.Y + turple.y);
+            return point.ShiftImmutable(turple.x, turple.y);
+        }
+
+        public static Point operator +((int x, int y) turple, Point point)
+        {
+            return point + turple;
+        }
+
+        public static Point operator -(Point point, Size size)
+        {
+            //return new Point(point.X - size.Width, point.Y - size.Height);
+            return point.ShiftImmutable(-size.Width, -size.Height);
+        }
+
+        public static Point operator -(Size size, Point point)
+        {
+            return point - size;
+        }
+
+        public static Point operator -(Point point, (int x, int y) turple)
+        {
+            //return new Point(point.X - turple.x, point.Y - turple.y);
+            return point.ShiftImmutable(-turple.x, -turple.y);
+        }
+
+        public static Point operator -((int x, int y) turple, Point point)
+        {
+            return point - turple;
         }
     }
 }
