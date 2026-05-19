@@ -46,6 +46,12 @@ namespace MouseStdLib
             return ref matrix[y * Width + x];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref byte At(Point point)
+        {
+            return ref At(point.X, point.Y);
+        }
+
         public ref byte AtWithCheck(int x, int y)
         {
             if (0 > y || y >= Height)
@@ -55,6 +61,11 @@ namespace MouseStdLib
                 throw new ArgumentException("Выход за границы по ширине матрицы");
 
             return ref At(x, y);
+        }
+
+        public ref byte AtWithCheck(Point point)
+        {
+            return ref AtWithCheck(point.X, point.Y);
         }
 
         public ReadOnlySpan<byte> GetData()

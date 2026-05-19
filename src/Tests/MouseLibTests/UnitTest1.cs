@@ -15,17 +15,20 @@ namespace MouseLibTests
         [Test]
         public void Test1()
         {
-            IMatrix m = new ImageMatrix(new byte[,]
+            byte[,] src = new byte[,]
             {
-                { 1, 2, 3 },
-                { 4, 5, 6 },
-                { 7, 8, 9 }
-            });
+                { 0, 1, 2, 3, 4, 5 },
+                { 6, 7, 8, 9, 10, 11 },
+                { 12, 13, 14, 15, 16, 17 }
+            };
 
-            byte[] matrix = [1, 2, 3];
+            IMatrix first = new ImageMatrix(src);
 
-            var x = Unsafe.Add<byte[]>(ref matrix, 2);
+            IMatrixCutter cut = new ImageCutter();
 
+            IMatrix sec = cut.Cut(first, 0, 0, 4, 3);
+            IMatrix sec1 = cut.Cut(first, 1, 1, 4, 3);
+            IMatrix sec2 = cut.Cut(first, 10, 10, 4, 3);
 
             Assert.Pass();
         }
