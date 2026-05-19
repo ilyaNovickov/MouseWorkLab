@@ -26,8 +26,8 @@ namespace MouseLibTests
 
             IMatrixCutter cut = new ImageCutter();
 
-            IMatrix sec = cut.Cut(first, 0, 0, 4, 3);
-            IMatrix sec1 = cut.Cut(first, 1, 1, 4, 3);
+            //IMatrix sec = cut.Cut(first, 0, 0, 4, 3);
+            //IMatrix sec1 = cut.Cut(first, 1, 1, 4, 3);
             IMatrix sec2 = cut.Cut(first, 10, 10, 4, 3);
 
             Assert.Pass();

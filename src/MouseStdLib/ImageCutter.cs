@@ -28,36 +28,34 @@ namespace MouseStdLib
                 return new ImageMatrix([], 0, 0, true);
 
             Point dstPosition = new Point(position.X + size.Width, position.Y + size.Height);
+            byte fillValue = fillZero ? byte.MinValue : byte.MaxValue;
 
-            if ( (dstPosition.X < 0 || dstPosition.X > src.Width) && (dstPosition.Y < 0 || dstPosition.Y > src.Height) )
+            if ((dstPosition.X < 0 || dstPosition.X > src.Width) && (dstPosition.Y < 0 || dstPosition.Y > src.Height))
             {
                 byte[] bytes = new byte[size.Width * size.Height];
-                Span<byte> bytesSpan = new Span<byte>(bytes);
-                foreach (ref byte @byte in bytesSpan)
-                {
-                    @byte = fillZero ? byte.MinValue : byte.MaxValue;
-                }
+                
+                bytes.AsSpan().Fill(fillValue);
 
                 return new ImageMatrix(bytes, size, true);
             }
 
-            byte[,] dst = new byte[size.Height, size.Width];
+            int totalPixels = size.Width * size.Height;
+            byte[] dst = new byte[totalPixels];
 
-            for (int y = 0; y < size.Height; y++)
+            for (int i = 0; i < totalPixels; i++)
             {
-                for (int x = 0; x < size.Width; x++)
-                {
-                    int newX = x + position.X;
-                    int newY = y + position.Y;
+                int x = i % size.Width;
+                int y = i / size.Width;
+                int newX = x + position.X;
+                int newY = y + position.Y;
 
-                    if (newX < 0 || newX >= src.Width || newY < 0 || newY >= src.Height)
-                        dst[y, x] = fillZero ? byte.MinValue : byte.MaxValue;
-                    else
-                        dst[y, x] = src.At(newX, newY);
-                }
+                if (newX < 0 || newX >= src.Width || newY < 0 || newY >= src.Height)
+                    dst[i] = fillValue;
+                else
+                    dst[i] = src.At(newX, newY);
             }
 
-            return new ImageMatrix(dst);
+            return new ImageMatrix(dst, size, true);
         }
     }
 }
