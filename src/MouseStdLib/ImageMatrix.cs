@@ -1,4 +1,6 @@
 ﻿using MouseBaseLib;
+using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace MouseStdLib
@@ -7,10 +9,10 @@ namespace MouseStdLib
     {
         private byte[] matrix;
         private Size size;
-        
+
         public ImageMatrix(byte[] matrix, Size size)
         {
-            this.matrix = (byte[]) matrix.Clone();
+            this.matrix = (byte[])matrix.Clone();
             this.size = size;
         }
 
@@ -21,9 +23,15 @@ namespace MouseStdLib
 
         public ImageMatrix(byte[,] matrix)
         {
-            this.size = new Size(matrix.GetLength(0), matrix.GetLength(1));
-            this.matrix = new byte[matrix.Length];
-            matrix.CopyTo(this.matrix, 0);
+            int height = matrix.GetLength(0);
+            int width = matrix.GetLength(1);
+            this.size = new Size(width, height);
+            this.matrix = new byte[width * height];
+
+            for (int y = 0; y < height; y++)
+            {
+                Buffer.BlockCopy(matrix, y * width, this.matrix, y * width, width);
+            }
         }
 
         public int Width => size.Width;
@@ -32,10 +40,17 @@ namespace MouseStdLib
 
         public byte[] RawData => matrix;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref byte At(int x, int y)
         {
             return ref matrix[y * Width + x];
         }
+
+        // [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.NoInlining)]
+        // public ref byte AtUnsafe(int x, int y)
+        // {
+        //     return ref Unsafe.Add(ref matrix, y * Width + x).First();
+        // }
 
         public ref byte AtWithCheck(int x, int y)
         {
@@ -64,29 +79,23 @@ namespace MouseStdLib
                 return this.ToString()!;
 
             const int maxLen = 3;
-
-            StringBuilder builder = new();
-
-            StringBuilder stringBuilder = new StringBuilder();
+            int rowLength = Width * (maxLen + 1) + Environment.NewLine.Length;
+            StringBuilder stringBuilder = new StringBuilder(rowLength * Height);
 
             for (int y = 0; y < Height; y++)
             {
                 ReadOnlySpan<byte> row = this.GetRow(y);
 
-                foreach (byte value in row)
+                for (int i = 0; i < row.Length; i++)
                 {
-                    StringBuilder inner = new(3);
-                    inner.Append(value);
+                    byte value = row[i];
+                    int len = value < 10 ? 1 : value < 100 ? 2 : 3;
+                    int diff = maxLen - len;
 
-                    //Выравнивание byte по левому краю
-                    int diff = maxLen - inner.Length;
+                    if (diff > 0)
+                        stringBuilder.Append(' ', diff);
 
-                    if (diff != 0)
-                    {
-                        inner.Insert(0, new string(' ', diff));
-                    }
-
-                    stringBuilder.Append(inner);
+                    stringBuilder.Append(value);
                     stringBuilder.Append('|');
                 }
 
