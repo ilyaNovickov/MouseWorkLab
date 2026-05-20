@@ -36,9 +36,19 @@ namespace MouseBaseLib
             this.Y += dy;
         }
 
+        public void Shift(Vector vector)
+        {
+            this.Shift(vector.Dx, vector.Dy);
+        }
+
         public Point ShiftImmutable(int dx, int dy)
         {
             return new Point(X + dx, Y + dy);
+        }
+
+        public Point ShiftImmutable(Vector vector)
+        {
+            return new Point(X + vector.Dx, Y + vector.Dy);
         }
 
         public object Clone()
@@ -63,7 +73,6 @@ namespace MouseBaseLib
 
         public static Point operator +(Point point, Size size)
         {
-            //return new Point(point.X + size.Width, point.Y + size.Height);
             return point.ShiftImmutable(size.Width, size.Height);
         }
 
@@ -74,7 +83,6 @@ namespace MouseBaseLib
     
         public static Point operator +(Point point, (int x, int y) turple)
         {
-            //return new Point(point.X + turple.x, point.Y + turple.y);
             return point.ShiftImmutable(turple.x, turple.y);
         }
 
@@ -83,9 +91,18 @@ namespace MouseBaseLib
             return point + turple;
         }
 
+        public static Point operator +(Point point, Vector vector)
+        {
+            return point.ShiftImmutable(vector.Dx, vector.Dy);
+        }
+
+        public static Point operator +(Vector vector, Point point)
+        {
+            return point + vector;
+        }
+
         public static Point operator -(Point point, Size size)
         {
-            //return new Point(point.X - size.Width, point.Y - size.Height);
             return point.ShiftImmutable(-size.Width, -size.Height);
         }
 
@@ -96,13 +113,22 @@ namespace MouseBaseLib
 
         public static Point operator -(Point point, (int x, int y) turple)
         {
-            //return new Point(point.X - turple.x, point.Y - turple.y);
             return point.ShiftImmutable(-turple.x, -turple.y);
         }
 
         public static Point operator -((int x, int y) turple, Point point)
         {
             return point - turple;
+        }
+
+        public static Point operator -(Point point, Vector vector)
+        {
+            return point.ShiftImmutable(-vector.Dx, -vector.Dy);
+        }
+
+        public static Point operator -(Vector vector, Point point)
+        {
+            return point - vector;
         }
     }
 }
