@@ -1,6 +1,8 @@
 ﻿using Microsoft.ApplicationInsights;
 using MouseBaseLib;
 using MouseStdLib;
+using System.Diagnostics.Metrics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace MouseLibTests
@@ -15,20 +17,76 @@ namespace MouseLibTests
         [Test]
         public void Test1()
         {
-            byte[,] src = new byte[,]
+            StdMoveFinder finder = new();
+
+            byte[] m1 = new byte[]
             {
-                { 0, 1, 2, 3, 4, 5 },
-                { 6, 7, 8, 9, 10, 11 },
-                { 12, 13, 14, 15, 16, 17 }
+                0,   0,   0,   0, 0,
+                0,   0, 255,   0, 0,
+                0, 255, 255, 255, 0,
+                0,   0, 255,   0, 0,
+                0,   0,   0,   0, 0,
             };
 
-            IMatrix first = new ImageMatrix(src);
+            byte[] m2 = new byte[]
+            {
+                  0, 255,   0, 0, 0,
+                255, 255, 255, 0, 0,
+                  0, 255,   0, 0, 0,
+                  0,   0,   0, 0, 0,
+                  0,   0,   0, 0, 0,
+            };
 
-            IMatrixCutter cut = new ImageCutter();
+            //byte[] m2 = new byte[]
+            //{
+            //    0,   0, 255,   0, 0,
+            //    0,   0,   0,   0, 0,
+            //    0,   0,   0,   0, 0,
+            //    0,   0,   0,   0, 0,
+            //    0,   0,   0,   0, 0,
+            //};
 
-            //IMatrix sec = cut.Cut(first, 0, 0, 4, 3);
-            //IMatrix sec1 = cut.Cut(first, 1, 1, 4, 3);
-            IMatrix sec2 = cut.Cut(first, 10, 10, 4, 3);
+            IMatrix matrix1 = new ImageMatrix(m1, 5, 5);
+            IMatrix matrix2 = new ImageMatrix(m2, 5, 5);
+
+            int p = 3;
+            int s = 3;
+
+            //Vector v = finder.Find(matrix1, matrix2, p, s);
+            //Vector v = finder.OptFind(matrix1, matrix2, p, s);
+            //Vector v = finder.FillFind(matrix1, matrix2, p, s);
+            Vector v2 = finder.FindSimd(matrix1, matrix2, p, s);
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public void Test2()
+        {
+            int R = 40;
+            int p = 16;
+            int s = (R - p) / 2;
+
+            IMatrix src = (new ImageRandomizer()).Randomize(R + 2 * s, R + 2 * s);
+
+            Point position = new Point((src.Width - R) / 2, (src.Height - R) / 2);
+
+            ImageCutter cutter = new();
+
+            MoveFinderFast f1 = new();
+            MoveFinderBoundy f2 = new();
+
+            Random random = new();
+
+            Vector vector = new Vector();
+            vector.Dx = random.Next(-s, +s);
+            vector.Dy = random.Next(-s, +s);
+
+            IMatrix m1 = cutter.Cut(src, position, new Size(R));
+            IMatrix m2 = cutter.Cut(src, position + vector, new Size(R));
+
+            Vector v1 = f1.Find(m1, m2, p, s);
+            Vector v2 = f2.Find(m1, m2, p, s);
 
             Assert.Pass();
         }
