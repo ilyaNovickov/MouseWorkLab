@@ -1,6 +1,7 @@
 ﻿using Microsoft.ApplicationInsights;
 using MouseBaseLib;
 using MouseStdLib;
+using MouseUnsafeLib;
 using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -17,8 +18,6 @@ namespace MouseLibTests
         [Test]
         public void Test1()
         {
-            StdMoveFinder finder = new();
-
             byte[] m1 = new byte[]
             {
                 0,   0,   0,   0, 0,
@@ -28,23 +27,23 @@ namespace MouseLibTests
                 0,   0,   0,   0, 0,
             };
 
-            byte[] m2 = new byte[]
-            {
-                  0, 255,   0, 0, 0,
-                255, 255, 255, 0, 0,
-                  0, 255,   0, 0, 0,
-                  0,   0,   0, 0, 0,
-                  0,   0,   0, 0, 0,
-            };
-
             //byte[] m2 = new byte[]
             //{
-            //    0,   0, 255,   0, 0,
-            //    0,   0,   0,   0, 0,
-            //    0,   0,   0,   0, 0,
-            //    0,   0,   0,   0, 0,
-            //    0,   0,   0,   0, 0,
+            //      0, 255,   0, 0, 0,
+            //    255, 255, 255, 0, 0,
+            //      0, 255,   0, 0, 0,
+            //      0,   0,   0, 0, 0,
+            //      0,   0,   0, 0, 0,
             //};
+
+            byte[] m2 = new byte[]
+            {
+                0,   0, 255,   0, 0,
+                0,   0,   0,   0, 0,
+                0,   0,   0,   0, 0,
+                0,   0,   0,   0, 0,
+                0,   0,   0,   0, 0,
+            };
 
             IMatrix matrix1 = new ImageMatrix(m1, 5, 5);
             IMatrix matrix2 = new ImageMatrix(m2, 5, 5);
@@ -52,10 +51,15 @@ namespace MouseLibTests
             int p = 3;
             int s = 3;
 
-            //Vector v = finder.Find(matrix1, matrix2, p, s);
-            //Vector v = finder.OptFind(matrix1, matrix2, p, s);
-            //Vector v = finder.FillFind(matrix1, matrix2, p, s);
-            Vector v2 = finder.FindSimd(matrix1, matrix2, p, s);
+            MoveFinderFast f1 = new MoveFinderFast();
+            MoveFinderBoundy f2 = new();
+            MoveFinderSimd f3 = new();
+            MoveFinderSimdParallel f4 = new();
+
+            Vector v1 = f1.Find(matrix1, matrix2, p, s);
+            Vector v2 = f2.Find(matrix1, matrix2, p, s);
+            Vector v3 = f3.Find(matrix1, matrix2, p, s);
+            Vector v4 = f4.Find(matrix1, matrix2, p, s);
 
             Assert.Pass();
         }

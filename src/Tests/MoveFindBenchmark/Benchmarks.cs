@@ -4,6 +4,7 @@ using System;
 using System.Security.Cryptography;
 using MouseBaseLib;
 using MouseStdLib;
+using MouseUnsafeLib;
 
 namespace MoveFindBenchmark
 {
@@ -13,13 +14,12 @@ namespace MoveFindBenchmark
     {
         //private int R = 40;
         //private int p = 16;
-        private int R = 40;
-        private int p = 34;
+        private int R = 128;
+        private int p = 32;
         private int s => (R - p) / 2;
 
         IMatrixRandomizer rnd = new ImageRandomizer();
         IMatrixCutter cutter = new ImageCutter();
-        StdMoveFinder moveFinder = new();
 
         IMatrix m1;
         IMatrix m2;
@@ -42,27 +42,31 @@ namespace MoveFindBenchmark
         }
 
         [Benchmark]
-        public Vector Std()
+        public Vector Fast()
         {
+            MoveFinderFast moveFinder = new();
             return moveFinder.Find(m1, m2, p, R);
         }
 
         [Benchmark]
-        public Vector Opt()
+        public Vector Bounty()
         {
-            return moveFinder.OptFind(m1, m2, p, R);
-        }
-
-        [Benchmark]
-        public Vector Fill()
-        {
-            return moveFinder.FillFind(m1, m2, p, R);
+            MoveFinderBoundy moveFinder = new();
+            return moveFinder.Find(m1, m2, p, R);
         }
 
         [Benchmark]
         public Vector Simd()
         {
-            return moveFinder.FindSimd(m1, m2, p, R);
+            MoveFinderSimd moveFinder = new();
+            return moveFinder.Find(m1, m2, p, R);
+        }
+
+        [Benchmark]
+        public Vector SimdParallel()
+        {
+            MoveFinderSimdParallel moveFinder = new();
+            return moveFinder.Find(m1, m2, p, R);
         }
     }
 }

@@ -13,5 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\MouseBaseLib\MouseBaseLib.csproj" />
     <ProjectReference Include="..\..\MouseStdLib\MouseStdLib.csproj" />
+    <ProjectReference Include="..\..\MouseUnsafeLib\MouseUnsafeLib.csproj" />
   </ItemGroup>
 </Project>

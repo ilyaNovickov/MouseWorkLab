@@ -7,7 +7,7 @@ namespace MouseStdLib
     public abstract class StdMoveFinder : IMoveFinder
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected Exception? ArgsValidation(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange)
+        protected static Exception? ArgsValidation(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange)
         {
             if (matrix1 == null || matrix2 == null)
                 return new ArgumentException("Должны быть хоть какие-то изображения");
