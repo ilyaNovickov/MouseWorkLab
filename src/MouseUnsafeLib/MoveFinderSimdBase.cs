@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 
@@ -44,6 +45,24 @@ namespace MouseUnsafeLib
                     Vector128<byte> v2 = Sse2.LoadVector128(p2 + i);
                     Vector128<ulong> sad = Sse2.SumAbsoluteDifferences(v1, v2).AsUInt64<ushort>();
                     vSum = Sse2.Add(vSum, sad);
+                }
+                sum += (int)(vSum.GetElement(0) + vSum.GetElement(1));
+            }
+            // Для ARM процессоров (непротестировано
+            else if (AdvSimd.IsSupported && length >= 16)
+            {
+                Vector128<ulong> vSum = Vector128<ulong>.Zero;
+                for (; i <= length - 16; i += 16)
+                {
+                    Vector128<byte> v1 = AdvSimd.LoadVector128(p1 + i);
+                    Vector128<byte> v2 = AdvSimd.LoadVector128(p2 + i);
+
+                    Vector128<byte> abd = AdvSimd.AbsoluteDifference(v1, v2);
+                    Vector128<ushort> sum16 = AdvSimd.AddPairwiseWidening(abd);
+                    Vector128<uint> sum32 = AdvSimd.AddPairwiseWidening(sum16);
+                    Vector128<ulong> sum64 = AdvSimd.AddPairwiseWidening(sum32);
+
+                    vSum = AdvSimd.Add(vSum, sum64);
                 }
                 sum += (int)(vSum.GetElement(0) + vSum.GetElement(1));
             }
