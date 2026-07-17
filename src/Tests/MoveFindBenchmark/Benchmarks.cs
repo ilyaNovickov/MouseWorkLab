@@ -10,12 +10,16 @@ namespace MoveFindBenchmark
 {
     // For more information on the VS BenchmarkDotNet Diagnosers see https://learn.microsoft.com/visualstudio/profiling/profiling-with-benchmark-dotnet
     [CPUUsageDiagnoser]
+    [MemoryDiagnoser]
+    [ThreadingDiagnoser]
     public class Benchmarks
     {
         //private int R = 40;
         //private int p = 16;
-        private int R = 128;
-        private int p = 32;
+        //private int R = 128;
+        //private int p = 32;
+        private int R = 512;
+        private int p = 128;
         private int s => (R - p) / 2;
 
         IMatrixRandomizer rnd = new ImageRandomizer();
@@ -23,6 +27,13 @@ namespace MoveFindBenchmark
 
         IMatrix m1;
         IMatrix m2;
+
+        MoveFinderFast f1 = new();
+        MoveFinderBoundy f2 = new();
+        MoveFinderSimd f3 = new();
+        MoveFinderSimdParallel f4 = new();
+        MoveFinderSimdBounty f5 = new();
+        MoveFinderSimdBountyParallel f6 = new();
 
         [IterationSetup]
         public void Setup()
@@ -41,32 +52,40 @@ namespace MoveFindBenchmark
             m2 = cutter.Cut(src, position + vector, new Size(R));
         }
 
-        [Benchmark]
-        public Vector Fast()
-        {
-            MoveFinderFast moveFinder = new();
-            return moveFinder.Find(m1, m2, p, R);
-        }
+        //[Benchmark]
+        //public Vector Fast()
+        //{
+        //    return f1.Find(m1, m2, p, R);
+        //}
 
-        [Benchmark]
-        public Vector Bounty()
-        {
-            MoveFinderBoundy moveFinder = new();
-            return moveFinder.Find(m1, m2, p, R);
-        }
+        //[Benchmark]
+        //public Vector Bounty()
+        //{
+        //    return f2.Find(m1, m2, p, R);
+        //}
 
         [Benchmark]
         public Vector Simd()
         {
-            MoveFinderSimd moveFinder = new();
-            return moveFinder.Find(m1, m2, p, R);
+            return f3.Find(m1, m2, p, R);
         }
 
         [Benchmark]
         public Vector SimdParallel()
         {
-            MoveFinderSimdParallel moveFinder = new();
-            return moveFinder.Find(m1, m2, p, R);
+            return f4.Find(m1, m2, p, R);
+        }
+
+        [Benchmark]
+        public Vector SimdBountyl()
+        {
+            return f5.Find(m1, m2, p, R);
+        }
+
+        [Benchmark]
+        public Vector SimdBountyParallel()
+        {
+            return f6.Find(m1, m2, p, R);
         }
     }
 }

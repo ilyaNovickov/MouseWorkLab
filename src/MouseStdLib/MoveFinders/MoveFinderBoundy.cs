@@ -50,8 +50,10 @@ namespace MouseStdLib
                         {
                             //Смещение по оси Y для матрицы №1 (шаблон)
                             int y1 = patchPositionY + y;
+                            int offset1 = y1 * matrix1.Width;
                             //Смещение по оси Y для матрицы №2
                             int y2 = y1 + dy;
+                            int offset2 = y2 * matrix1.Width;
 
                             for (int x = 0; x < patchSize; x++)
                             {
@@ -61,14 +63,14 @@ namespace MouseStdLib
                                 byte p1, p2;
 
                                 // matrix1 всегда в пределах (патч берётся из центра)
-                                p1 = data1[y1 * matrix1.Width + offsetPatchX];
+                                p1 = data1[offset1 + offsetPatchX];
 
 
                                 // matrix2 может выходить за границы
                                 if (offsetMovingX < 0 || offsetMovingX >= matrix1.Width || y2 < 0 || y2 >= matrix1.Height)
                                     p2 = outOfBoundsValue;
                                 else 
-                                    p2 = data2[y2 * matrix1.Width + offsetMovingX];
+                                    p2 = data2[offset2 + offsetMovingX];
 
                                 int diff = p1 - p2;
                                 currentSum += (diff < 0) ? -diff : diff;
@@ -91,8 +93,10 @@ namespace MouseStdLib
                         {
                             //Смещение по оси Y для матрицы №1 (шаблон)
                             int y1 = patchPositionY + y;
+                            int offset1 = y1 * matrix1.Width;
                             //Смещение по оси Y для матрицы №2
                             int y2 = y1 + dy;
+                            int offset2 = y2 * matrix1.Width;
 
                             for (int x = 0; x < patchSize; x++)
                             {
@@ -101,8 +105,8 @@ namespace MouseStdLib
                                 //Смещение по оси X для матрицы №2
                                 int offsetMovingX = offsetPatchX + dx;
 
-                                byte p1 = data1[y1 * matrix1.Width + offsetPatchX];
-                                byte p2 = data2[y2 * matrix1.Width + offsetMovingX];
+                                byte p1 = data1[offset1 + offsetPatchX];
+                                byte p2 = data2[offset2 + offsetMovingX];
 
                                 int diff = p1 - p2;
                                 currentSum += (diff < 0) ? -diff : diff;

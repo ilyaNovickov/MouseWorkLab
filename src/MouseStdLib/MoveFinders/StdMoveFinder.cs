@@ -6,7 +6,6 @@ namespace MouseStdLib
 {
     public abstract class StdMoveFinder : IMoveFinder
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected static Exception? ArgsValidation(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange)
         {
             if (matrix1 == null || matrix2 == null)
