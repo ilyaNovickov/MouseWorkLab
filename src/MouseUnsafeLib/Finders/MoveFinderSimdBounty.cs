@@ -7,7 +7,7 @@ using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 
-namespace MouseUnsafeLib
+namespace MouseUnsafeLib.Finders
 {
     public class MoveFinderSimdBounty : MoveFinderSimdBase
     {
@@ -95,47 +95,6 @@ namespace MouseUnsafeLib
             }
 
             return -bestVector;
-        }
-
-        // SIMD SAD когда одна сторона - константа (выход за границы)
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected unsafe static int CalculateSADWithConstant(byte* p1, byte constant, int length)
-        {
-            int sum = 0;
-            int i = 0;
-            var vConst256 = Vector256.Create(constant);
-            var vConst128 = Vector128.Create(constant);
-
-            if (Avx2.IsSupported && length >= 32)
-            {
-                Vector256<ulong> vSum = Vector256<ulong>.Zero;
-                for (; i <= length - 32; i += 32)
-                    vSum = Avx2.Add(vSum, Avx2.SumAbsoluteDifferences(Avx.LoadVector256(p1 + i), vConst256).AsUInt64<ushort>());
-                sum += (int)(vSum.GetElement(0) + vSum.GetElement(1) + vSum.GetElement(2) + vSum.GetElement(3));
-            }
-            else if (Sse2.IsSupported && length >= 16)
-            {
-                Vector128<ulong> vSum = Vector128<ulong>.Zero;
-                for (; i <= length - 16; i += 16)
-                    vSum = Sse2.Add(vSum, Sse2.SumAbsoluteDifferences(Sse2.LoadVector128(p1 + i), vConst128).AsUInt64<ushort>());
-                sum += (int)(vSum.GetElement(0) + vSum.GetElement(1));
-            }
-            else if (AdvSimd.IsSupported && length >= 16)
-            {
-                Vector128<ulong> vSum = Vector128<ulong>.Zero;
-                for (; i <= length - 16; i += 16)
-                {
-                    Vector128<byte> v1 = AdvSimd.LoadVector128(p1 + i);
-                    Vector128<byte> abd = AdvSimd.AbsoluteDifference(v1, vConst128);
-                    Vector128<ushort> sum16 = AdvSimd.AddPairwiseWidening(abd);
-                    Vector128<uint> sum32 = AdvSimd.AddPairwiseWidening(sum16);
-                    Vector128<ulong> sum64 = AdvSimd.AddPairwiseWidening(sum32);
-                    vSum = AdvSimd.Add(vSum, sum64);
-                }
-                sum += (int)(vSum.GetElement(0) + vSum.GetElement(1));
-            }
-            for (; i < length; i++) sum += Math.Abs(p1[i] - constant);
-            return sum;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
