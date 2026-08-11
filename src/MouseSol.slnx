@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Mouse.Services/Mouse.Services.csproj" Id="ee781f06-e5be-4d1a-bae0-58aa34679cc2" />
   <Project Path="MouseBaseLib/MouseBaseLib.csproj" />
   <Project Path="MouseStdLib/MouseStdLib.csproj" Id="fdf7568a-5f27-4186-9af6-2a0383c6e101" />
   <Project Path="MouseUnsafeLib/MouseUnsafeLib.csproj" Id="14c5ef9a-ba14-4ee0-a818-41a990971b25" />

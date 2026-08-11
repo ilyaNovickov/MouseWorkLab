@@ -12,7 +12,7 @@ namespace MouseBaseLib
         public double[] Well { get; init; }       // G
 
         // Оптимальная точка для выделения на графике или вывода в текст
-        public (double p, double s, double n, double g) Optimal { get; init; }
+        public (double p, double s, double n, double g) Optimal { get; set; }
 
         public OptimizationReport(int count)
         {

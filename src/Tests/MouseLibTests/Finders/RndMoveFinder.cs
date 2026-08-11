@@ -72,7 +72,7 @@ namespace MouseLibTests.Finders
         [Test]
         public void Bounty()
         {
-            MoveFinderBoundy finder = new();
+            MoveFinderBoundary finder = new();
 
             Vector vector = finder.Find(Matrix1, Matrix2, PatchSize, SearchRange);
 
@@ -99,7 +99,7 @@ namespace MouseLibTests.Finders
         [Test]
         public void SimdBounty()
         {
-            MoveFinderSimdBounty finder = new();
+            MoveFinderSimdBoundary finder = new();
 
             Vector vector = finder.Find(Matrix1, Matrix2, PatchSize, SearchRange);
 
@@ -126,7 +126,7 @@ namespace MouseLibTests.Finders
         [Test]
         public void SimdBountyParallel()
         {
-            MoveFinderSimdBountyParallel finder = new();
+            MoveFinderSimdBoundaryParallel finder = new();
 
             Vector vector = finder.Find(Matrix1, Matrix2, PatchSize, SearchRange);
 

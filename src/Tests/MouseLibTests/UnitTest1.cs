@@ -53,11 +53,11 @@ namespace MouseLibTests
             int s = 3;
 
             MoveFinderFast f1 = new MoveFinderFast();
-            MoveFinderBoundy f2 = new();
+            MoveFinderBoundary f2 = new();
             MoveFinderSimd f3 = new();
             MoveFinderSimdParallel f4 = new();
-            MoveFinderSimdBounty f5 = new();
-            MoveFinderSimdBountyParallel f6 = new();
+            MoveFinderSimdBoundary f5 = new();
+            MoveFinderSimdBoundaryParallel f6 = new();
 
             Vector v1 = f1.Find(matrix1, matrix2, p, s);
             Vector v2 = f2.Find(matrix1, matrix2, p, s);
@@ -83,11 +83,11 @@ namespace MouseLibTests
             ImageCutter cutter = new();
 
             MoveFinderFast f1 = new MoveFinderFast();
-            MoveFinderBoundy f2 = new();
+            MoveFinderBoundary f2 = new();
             MoveFinderSimd f3 = new();
             MoveFinderSimdParallel f4 = new();
-            MoveFinderSimdBounty f5 = new();
-            MoveFinderSimdBountyParallel f6 = new();
+            MoveFinderSimdBoundary f5 = new();
+            MoveFinderSimdBoundaryParallel f6 = new();
 
             Random random = new();
 

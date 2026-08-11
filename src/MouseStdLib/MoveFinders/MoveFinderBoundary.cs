@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MouseStdLib
 {
-    public class MoveFinderBoundy : StdMoveFinder
+    public class MoveFinderBoundary : StdMoveFinder
     {
         public override Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)
         {

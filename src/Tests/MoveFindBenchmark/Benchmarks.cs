@@ -64,11 +64,11 @@ namespace MoveFindBenchmark
         IMatrix m2;
 
         MoveFinderFast f1 = new();
-        MoveFinderBoundy f2 = new();
+        MoveFinderBoundary f2 = new();
         MoveFinderSimd f3 = new();
         MoveFinderSimdParallel f4 = new();
-        MoveFinderSimdBounty f5 = new();
-        MoveFinderSimdBountyParallel f6 = new();
+        MoveFinderSimdBoundary f5 = new();
+        MoveFinderSimdBoundaryParallel f6 = new();
 
         [IterationSetup]
         public void Setup()

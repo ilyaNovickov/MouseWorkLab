@@ -9,7 +9,7 @@ using System.Text;
 
 namespace MouseUnsafeLib.Finders
 {
-    public class MoveFinderSimdBounty : MoveFinderSimdBase
+    public class MoveFinderSimdBoundary : MoveFinderSimdBase
     {
         public override unsafe Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)
         {
