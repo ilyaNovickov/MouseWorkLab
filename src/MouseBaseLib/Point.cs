@@ -5,8 +5,9 @@ using System.Text;
 
 namespace MouseBaseLib
 {
-    public struct Point : ICloneable
+    public record struct Point //: ICloneable
     {
+        public static Point Zero => new Point(0, 0);
 
         public Point() : this(0, 0)
         {
@@ -51,10 +52,10 @@ namespace MouseBaseLib
             return new Point(X + vector.Dx, Y + vector.Dy);
         }
 
-        public object Clone()
-        {
-            return new Point(this.X, this.Y);
-        }
+        //public object Clone()
+        //{
+        //    return new Point(this.X, this.Y);
+        //}
 
         public string ToString(string arg)
         {

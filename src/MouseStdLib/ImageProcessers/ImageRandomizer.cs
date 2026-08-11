@@ -1,4 +1,5 @@
 ﻿using MouseBaseLib;
+using MouseBaseLib.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;

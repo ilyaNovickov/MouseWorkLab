@@ -29,4 +29,4 @@ namespace MouseUnsafeLib.Providers
         public byte GetByte(int offset) => _const;
     }
 }
-}
+

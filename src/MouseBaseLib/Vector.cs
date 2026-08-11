@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MouseBaseLib
 {
-    public struct Vector : ICloneable
+    public record struct Vector //: ICloneable
     {
         public Vector() : this(0, 0)
         {
@@ -26,10 +26,10 @@ namespace MouseBaseLib
             this.Dy = -Dy;
         }
 
-        public object Clone()
-        {
-            return new Vector(Dx, Dy);
-        }
+        //public object Clone()
+        //{
+        //    return new Vector(Dx, Dy);
+        //}
 
         public static Vector operator -(Vector vector)
         {

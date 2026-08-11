@@ -2,6 +2,7 @@
 using MouseBaseLib;
 using MouseStdLib;
 using MouseUnsafeLib;
+using MouseUnsafeLib.Finders;
 using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Runtime.CompilerServices;

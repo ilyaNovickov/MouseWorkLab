@@ -1,4 +1,5 @@
 ﻿using MouseBaseLib;
+using MouseBaseLib.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,7 +31,7 @@ namespace MouseStdLib
             Point dstPosition = new Point(position.X + size.Width, position.Y + size.Height);
             byte fillValue = fillZero ? byte.MinValue : byte.MaxValue;
 
-            if ((dstPosition.X < 0 || dstPosition.X > src.Width) && (dstPosition.Y < 0 || dstPosition.Y > src.Height))
+            if ((dstPosition.X < 0 || position.X > src.Width) && (dstPosition.Y < 0 || position.Y > src.Height))
             {
                 byte[] bytes = new byte[size.Width * size.Height];
                 

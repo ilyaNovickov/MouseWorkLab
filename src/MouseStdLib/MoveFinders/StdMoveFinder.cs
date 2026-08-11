@@ -1,4 +1,5 @@
 ﻿using MouseBaseLib;
+using MouseBaseLib.Interfaces.Services;
 using System.Runtime.CompilerServices;
 using Num = System.Numerics;
 
