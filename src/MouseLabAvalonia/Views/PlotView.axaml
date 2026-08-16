@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MouseLabAvalonia.ViewModels"
+             xmlns:ScottPlot="using:ScottPlot.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MouseLabAvalonia.Views.PlotView"
+             x:DataType="vm:PlotViewModel">
+    
+    <Design.DataContext>
+        <vm:PlotViewModel/>
+    </Design.DataContext>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <Label Content="Разрешение R"/>
+			<NumericUpDown Value="{Binding Resolution}"
+                           ParsingNumberStyle="Integer"
+                           Increment="1"
+                           Minimum="{Binding MinResolution}"
+                           Maximum="{Binding MaxResolution}"/>
+            <Separator/>
+            <!--<Button Content="Пересчитать"/>-->
+            <Button Click="GetDataButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Пересчитать"/>
+                    <TextBlock Text="*" IsVisible="{Binding IsOldData}" 
+                               Foreground="Red"
+                               FontWeight="Bold"/>
+                </StackPanel>
+            </Button>
+            <Button Content="Сохранить как CSV" Click="SaveAsButton_Click"/>
+            <Button Content="Копировать" Click="CopyButton_Click"/>
+        </Menu>
+        <TabControl>
+			<TabItem Header="Выч сложность">
+				<ScottPlot:AvaPlot Name="difficultPlot"/>
+            </TabItem>
+            <TabItem Header="Параметры">
+				<ScottPlot:AvaPlot Name="paramPlot"/>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

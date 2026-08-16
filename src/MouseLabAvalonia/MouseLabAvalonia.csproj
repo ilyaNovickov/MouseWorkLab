@@ -6,6 +6,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
+  <PropertyGroup Label="Avalonia">
+    <AvaloniaXamlIlDebuggerLaunch>False</AvaloniaXamlIlDebuggerLaunch>
+    <AvaloniaXamlCreateSourceInfo>True</AvaloniaXamlCreateSourceInfo>
+  </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Models\" />
@@ -17,13 +21,21 @@
     <PackageReference Include="Avalonia.Desktop" Version="12.1.1" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1" />
-    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>none</IncludeAssets>
-    </PackageReference>
+	<PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="ScottPlot.Avalonia" Version="5.1.59" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mouse.Services\Mouse.Services.csproj" />
+    <ProjectReference Include="..\MouseBaseLib\MouseBaseLib.csproj" />
+    <ProjectReference Include="..\MouseStdLib\MouseStdLib.csproj" />
+    <ProjectReference Include="..\MouseUnsafeLib\MouseUnsafeLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\PlotView.axaml.cs">
+      <DependentUpon>PlotView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

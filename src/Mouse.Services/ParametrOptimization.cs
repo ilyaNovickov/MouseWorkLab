@@ -7,9 +7,11 @@ namespace Mouse.Services
 {
     public static class ParametrOptimization
     {
+        private const int ResolutionThreshold = 128;
         public static OptimizationReport Calculate(int R)
         {
-            if (R <= 0 || R > 200) throw new ArgumentException("R out of range");
+            if (R <= 0 || R > ResolutionThreshold) 
+                throw new ArgumentException("R out of range");
 
             int count = R + 1;
             var report = new OptimizationReport(count);

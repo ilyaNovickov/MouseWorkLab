@@ -37,17 +37,17 @@ namespace MoveFindBenchmark
             new Scenario { Resolution = 16, PatchSize =  4 },
             new Scenario { Resolution = 16, PatchSize =  8 },
             new Scenario { Resolution = 16, PatchSize = 12 },
-            new Scenario { Resolution = 16, PatchSize =  6 },
+            new Scenario { Resolution = 16, PatchSize =  4 },
 
             new Scenario { Resolution = 40, PatchSize = 10 },
             new Scenario { Resolution = 40, PatchSize = 20 },
             new Scenario { Resolution = 40, PatchSize = 30 },
-            new Scenario { Resolution = 40, PatchSize = 16 },
+            new Scenario { Resolution = 40, PatchSize = 6 },
 
             new Scenario { Resolution = 128, PatchSize = 32 },
             new Scenario { Resolution = 128, PatchSize = 64 },
             new Scenario { Resolution = 128, PatchSize = 96 },
-            new Scenario { Resolution = 128, PatchSize = 52 },
+            new Scenario { Resolution = 128, PatchSize = 20 },
 
             //new Scenario { Resolution = 512, PatchSize = 128 },
             //new Scenario { Resolution = 512, PatchSize = 256 },

@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Diagnostics;
 using System;
 
 namespace MouseLabAvalonia
@@ -16,9 +17,11 @@ namespace MouseLabAvalonia
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+            /*
 #if DEBUG
                 .WithDeveloperTools()
 #endif
+            */
                 .WithInterFont()
                 .LogToTrace();
     }
