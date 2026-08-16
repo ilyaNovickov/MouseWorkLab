@@ -24,6 +24,9 @@ namespace Mouse.Services
         private int patchSize = 1;
         private int searchRange = (3 - 1) / 2;
 
+        private const int ParallelResolutionThreshold = 24;
+        private const int MinLogicalCpuCountForParallel = 3;
+
         private readonly IMoveFinder ConstFinder = new ConstMoveFinder();
         private readonly IMoveFinder FastFinder = new MoveFinderFast();
         private readonly IMoveFinder BountyFinder = new MoveFinderBoundary();
@@ -35,10 +38,10 @@ namespace Mouse.Services
         public MoveFinderManager()
         {
             LogicalCpuCount = Environment.ProcessorCount;
-            CurrentFinder = SimdFinder;
+            UpdateFinder();
         }
 
-        private IMoveFinder CurrentFinder { get; set; } 
+        private IMoveFinder? CurrentFinder { get; set; } 
 
         public int Resolution
         {
@@ -57,6 +60,10 @@ namespace Mouse.Services
                     PatchSize = resolution;
                     return;
                 }
+                else
+                {
+                    UpdateSearchRange();
+                }
 
                 UpdateFinder();
             }
@@ -73,6 +80,7 @@ namespace Mouse.Services
                     throw new Exception($"Размер шаблона не может быть больше размера изображения");
 
                 patchSize = value;
+                UpdateSearchRange();
                 UpdateFinder();
             }
         }
@@ -85,57 +93,77 @@ namespace Mouse.Services
                 if (value < 0)
                     throw new Exception("Интервал поиска не может быть меньше 0");
 
-                searchRange = value;
+                searchRange = value < ThresholdSearchRange ? value : ThresholdSearchRange;
                 UpdateFinder();
+            }
+        }
+
+        private int ThresholdSearchRange
+        {
+            get => (Resolution + PatchSize) / 2;
+        }
+
+        private void UpdateSearchRange()
+        {
+            if (SearchRange > ThresholdSearchRange)
+            {
+                SearchRange = ThresholdSearchRange;
             }
         }
 
         private void UpdateFinder()
         {
-            Point patchPosition = new Point()
+            CurrentFinder = SelectFinder();
+        }
+
+        private static int IdealMaxDifficult(int resolution)
+        {
+            return (resolution * resolution) * Convert.ToInt32(Math.Pow(resolution + 2, 2)) / 16;
+        }
+        
+        private static int GetDiffucult(int patchSize, int searchRange)
+        {
+            return (patchSize * patchSize) * Convert.ToInt32(Math.Pow(2 * searchRange + 1, 2));
+        }
+
+        private IMoveFinder SelectFinder()
+        {
+            //if (patchSize == resolution)
+            if (SearchRange == 0)
+                return ConstFinder;
+
+            //bool useParallel =
+            //    LogicalCpuCount >= MinLogicalCpuCountForParallel &&
+            //    resolution >= ParallelSolutionThreshold;
+            bool useParallel =
+                LogicalCpuCount >= MinLogicalCpuCountForParallel &&
+                (Resolution >= ParallelResolutionThreshold && 
+                GetDiffucult(PatchSize, SearchRange) > IdealMaxDifficult(Resolution));
+
+            bool patchAlwaysInside = IsPatchAlwaysInside(Resolution, PatchSize, SearchRange);
+
+            return (patchAlwaysInside, useParallel) switch
             {
-                X = (Resolution - PatchSize) / 2,
-                Y = (Resolution - PatchSize) / 2
+                (true, true) => SimdParallelFinder,
+                (true, false) => SimdFinder,
+                (false, true) => SimdParallelBountyFinder,
+                _ => SimdBountyFinder
             };
-            Point patchBorder = new Point()
-            {
-                X = patchPosition.X + patchSize,
-                Y = patchPosition.Y + patchSize
-            };
+        }
 
-            if (patchPosition == Point.Zero && patchBorder == new Point(Resolution, Resolution))
-            {
-                CurrentFinder = ConstFinder;
-                return;
-            }
+        private static bool IsPatchAlwaysInside(int solution, int patchSize, int searchRange)
+        {
+            int leftMargin = (solution - patchSize) / 2;
+            int rightMargin = solution - (leftMargin + patchSize);
 
-            bool isPatchInsideOnly = (patchPosition.X - SearchRange) >= 0 && 
-                (patchPosition.Y - SearchRange) >= 0 && 
-                (patchBorder.X + SearchRange) < Resolution && 
-                (patchBorder.Y + SearchRange) < Resolution;
-
-            if (isPatchInsideOnly && LogicalCpuCount > 2 && Resolution >= 64)
-            {
-                CurrentFinder = SimdParallelFinder;
-            }
-            else if (isPatchInsideOnly)
-            {
-                CurrentFinder = SimdFinder;
-            }
-            else if (LogicalCpuCount > 2 && Resolution >= 64)
-            {
-                CurrentFinder = SimdParallelBountyFinder;
-            }
-            else
-            {
-                CurrentFinder = SimdBountyFinder;
-            }
+            return searchRange <= leftMargin &&
+                   searchRange <= rightMargin;
         }
 
 
         public Vector Find(IMatrix matrix1, IMatrix matrix2, bool fillZero = true)
         {
-            return CurrentFinder.Find(matrix1, matrix2, PatchSize, SearchRange, fillZero);
+            return CurrentFinder!.Find(matrix1, matrix2, PatchSize, SearchRange, fillZero);
         }
     }
 }
