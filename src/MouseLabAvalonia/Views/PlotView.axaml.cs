@@ -3,9 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
-using Microsoft.Extensions.Logging;
 using MouseBaseLib;
 using MouseLabAvalonia.ViewModels;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using ScottPlot;
 using ScottPlot.Plottables;
 using System.IO;
@@ -32,19 +33,21 @@ public partial class PlotView : UserControl
         paramPlot.Refresh();
     }
 
-    private void GetDataButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void GetDataButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not PlotViewModel plotVM)
             return;
 
         OptimizationReport? report = plotVM.GetOptimizationReport();
 
+        if (report is null)
+        {
+            return;
+        }
+
         // Очистка старых данных
         difficultPlot.Plot.Clear();
         paramPlot.Plot.Clear();
-
-        if (report is null)
-            return;
 
         // Добавление новых данных (передаем массивы напрямую)
         Scatter? scatter1 = difficultPlot.Plot.Add.Scatter(report.P, report.Difficulty);
@@ -71,7 +74,7 @@ public partial class PlotView : UserControl
         if (DataContext is not PlotViewModel plotVM)
             return;
 
-        string? str = plotVM.CreateReportString();
+        string? str = await plotVM.CreateReportString();
 
         if (str is null)
             return;
@@ -79,7 +82,9 @@ public partial class PlotView : UserControl
         IClipboard? clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
 
         if (clipboard is null)
+        {
             return;
+        }
 
         await clipboard.SetTextAsync(str);
     }
@@ -89,7 +94,7 @@ public partial class PlotView : UserControl
         if (DataContext is not PlotViewModel plotVM)
             return;
 
-        string? str = plotVM.CreateReportString();
+        string? str = await plotVM.CreateReportString();
 
         if (str is null)
             return;
@@ -114,6 +119,10 @@ public partial class PlotView : UserControl
 
             // Записываем содержимое
             await streamWriter.WriteLineAsync(str);
+        }
+        else
+        {
+
         }
     }
 }

@@ -2,9 +2,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mouse.Services;
 using MouseBaseLib;
+using MouseLabAvalonia.Core.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Threading.Tasks;
 
 
 namespace MouseLabAvalonia.ViewModels
@@ -41,6 +43,13 @@ namespace MouseLabAvalonia.ViewModels
         [ObservableProperty]
         private bool isOldData = false;
 
+        private readonly IMessageDialogService messageDialogService;
+
+        public PlotViewModel(IMessageDialogService messageService)
+        {
+            messageDialogService = messageService;
+        }
+
         partial void OnResolutionChanging(int? oldValue, int? newValue)
         {
             if (oldValue == newValue)
@@ -67,7 +76,7 @@ namespace MouseLabAvalonia.ViewModels
         {
             if (this.Resolution == 0 || !this.Resolution.HasValue)
             {
-                //messega here
+                messageDialogService.ShowOkAsync("Значение расшерения равно 0 или не указано", "Ошибка");
                 return null;
             }
 
@@ -76,10 +85,24 @@ namespace MouseLabAvalonia.ViewModels
 
         }
 
-        public string? CreateReportString()
+        public async Task<string?> CreateReportString()
         {
-            if (Report is null || IsOldData)
+            if (Report is null)
+            {
+                await messageDialogService.ShowOkAsync("Отчёт не сформирован", "Ошибка", MsBox.Avalonia.Enums.Icon.Error);
                 return null;
+            }
+
+            if (IsOldData)
+            {
+                bool reuslt = await messageDialogService.ShowOkAbortAsync("Отчёт построен на основании старых данных" + Environment.NewLine +
+                    "Вы хотите сохранить устаревшие данные?" + Environment.NewLine +
+                    "Нажмите OK, чтобы сохранить старые данные. Нажмите Abort для отмены действий",
+                    "Внимание", MsBox.Avalonia.Enums.Icon.Question);
+
+                if (!reuslt)
+                    return null;
+            }
 
             StringBuilder builder = new();
             builder.AppendLine("p;s;N;G");

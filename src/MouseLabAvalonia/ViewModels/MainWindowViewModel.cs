@@ -1,11 +1,16 @@
-﻿namespace MouseLabAvalonia.ViewModels
+﻿using MouseLabAvalonia.Core.Interfaces;
+
+namespace MouseLabAvalonia.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
+        private readonly IMessageDialogService messageBoxService;
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IMessageDialogService messageDialogService)
         {
-            PlotViewModel = new PlotViewModel();
+            this.messageBoxService = messageDialogService;
+
+            PlotViewModel = new PlotViewModel(messageBoxService);
         }
 
         public PlotViewModel PlotViewModel { get; private set; }
