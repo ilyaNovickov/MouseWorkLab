@@ -6,11 +6,11 @@ namespace MouseLabAvalonia.ViewModels
     {
         private readonly IMessageDialogService messageBoxService;
 
-        public MainWindowViewModel(IMessageDialogService messageDialogService)
+        public MainWindowViewModel(IMessageDialogService messageDialogService, PlotViewModel plotViewModel)
         {
             this.messageBoxService = messageDialogService;
 
-            PlotViewModel = new PlotViewModel(messageBoxService);
+            PlotViewModel = plotViewModel;
         }
 
         public PlotViewModel PlotViewModel { get; private set; }

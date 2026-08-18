@@ -1,10 +1,12 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia.Platform.Storage;
 using Mouse.Services;
 using MouseBaseLib;
 using MouseLabAvalonia.Core.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,10 +46,12 @@ namespace MouseLabAvalonia.ViewModels
         private bool isOldData = false;
 
         private readonly IMessageDialogService messageDialogService;
+        private readonly IFileDialogService fileDialogService;
 
-        public PlotViewModel(IMessageDialogService messageService)
+        public PlotViewModel(IMessageDialogService messageService, IFileDialogService fileDialogService)
         {
             messageDialogService = messageService;
+            this.fileDialogService = fileDialogService;
         }
 
         partial void OnResolutionChanging(int? oldValue, int? newValue)
@@ -115,6 +119,26 @@ namespace MouseLabAvalonia.ViewModels
             builder.AppendLine($"{Report.Optimal.p};{(Resolution - Report.Optimal.p) / 2};{Report.Optimal.n};{Report.Optimal.g}");
 
             return builder.ToString();
+        }
+
+        public async Task SaveReportAsync()
+        {
+            string? str = await CreateReportString();
+
+            if (str is null)
+                return;
+
+            IStorageFile? file = await fileDialogService.ShowSaveFileAsync(
+                "Сохранить файл",
+                new[] { new FilePickerFileType("CSV") { Patterns = new[] { "*.csv" } } },
+                "csv");
+
+            if (file is null)
+                return;
+
+            await using Stream stream = await file.OpenWriteAsync();
+            await using StreamWriter streamWriter = new(stream);
+            await streamWriter.WriteLineAsync(str);
         }
     }
 }

@@ -33,6 +33,8 @@ namespace MouseLabAvalonia
             // 2. Регистрируем сервисы
             services.AddSingleton<IWindowLocator, WindowLocator>();
             services.AddSingleton<IMessageDialogService, MessegeDialogService>();
+            services.AddSingleton<IFileDialogService, FileDialogService>();
+            services.AddTransient<PlotViewModel>();
             services.AddTransient<MainWindowViewModel>();
 
             // 3. Строим провайдер

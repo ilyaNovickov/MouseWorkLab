@@ -2,14 +2,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
-using Avalonia.Platform.Storage;
 using MouseBaseLib;
 using MouseLabAvalonia.ViewModels;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using ScottPlot;
 using ScottPlot.Plottables;
-using System.IO;
 
 namespace MouseLabAvalonia.Views;
 
@@ -94,35 +90,6 @@ public partial class PlotView : UserControl
         if (DataContext is not PlotViewModel plotVM)
             return;
 
-        string? str = await plotVM.CreateReportString();
-
-        if (str is null)
-            return;
-
-        var topLevel = TopLevel.GetTopLevel(this);
-        if (topLevel is null) return;
-        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions 
-        { 
-            Title = "Сохранить файл",
-            FileTypeChoices = new[]
-            {
-                new FilePickerFileType("CSV") { Patterns = new[] { "*.csv" } },
-            },
-            DefaultExtension = "csv"
-        });
-
-        if (file != null)
-        {
-            // Открываем поток для записи
-            await using var stream = await file.OpenWriteAsync();
-            using var streamWriter = new StreamWriter(stream);
-
-            // Записываем содержимое
-            await streamWriter.WriteLineAsync(str);
-        }
-        else
-        {
-
-        }
+        await plotVM.SaveReportAsync();
     }
 }
