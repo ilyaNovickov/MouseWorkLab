@@ -23,7 +23,7 @@ namespace MouseLabAvalonia.ViewModels
         public OptimizationReport? Report { get; private set; }
     }
 
-    public partial class PlotViewModel : ObservableValidator
+    public partial class PlotViewModel : ViewModelBase
     {
         private OptimizationReport? Report
         {
