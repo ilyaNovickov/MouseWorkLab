@@ -47,9 +47,17 @@ namespace MouseLabAvalonia
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+
+                var mainWindowViewModel = Services.GetRequiredService<MainWindowViewModel>();
+
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = Services.GetRequiredService<MainWindowViewModel>(),
+                    DataContext = mainWindowViewModel
+                };
+
+                desktop.MainWindow.Closing += (_, _) =>
+                {
+                    mainWindowViewModel.CloseLayout();
                 };
             }
 

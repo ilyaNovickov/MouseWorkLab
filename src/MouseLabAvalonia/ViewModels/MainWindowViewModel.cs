@@ -1,4 +1,5 @@
 ﻿using Dock.Model.Controls;
+using Dock.Model.Core;
 using MouseLabAvalonia.Core.Interfaces;
 
 namespace MouseLabAvalonia.ViewModels
@@ -26,6 +27,17 @@ namespace MouseLabAvalonia.ViewModels
         {
             get => _layout;
             set => SetProperty(ref _layout, value);
+        }
+
+        public void CloseLayout()
+        {
+            if (Layout is IDock dock)
+            {
+                if (dock.Close.CanExecute(null))
+                {
+                    dock.Close.Execute(null);
+                }
+            }
         }
     }
 }

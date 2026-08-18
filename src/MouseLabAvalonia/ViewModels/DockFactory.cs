@@ -1,3 +1,4 @@
+using Dock.Avalonia.Controls;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
@@ -25,7 +26,8 @@ namespace MouseLabAvalonia.ViewModels
                 Id = "PlotDocument",
                 Title = "Параметры",
                 Context = plotViewModel,
-                CanClose = false
+                CanClose = false,
+                CanFloat = true
             };
 
             var documentDock = new DocumentDock
@@ -59,7 +61,23 @@ namespace MouseLabAvalonia.ViewModels
                 ["Documents"] = () => _documentDock
             };
 
+            HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>
+            {
+                [nameof(IDockWindow)] = () => new HostWindow()
+            };
+
             base.InitLayout(layout);
+        }
+
+        public override IDockWindow? CreateWindowFrom(IDockable dockable)
+        {
+            var window = base.CreateWindowFrom(dockable);
+
+            if (window != null)
+            {
+                window.Title = "Dock Avalonia Demo";
+            }
+            return window;
         }
     }
 }
