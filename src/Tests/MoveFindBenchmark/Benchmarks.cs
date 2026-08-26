@@ -135,7 +135,7 @@ namespace MoveFindBenchmark
         {
             using var p1 = cutter.Cut(src, position, new Size(Scenario.Resolution), PooledMatrixProvider.Instance);
             using var p2 = cutter.Cut(src, position + vector, new Size(Scenario.Resolution), PooledMatrixProvider.Instance);
-            return f1.Find(p1, p2, Scenario.PatchSize, Scenario.Resolution);
+            return f3.Find(p1, p2, Scenario.PatchSize, Scenario.Resolution);
         }
 
         [Benchmark]
@@ -147,7 +147,7 @@ namespace MoveFindBenchmark
             cutter.Cut(src, position, new Size(Scenario.Resolution), d1);
             cutter.Cut(src, position + vector, new Size(Scenario.Resolution), d2);
 
-            Vector v = f1.Find(d1, d2, Scenario.PatchSize, Scenario.Resolution);
+            Vector v = f3.Find(d1, d2, Scenario.PatchSize, Scenario.Resolution);
 
             d1.Dispose();
             d2.Dispose();
