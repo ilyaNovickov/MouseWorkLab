@@ -1,6 +1,6 @@
 ﻿namespace MouseBaseLib;
 
-public interface IMatrix
+public interface IMatrix : IDisposable
 {
     int Width { get; }
     int Height { get; }

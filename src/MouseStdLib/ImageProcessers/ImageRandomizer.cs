@@ -1,32 +1,31 @@
 ﻿using MouseBaseLib;
 using MouseBaseLib.Interfaces.Services;
+using MouseStdLib.Providers;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MouseStdLib
 {
     public class ImageRandomizer : IMatrixRandomizer
     {
         public IMatrix Randomize(Size size, int? seed = null)
-        {
-            return Randomize(size.Width, size.Height, seed);
-        }
+            => Randomize(size.Width, size.Height, seed);
 
         public IMatrix Randomize(int width, int height, int? seed = null)
+            => Randomize(width, height, DefaultMatrixProvider.Instance, seed);
+
+        public IMatrix Randomize(Size size, IMatrixProvider provider, int? seed = null)
+            => Randomize(size.Width, size.Height, provider, seed);
+
+        public IMatrix Randomize(int width, int height, IMatrixProvider provider, int? seed = null)
         {
-            Random random;
+            provider ??= DefaultMatrixProvider.Instance;
 
-            if (seed is not null)
-                random = new Random(seed.Value);
-            else
-                random = new Random();
+            IMatrix matrix = provider.Create(width, height);
 
-            byte[] buffer = new byte[width * height];
+            Random random = seed is not null ? new Random(seed.Value) : new Random();
+            random.NextBytes(matrix.RawData.AsSpan(0, width * height));
 
-            random.NextBytes(buffer);
-
-            return  new ImageMatrix(buffer, width, height);
+            return matrix;
         }
     }
 }

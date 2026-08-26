@@ -50,6 +50,13 @@ namespace MouseLibTests.Finders.Base
             TestContext.Out.WriteLine(" --- ---------- --- ");
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Matrix1?.Dispose();
+            Matrix2?.Dispose();
+        }
+
         [Test]
         public abstract void Fast();
 

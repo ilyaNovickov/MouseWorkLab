@@ -95,6 +95,10 @@ namespace MouseStdLib
             return matrix.AsSpan<byte>(y * Width, Width);
         }
 
+        public void Dispose()
+        {
+        }
+
         public string ToString(string arg)
         {
             if (arg.ToLower() is not ("d" or "debug"))

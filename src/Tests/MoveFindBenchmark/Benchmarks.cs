@@ -4,6 +4,7 @@ using System;
 using System.Security.Cryptography;
 using MouseBaseLib;
 using MouseStdLib;
+using MouseStdLib.Providers;
 using MouseUnsafeLib;
 using System.Collections.Generic;
 using MouseUnsafeLib.Finders;
@@ -63,6 +64,10 @@ namespace MoveFindBenchmark
         IMatrix m1;
         IMatrix m2;
 
+        IMatrix src;
+        Point position;
+        Vector vector;
+
         MoveFinderFast f1 = new();
         MoveFinderBoundary f2 = new();
         MoveFinderSimd f3 = new();
@@ -75,13 +80,13 @@ namespace MoveFindBenchmark
         {
             IMatrixRandomizer rnd = new ImageRandomizer();
 
-            IMatrix src = rnd.Randomize(Scenario.Resolution + 2 * Scenario.SearchRange, Scenario.Resolution + 2 * Scenario.SearchRange);
+            src = rnd.Randomize(Scenario.Resolution + 2 * Scenario.SearchRange, Scenario.Resolution + 2 * Scenario.SearchRange);
 
-            Point position = new Point((src.Width - Scenario.Resolution) / 2, (src.Height  - Scenario.Resolution) / 2);
+            position = new Point((src.Width - Scenario.Resolution) / 2, (src.Height  - Scenario.Resolution) / 2);
 
             Random random = new();
 
-            Vector vector = new Vector();
+            vector = new Vector();
             vector.Dx = random.Next(-Scenario.SearchRange, +Scenario.SearchRange);
             vector.Dy = random.Next(-Scenario.SearchRange, +Scenario.SearchRange);
 
@@ -123,6 +128,30 @@ namespace MoveFindBenchmark
         public Vector SimdBountyParallel()
         {
             return f6.Find(m1, m2, Scenario.PatchSize, Scenario.Resolution);
+        }
+
+        [Benchmark]
+        public Vector Pooled()
+        {
+            using var p1 = cutter.Cut(src, position, new Size(Scenario.Resolution), PooledMatrixProvider.Instance);
+            using var p2 = cutter.Cut(src, position + vector, new Size(Scenario.Resolution), PooledMatrixProvider.Instance);
+            return f1.Find(p1, p2, Scenario.PatchSize, Scenario.Resolution);
+        }
+
+        [Benchmark]
+        public Vector PooledDestination()
+        {
+            var d1 = (PooledImageMatrix)PooledMatrixProvider.Instance.Create(Scenario.Resolution, Scenario.Resolution);
+            var d2 = (PooledImageMatrix)PooledMatrixProvider.Instance.Create(Scenario.Resolution, Scenario.Resolution);
+
+            cutter.Cut(src, position, new Size(Scenario.Resolution), d1);
+            cutter.Cut(src, position + vector, new Size(Scenario.Resolution), d2);
+
+            Vector v = f1.Find(d1, d2, Scenario.PatchSize, Scenario.Resolution);
+
+            d1.Dispose();
+            d2.Dispose();
+            return v;
         }
     }
 }
