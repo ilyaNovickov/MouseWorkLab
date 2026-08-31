@@ -10,13 +10,15 @@ namespace MouseLabAvalonia.ViewModels
 {
     public class DockFactory : Factory
     {
-        private readonly PlotViewModel plotViewModel;
+        //private readonly PlotViewModel plotViewModel;
+        private ViewModelFactory factory;
         private IRootDock? _rootDock;
         private IDocumentDock? _documentDock;
 
-        public DockFactory(PlotViewModel plotViewModel)
+        public DockFactory(ViewModelFactory viewModelFactory)
         {
-            this.plotViewModel = plotViewModel;
+            //this.plotViewModel = plotViewModel;
+            factory = viewModelFactory;
         }
 
         public override IRootDock CreateLayout()
@@ -25,12 +27,12 @@ namespace MouseLabAvalonia.ViewModels
             {
                 Id = "PlotDocument",
                 Title = "Параметры",
-                Context = plotViewModel,
-                CanClose = false,
+                Context = factory.PlotViewModel,
+                CanClose = true,
                 CanFloat = true
             };
 
-            var documentDock = new DocumentDock
+            _documentDock = new DocumentDock
             {
                 Id = "Documents",
                 Title = "Documents",
@@ -40,17 +42,14 @@ namespace MouseLabAvalonia.ViewModels
                 VisibleDockables = CreateList<IDockable>(document)
             };
 
-            var rootDock = CreateRootDock();
-            rootDock.Id = "Root";
-            rootDock.IsCollapsable = false;
-            rootDock.ActiveDockable = documentDock;
-            rootDock.DefaultDockable = documentDock;
-            rootDock.VisibleDockables = CreateList<IDockable>(documentDock);
+            _rootDock = CreateRootDock();
+            _rootDock.Id = "Root";
+            _rootDock.IsCollapsable = false;
+            _rootDock.ActiveDockable = _documentDock;
+            _rootDock.DefaultDockable = _documentDock;
+            _rootDock.VisibleDockables = CreateList<IDockable>(_documentDock);
 
-            _rootDock = rootDock;
-            _documentDock = documentDock;
-
-            return rootDock;
+            return _rootDock;
         }
 
         public override void InitLayout(IDockable layout)
@@ -78,6 +77,16 @@ namespace MouseLabAvalonia.ViewModels
                 window.Title = "Dock Avalonia Demo";
             }
             return window;
+        }
+
+        public override void CloseDockable(IDockable dockable)
+        {
+            base.CloseDockable(dockable);
+        }
+
+        public override void CloseWindow(IDockWindow window)
+        {
+            base.CloseWindow(window);
         }
     }
 }

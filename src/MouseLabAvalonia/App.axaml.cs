@@ -43,21 +43,19 @@ namespace MouseLabAvalonia
 
         public override void OnFrameworkInitializationCompleted()
         {
-            CreateServices();
+            //CreateServices();
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                var vmFactory = new ViewModelFactory();
 
-                var mainWindowViewModel = Services.GetRequiredService<MainWindowViewModel>();
+
+                var mainWindowViewModel = //Services.GetRequiredService<MainWindowViewModel>();
+                    new MainWindowViewModel(new DockFactory(vmFactory), vmFactory);
 
                 desktop.MainWindow = new MainWindow
                 {
                     DataContext = mainWindowViewModel
-                };
-
-                desktop.MainWindow.Closing += (_, _) =>
-                {
-                    mainWindowViewModel.CloseLayout();
                 };
             }
 
