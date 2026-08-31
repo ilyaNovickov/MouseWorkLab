@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Diagnostics;
+using Dock.Settings;
 using System;
 
 namespace MouseLabAvalonia

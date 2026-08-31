@@ -3,6 +3,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Dock.Model.Core;
+using Dock.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using MouseLabAvalonia.Core;
 using MouseLabAvalonia.Core.Interfaces;

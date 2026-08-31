@@ -8,12 +8,14 @@ namespace MouseLabAvalonia.Views
     {
         public MainWindow()
         {
+#if DEBUG
             // Prevent the previewer's DataContext from being set when the application is run.
             if (Design.IsDesignMode)
             {
                 // This can be before or after InitializeComponent.
                 Design.SetDataContext(this, MainWindowViewModel.Instance);
             }
+#endif
             InitializeComponent();
         }
 

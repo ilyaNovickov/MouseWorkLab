@@ -14,8 +14,20 @@
         
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="Окна" ItemsSource="">
-
+                <MenuItem Header="Окна" ItemsSource="{Binding MenuItems}">
+                    <!--
+                    <MenuItem.DataTemplates>
+                        <DataTemplate x:DataType="vm:MenuListViewModel">
+                            <MenuItem Header="{Binding Name}" Command="{Binding AddDockableCommand}"/>
+                        </DataTemplate>
+                    </MenuItem.DataTemplates>
+                    -->
+                    <MenuItem.ItemContainerTheme>
+                        <ControlTheme TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="vm:MenuListViewModel">
+                            <Setter Property="Header" Value="{Binding Name}" />
+                            <Setter Property="Command" Value="{Binding AddDockableCommand}" />
+                        </ControlTheme>
+                    </MenuItem.ItemContainerTheme>
                 </MenuItem>
             </Menu>
             <dock:DockControl Layout="{Binding Layout}"/>

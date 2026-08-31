@@ -1,26 +1,36 @@
-﻿using Dock.Model.Controls;
+﻿using CommunityToolkit.Mvvm.Input;
+using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using MouseLabAvalonia.Core.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace MouseLabAvalonia.ViewModels
 {
+    public partial class MenuListViewModel : ViewModelBase
+    {
+        private DockFactory factory;
+        public MenuListViewModel(string name, string vmName, DockFactory factory)
+        {
+            Name = name;
+            ViewModelName = vmName;
+            this.factory = factory;
+        }
+        public string Name { get; }
+
+        private string ViewModelName { get; }
+
+        [RelayCommand]
+        private void AddDockable()
+        {
+            factory.AddDockable(this.ViewModelName);
+        }
+    }
+
     public partial class MainWindowViewModel : ViewModelBase
     {
         private IRootDock? _layout;
         private IFactory dockFactory;
-
-        //public MainWindowViewModel(IMessageDialogService messageDialogService, PlotViewModel plotViewModel)
-        //{
-        //    this.messageBoxService = messageDialogService;
-
-        //    PlotViewModel = plotViewModel;
-
-        //    var factory = new DockFactory(plotViewModel);
-        //    var layout = factory.CreateLayout();
-        //    factory.InitLayout(layout);
-        //    Layout = layout;
-        //}
 
         public MainWindowViewModel(DockFactory dockFactory, ViewModelFactory viewModelFactory)
         {
@@ -31,7 +41,11 @@ namespace MouseLabAvalonia.ViewModels
             var layout = dockFactory.CreateLayout();
             dockFactory.InitLayout(layout);
             Layout = layout;
+
+            MenuItems.Add(new MenuListViewModel("Графики", "PlotViewModelDocument", dockFactory));
         }
+
+        public ObservableCollection<MenuListViewModel> MenuItems { get; } = new();
 
         public PlotViewModel PlotViewModel { get; private set; }
 
@@ -69,7 +83,7 @@ namespace MouseLabAvalonia.ViewModels
                 }
             }
         }
-
+#if DEBUG
         public static MainWindowViewModel Instance 
         {
             get
@@ -79,6 +93,6 @@ namespace MouseLabAvalonia.ViewModels
                 return new MainWindowViewModel(new DockFactory(vmFactory), vmFactory);
             }
         }
-
+#endif
     }
 }
