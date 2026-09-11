@@ -4,6 +4,7 @@ using Dock.Model.Core;
 using MouseLabAvalonia.ViewModels;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using StaticViewLocator;
 
 namespace MouseLabAvalonia
 {
@@ -11,11 +12,28 @@ namespace MouseLabAvalonia
     /// Given a view model, returns the corresponding view if possible.
     /// Dockable content is resolved through its <see cref="IDockable.Context"/>.
     /// </summary>
-    [RequiresUnreferencedCode(
-        "Default implementation of ViewLocator involves reflection which may be trimmed away.",
-        Url = "https://docs.avaloniaui.net/docs/concepts/view-locator")]
-    public class ViewLocator : IDataTemplate
+    [StaticViewLocator(GenerateViewFactoryMethods = true, GenerateRuntimeTypeFallbackMethods = false)]
+    public partial class ViewLocator : IDataTemplate
     {
+
+        public Control? Build(object? data)
+        {
+            if (data is null) return null;
+            var content = data is IDockable d ? (d.Context ?? d) : data;
+            if (TryCreateViewExact(content.GetType(), out var view))
+            {
+                if (!ReferenceEquals(content, data)) view!.DataContext = content;
+                return view;
+            }
+            return new TextBlock { Text = "Not Found: " + content.GetType().FullName };
+        }
+
+        public bool Match(object? data) =>
+            data is ViewModelBase
+            || (data is IDockable d && TryCreateViewExact((d.Context ?? d).GetType(), out _));
+
+        //old impl
+        /*
         public Control? Build(object? data)
         {
             if (data is null)
@@ -52,5 +70,6 @@ namespace MouseLabAvalonia
 
             return type is not null && typeof(Control).IsAssignableFrom(type) ? type : null;
         }
+        */
     }
 }

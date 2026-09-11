@@ -5,7 +5,6 @@ using Mouse.Services;
 using MouseBaseLib;
 using MouseLabAvalonia.Core.Interfaces;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,7 +38,6 @@ namespace MouseLabAvalonia.ViewModels
         public int MinResolution => 0;
 
         [ObservableProperty]
-        [Range(0, 128, ErrorMessage = "Значение должно быть от 0 до 128")]
         private int? resolution = 10;
 
         [ObservableProperty]
@@ -62,12 +60,8 @@ namespace MouseLabAvalonia.ViewModels
             IsOldData = true;
         }
 
-        // Важный момент для работы CommunityToolkit.Mvvm:
-        // Нужно переопределить логику записи, чтобы запускалась валидация
         partial void OnResolutionChanged(int? value)
         {
-            ValidateProperty(value, nameof(Resolution));
-
             if (value < MinResolution || value is null)
                 Resolution = MinResolution;
             else if (value > MaxResolution)
