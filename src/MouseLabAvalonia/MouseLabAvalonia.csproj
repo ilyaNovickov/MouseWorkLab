@@ -6,6 +6,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <PublishAot>True</PublishAot>
+	<IsAotCompatible>true</IsAotCompatible>
+	<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+	<Platforms>AnyCPU;x64</Platforms>
+	<NoWarn>$(NoWarn);IL2104;IL3053</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Avalonia">
     <AvaloniaXamlIlDebuggerLaunch>False</AvaloniaXamlIlDebuggerLaunch>
