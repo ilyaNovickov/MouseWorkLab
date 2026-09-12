@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Mouse.Services
 {
+    /// <summary>
+    /// Класс по определению оптимальных значений
+    /// </summary>
     public static class ParametrOptimization
     {
         private const int ResolutionThreshold = 128;

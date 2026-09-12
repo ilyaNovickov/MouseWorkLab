@@ -5,6 +5,9 @@ using System;
 
 namespace MouseStdLib
 {
+    /// <summary>
+    /// Сервис получения случайной матрицы
+    /// </summary>
     public class ImageRandomizer : IMatrixRandomizer
     {
         public IMatrix Randomize(Size size, int? seed = null)
@@ -26,6 +29,12 @@ namespace MouseStdLib
             random.NextBytes(matrix.RawData.AsSpan(0, width * height));
 
             return matrix;
+        }
+
+        public void Randomize(IMatrix dest, int Width, int Height, int? seed = null)
+        {
+            Random random = seed is not null ? new Random(seed.Value) : new Random();
+            random.NextBytes(dest.RawData.AsSpan<byte>());
         }
     }
 }

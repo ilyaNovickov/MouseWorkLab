@@ -5,7 +5,10 @@ using System.Text;
 
 namespace MouseBaseLib
 {
-    public record struct Point //: ICloneable
+    /// <summary>
+    /// Структура точки
+    /// </summary>
+    public record struct Point
     {
         public static Point Zero => new Point(0, 0);
 
@@ -20,42 +23,64 @@ namespace MouseBaseLib
             this.Y = y;
         }
 
-
+        /// <summary>
+        /// Положение X
+        /// </summary>
         public int X { get; set; }
-
+        /// <summary>
+        /// Положение Y
+        /// </summary>
         public int Y { get; set; }
-
+        /// <summary>
+        /// Перемещение точки на позицию (X, Y) 
+        /// </summary>
+        /// <param name="x">Новая координата X</param>
+        /// <param name="y">Новая координата Y</param>
         public void Move(int x, int y)
         {
             this.X = x;
             this.Y = y;
         }
 
+        /// <summary>
+        /// Смещение точки на Dx и Dy 
+        /// </summary>
+        /// <param name="dx">Смещение по оси X</param>
+        /// <param name="dy">Смещение по оси Y</param>
         public void Shift(int dx, int dy)
         {
             this.X += dx;
             this.Y += dy;
         }
 
+        /// <summary>
+        /// Смещение точки на Dx и Dy 
+        /// </summary>
+        /// <param name="vector">Вектор смещения</param>
         public void Shift(Vector vector)
         {
             this.Shift(vector.Dx, vector.Dy);
         }
 
+        /// <summary>
+        /// Неизменяемый метод смещения точки
+        /// </summary>
+        /// <param name="dx">Смещение по оси X</param>
+        /// <param name="dy">Смещение по оси Y</param>
+        /// <returns>Новая точка</returns>
         public Point ShiftImmutable(int dx, int dy)
         {
             return new Point(X + dx, Y + dy);
         }
-
+        /// <summary>
+        /// Неизменяемый метод смещения точки
+        /// </summary>
+        /// <param name="vector">Вектор смещения</param>
+        /// <returns>Новая точка</returns>
         public Point ShiftImmutable(Vector vector)
         {
             return new Point(X + vector.Dx, Y + vector.Dy);
         }
-
-        //public object Clone()
-        //{
-        //    return new Point(this.X, this.Y);
-        //}
 
         public string ToString(string arg)
         {

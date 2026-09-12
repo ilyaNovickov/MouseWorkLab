@@ -5,6 +5,9 @@ using System.Text;
 
 namespace MouseStdLib
 {
+    /// <summary>
+    /// Сервис поиска перемещения с проверкой выхода за границы
+    /// </summary>
     public class MoveFinderBoundary : StdMoveFinder
     {
         public override Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)

@@ -4,7 +4,10 @@ using System.Text;
 
 namespace MouseBaseLib
 {
-    public struct Size : ICloneable
+    /// <summary>
+    /// Структура размера
+    /// </summary>
+    public record struct Size 
     {
         public Size() : this(0, 0)
         {
@@ -22,6 +25,9 @@ namespace MouseBaseLib
             Height = height;
         }
 
+        /// <summary>
+        /// Ширина
+        /// </summary>
         public int Width
         {
             get;
@@ -34,6 +40,9 @@ namespace MouseBaseLib
             }
         }
 
+        /// <summary>
+        /// Высота
+        /// </summary>
         public int Height
         {
             get;
@@ -46,10 +55,6 @@ namespace MouseBaseLib
             }
         }
 
-        public object Clone()
-        {
-            return new Size(Width, Height);
-        }
 
         public string ToString(string arg)
         {

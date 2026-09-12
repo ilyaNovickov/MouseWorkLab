@@ -26,8 +26,10 @@ namespace MouseStdLib
 
         public int Height => _size.Height;
 
-        // Возвращает арендованный буфер целиком (его длина может превышать width*height).
-        // Для точных данных используйте GetData()/GetRow().
+        /// <summary>
+        /// Возвращает арендованный буфер целиком (его длина может превышать width*height).
+        /// Для точных данных используйте GetData()/GetRow().
+        /// </summary>
         public byte[] RawData
         {
             get
@@ -87,6 +89,11 @@ namespace MouseStdLib
 
             _disposed = true;
             ArrayPool<byte>.Shared.Return(_rented, clearArray: false);
+        }
+
+        ~PooledImageMatrix()
+        {
+            this.Dispose();
         }
 
         private void ThrowIfDisposed()

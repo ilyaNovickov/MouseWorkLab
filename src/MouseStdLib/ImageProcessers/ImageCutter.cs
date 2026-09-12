@@ -5,6 +5,9 @@ using System;
 
 namespace MouseStdLib
 {
+    /// <summary>
+    /// Сервис вырезания области из матриц
+    /// </summary>
     public class ImageCutter : IMatrixCutter
     {
         public IMatrix Cut(IMatrix src, int x, int y, int width, int height, bool fillZero = true)
