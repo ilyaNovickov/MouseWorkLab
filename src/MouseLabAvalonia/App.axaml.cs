@@ -51,9 +51,11 @@ namespace MouseLabAvalonia
             {
                 var vmFactory = new ViewModelFactory();
 
+                var dockFactory = new DockFactory(vmFactory);
+
 
                 var mainWindowViewModel = //Services.GetRequiredService<MainWindowViewModel>();
-                    new MainWindowViewModel(new DockFactory(vmFactory), vmFactory);
+                    new MainWindowViewModel(dockFactory, vmFactory);
 
                 desktop.MainWindow = new MainWindow
                 {

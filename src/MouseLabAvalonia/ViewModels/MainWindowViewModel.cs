@@ -7,38 +7,23 @@ using System.Collections.ObjectModel;
 
 namespace MouseLabAvalonia.ViewModels
 {
-    public partial class MenuListViewModel : ViewModelBase
-    {
-        private DockFactory factory;
-        public MenuListViewModel(string name, string vmName, DockFactory factory)
-        {
-            Name = name;
-            ViewModelName = vmName;
-            this.factory = factory;
-        }
-        public string Name { get; }
-
-        private string ViewModelName { get; }
-
-        [RelayCommand]
-        private void AddDockable()
-        {
-            factory.AddDockable(this.ViewModelName);
-        }
-    }
 
     public partial class MainWindowViewModel : ViewModelBase
     {
         private IRootDock? _layout;
-        private IFactory dockFactory;
+        private readonly IDockFactory dockFactory;
 
-        public MainWindowViewModel(DockFactory dockFactory, ViewModelFactory viewModelFactory)
+        public MainWindowViewModel(IDockFactory dockFactory, IViewModelFactory viewModelFactory)
         {
             this.dockFactory = dockFactory;
 
             this.PlotViewModel = viewModelFactory.PlotViewModel;
 
             var layout = dockFactory.CreateLayout();
+
+            if (layout is null) 
+                throw new System.Exception("Не найден макет");
+
             dockFactory.InitLayout(layout);
             Layout = layout;
 

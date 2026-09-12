@@ -12,16 +12,6 @@ using System.Threading.Tasks;
 
 namespace MouseLabAvalonia.ViewModels
 {
-    public class ReportChangedEventArgs : EventArgs
-    {
-        public ReportChangedEventArgs(OptimizationReport? report)
-        {
-            Report = report;
-        }
-
-        public OptimizationReport? Report { get; private set; }
-    }
-
     public partial class PlotViewModel : ViewModelBase
     {
         private OptimizationReport? Report
@@ -30,7 +20,6 @@ namespace MouseLabAvalonia.ViewModels
             set
             {
                 field = value;
-                ReportChanged?.Invoke(this, new ReportChangedEventArgs(field));
                 IsOldData = false;
             }
         }
@@ -48,7 +37,7 @@ namespace MouseLabAvalonia.ViewModels
 
         public PlotViewModel(IMessageDialogService messageService, IFileDialogService fileDialogService)
         {
-            messageDialogService = messageService;
+            this.messageDialogService = messageService;
             this.fileDialogService = fileDialogService;
         }
 
@@ -67,8 +56,6 @@ namespace MouseLabAvalonia.ViewModels
             else if (value > MaxResolution)
                 Resolution = MaxResolution;
         }
-
-        public event EventHandler<ReportChangedEventArgs>? ReportChanged;
 
         public OptimizationReport? GetOptimizationReport()
         {

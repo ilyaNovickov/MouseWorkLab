@@ -8,27 +8,27 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using MouseLabAvalonia.Core.Interfaces;
 
 namespace MouseLabAvalonia.ViewModels
 {
-    public class DockFactory : Factory
+    public class DockFactory : Factory, IDockFactory
     {
         //private readonly PlotViewModel plotViewModel;
-        private ViewModelFactory factory;
+        private readonly ViewModelFactory factory;
         private IRootDock? _rootDock;
         private IDocumentDock? _documentDock;
 
         private IToolDock? _toolDock;
 
-        private List<IDockable> deletedItems = new();
+        private HashSet<IDockable> deletedItems = new();
         private IDocument? plotDocument;
 
         public DockFactory(ViewModelFactory viewModelFactory)
         {
-            //this.plotViewModel = plotViewModel;
             factory = viewModelFactory;
 
-            this.HideDocumentsOnClose = true;
+            //this.HideDocumentsOnClose = true;
         }
 
         public override IRootDock CreateLayout()
@@ -132,8 +132,11 @@ namespace MouseLabAvalonia.ViewModels
             deletedItems.Remove(item);
         }
 
-        public override void CloseDockable(IDockable dockable)
+        public override void CloseDockable(IDockable? dockable)
         {
+            if (dockable is null)
+                return;
+
             bool? res = this.DockableLocator?.ContainsKey(dockable.Id);
             if (res.HasValue && res.Value && (dockable is IDocument or ITool))
             {

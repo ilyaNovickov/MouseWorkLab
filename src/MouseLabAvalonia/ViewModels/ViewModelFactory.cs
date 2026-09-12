@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MouseLabAvalonia.ViewModels
 {
-    public class ViewModelFactory
+    public class ViewModelFactory : IViewModelFactory
     {
         public ViewModelFactory()
         {
