@@ -7,8 +7,16 @@ using System.Linq;
 
 namespace MouseLabAvalonia.Core
 {
+    /// <summary>
+    /// Локатор, позволяющий получить активное или главное окно приложения
+    /// </summary>
     public class WindowLocator : IWindowLocator
     {
+        /// <summary>
+        /// Возвращает активное окно приложения, либо главное окно, если активного нет
+        /// </summary>
+        /// <returns>Активное или главное окно приложения</returns>
+        /// <exception cref="InvalidOperationException">Приложение не запущено в desktop lifetime или не найдено ни одно окно</exception>
         public Window GetRequiredWindow()
         {
             if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)

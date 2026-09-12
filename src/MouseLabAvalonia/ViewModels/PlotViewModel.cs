@@ -12,8 +12,15 @@ using System.Threading.Tasks;
 
 namespace MouseLabAvalonia.ViewModels
 {
+    
+    /// <summary>
+    /// ViewModel для работы с графиками
+    /// </summary>
     public partial class PlotViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Отчёт с информацией для графиков
+        /// </summary>
         private OptimizationReport? Report
         {
             get;
@@ -23,12 +30,26 @@ namespace MouseLabAvalonia.ViewModels
                 IsOldData = false;
             }
         }
+
+        /// <summary>
+        /// Максимальное значение разрешения
+        /// </summary>
         public int MaxResolution => 128;
+
+        /// <summary>
+        /// Минимальное значение разрешения
+        /// </summary>
         public int MinResolution => 0;
 
+        /// <summary>
+        /// Свойство разрешения
+        /// </summary>
         [ObservableProperty]
         private int? resolution = 10;
 
+        /// <summary>
+        /// Свойство того, что данные отчёт Report устарели
+        /// </summary>
         [ObservableProperty]
         private bool isOldData = false;
 
@@ -51,12 +72,17 @@ namespace MouseLabAvalonia.ViewModels
 
         partial void OnResolutionChanged(int? value)
         {
+            //Не даёт выйти за границы значений
             if (value < MinResolution || value is null)
                 Resolution = MinResolution;
             else if (value > MaxResolution)
                 Resolution = MaxResolution;
         }
 
+        /// <summary>
+        /// Получение отчёта для графиков
+        /// </summary>
+        /// <returns>Отчёт с информацией для графиков</returns>
         public OptimizationReport? GetOptimizationReport()
         {
             if (this.Resolution == 0 || !this.Resolution.HasValue)
@@ -70,6 +96,10 @@ namespace MouseLabAvalonia.ViewModels
 
         }
 
+        /// <summary>
+        /// Создание отчёта в виде строки в CSV виде 
+        /// </summary>
+        /// <returns>Строка с информацией из отчёта в CSV виде</returns>
         public async Task<string?> CreateReportString()
         {
             if (Report is null)
@@ -102,6 +132,10 @@ namespace MouseLabAvalonia.ViewModels
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Сохранение отчёта в CSV виде
+        /// </summary>
+        /// <returns></returns>
         public async Task SaveReportAsync()
         {
             string? str = await CreateReportString();

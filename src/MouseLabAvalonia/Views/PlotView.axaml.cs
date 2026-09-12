@@ -15,6 +15,8 @@ public partial class PlotView : UserControl
     {
         InitializeComponent();
 
+        //Инициализация графиков
+
         difficultPlot.Plot.Title($"Кол-во операций при разных параметрах");
         difficultPlot.Plot.XLabel("Разрешение шаблона p");
         difficultPlot.Plot.YLabel("Выч. сложность (N)");
@@ -29,6 +31,11 @@ public partial class PlotView : UserControl
         paramPlot.Refresh();
     }
 
+    /// <summary>
+    /// Обработка события нажатия на кнопку получения данных
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void GetDataButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not PlotViewModel plotVM)
@@ -65,6 +72,11 @@ public partial class PlotView : UserControl
         paramPlot.Refresh();
     }
 
+    /// <summary>
+    /// Обработка события нажатия на кнопку копирования отчёта
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void CopyButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not PlotViewModel plotVM)
@@ -85,6 +97,11 @@ public partial class PlotView : UserControl
         await clipboard.SetTextAsync(str);
     }
 
+    /// <summary>
+    /// Обработка события сохранения отчёта в виде CSV файла
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void SaveAsButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not PlotViewModel plotVM)

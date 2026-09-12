@@ -34,12 +34,18 @@ namespace MouseLabAvalonia.ViewModels
 
         public PlotViewModel PlotViewModel { get; private set; }
 
+        /// <summary>
+        /// Макет Dock элементов
+        /// </summary>
         public IRootDock? Layout
         {
             get => _layout;
             set => SetProperty(ref _layout, value);
         }
 
+        /// <summary>
+        /// Сброс макета до значений по умолчанию
+        /// </summary>
         public void ResetLayout()
         {
             if (Layout is not null)
@@ -58,6 +64,9 @@ namespace MouseLabAvalonia.ViewModels
             }
         }
 
+        /// <summary>
+        /// Закрытие Dock макета
+        /// </summary>
         public void CloseLayout()
         {
             if (Layout is IDock dock)
@@ -69,6 +78,9 @@ namespace MouseLabAvalonia.ViewModels
             }
         }
 #if DEBUG
+        /// <summary>
+        /// Экземпляр ViewModel для отладки
+        /// </summary>
         public static MainWindowViewModel Instance 
         {
             get

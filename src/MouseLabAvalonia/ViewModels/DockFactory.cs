@@ -12,9 +12,11 @@ using MouseLabAvalonia.Core.Interfaces;
 
 namespace MouseLabAvalonia.ViewModels
 {
+    /// <summary>
+    /// Фабрика Dockable элементов
+    /// </summary>
     public class DockFactory : Factory, IDockFactory
     {
-        //private readonly PlotViewModel plotViewModel;
         private readonly ViewModelFactory factory;
         private IRootDock? _rootDock;
         private IDocumentDock? _documentDock;
@@ -33,6 +35,7 @@ namespace MouseLabAvalonia.ViewModels
 
         public override IRootDock CreateLayout()
         {
+            //Документ с графикаи
             plotDocument = new Document
             {
                 Id = "PlotViewModelDocument",
@@ -42,6 +45,7 @@ namespace MouseLabAvalonia.ViewModels
                 CanFloat = false//должен быть всегда `false`, иначе страшный баг
             };
 
+            //Док для документов
             _documentDock = new DocumentDock
             {
                 Id = "Documents",
@@ -52,6 +56,7 @@ namespace MouseLabAvalonia.ViewModels
                 VisibleDockables = CreateList<IDockable>(plotDocument)
             };
 
+            //Корневой док
             _rootDock = CreateRootDock();
             _rootDock.Id = "Root";
             _rootDock.IsCollapsable = false;
@@ -84,6 +89,7 @@ namespace MouseLabAvalonia.ViewModels
             base.InitLayout(layout);
         }
 
+
         public override IDockWindow? CreateWindowFrom(IDockable dockable)
         {
             var window = base.CreateWindowFrom(dockable);
@@ -95,8 +101,13 @@ namespace MouseLabAvalonia.ViewModels
             return window;
         }
 
+        /// <summary>
+        /// Добавление Dockable элемента по имени
+        /// </summary>
+        /// <param name="vmName"></param>
         public void AddDockable(string vmName)
         {
+            //Проверка, есть ли такой элементв в фабрике
             if (this.DockableLocator is null)
                 return;
 
@@ -107,12 +118,14 @@ namespace MouseLabAvalonia.ViewModels
 
             IDockable? item = this.DockableLocator[vmName].Invoke();
 
+            //Добавляются только удалённые элементы (по списку deleteItems)
             if (item is null)
                 return;
 
             if (!deletedItems.Contains(item))
                 return;
 
+            //Элемент добавляется в док документов или инструментов
             IDock? dock = null;
 
             if (item is IDocument)
@@ -136,7 +149,7 @@ namespace MouseLabAvalonia.ViewModels
         {
             if (dockable is null)
                 return;
-
+            //Добавление удалённого элемента в список
             bool? res = this.DockableLocator?.ContainsKey(dockable.Id);
             if (res.HasValue && res.Value && (dockable is IDocument or ITool))
             {
