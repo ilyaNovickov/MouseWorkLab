@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using MouseLabAvalonia.ViewModels;
 using System;
+using System.Threading.Tasks;
 
 namespace MouseLabAvalonia.Views
 {
@@ -19,13 +20,49 @@ namespace MouseLabAvalonia.Views
             InitializeComponent();
         }
 
+        private bool closing = false;
+        private bool confirmPending = false;
+
         protected override void OnDataContextChanged(EventArgs e)
         {
             if (this.DataContext is MainWindowViewModel vm)
             {
-                this.Closing += (_, _) => vm.CloseLayout();
+                this.Closing += (_, args) => Closing_MainWindow(args, vm);
+                
             }
             base.OnDataContextChanged(e);
+        }
+
+        private void Closing_MainWindow(WindowClosingEventArgs e, MainWindowViewModel vm)
+        {
+            if (confirmPending)
+            {
+                e.Cancel = true;
+                return;
+            }
+            if (closing)
+            {
+                vm.CloseLayout();
+                return;
+            }
+            confirmPending = true;
+            e.Cancel = true;
+
+            _ = ConfirmCancel(vm);
+        }
+
+        private async Task ConfirmCancel(MainWindowViewModel vm)
+        {
+            bool confirm = await vm.ConfirmCloseAsync();
+
+            confirmPending = false;
+
+            if (confirm)
+            {
+                closing = true;
+                Close();
+            }
+           
         }
     }
 }

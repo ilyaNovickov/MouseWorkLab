@@ -3,7 +3,9 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using MouseLabAvalonia.Core.Interfaces;
+using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace MouseLabAvalonia.ViewModels
 {
@@ -13,8 +15,11 @@ namespace MouseLabAvalonia.ViewModels
         private IRootDock? _layout;
         private readonly IDockFactory dockFactory;
 
+        private readonly IViewModelFactory vmFactory;
+
         public MainWindowViewModel(IDockFactory dockFactory, IViewModelFactory viewModelFactory)
         {
+            this.vmFactory = viewModelFactory;
             this.dockFactory = dockFactory;
 
             this.PlotViewModel = viewModelFactory.PlotViewModel;
@@ -76,6 +81,15 @@ namespace MouseLabAvalonia.ViewModels
                     dock.Close.Execute(null);
                 }
             }
+        }
+
+        public async Task<bool> ConfirmCloseAsync()
+        {
+            var task = await vmFactory.MessageDialogService.ShowOkAbortAsync("Вы уверены, что хотиче закрыть окно?" + Environment.NewLine +
+                "Закрытие главного окна приведёт к закрытию главного", "Внимание", 
+                MsBox.Avalonia.Enums.Icon.Question);
+
+            return task;
         }
 #if DEBUG
         /// <summary>
