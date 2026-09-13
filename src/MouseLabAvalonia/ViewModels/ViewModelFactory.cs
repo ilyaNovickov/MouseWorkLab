@@ -17,6 +17,8 @@ namespace MouseLabAvalonia.ViewModels
             this.MessageDialogService = new MessegeDialogService(WindowsLocator);
             this.FileDialogService = new FileDialogService(WindowsLocator);
             this.PlotViewModel = new PlotViewModel(MessageDialogService, FileDialogService);
+
+            this.WorkSurfaceViewModel = new WorkSurfaceViewModel();
         }
 
         /// <summary>
@@ -38,5 +40,7 @@ namespace MouseLabAvalonia.ViewModels
         /// ViewModel для работы с графиками
         /// </summary>
         public PlotViewModel PlotViewModel { get; private set; }
+
+        public WorkSurfaceViewModel WorkSurfaceViewModel { get; private set; }
     }
 }

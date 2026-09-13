@@ -53,5 +53,8 @@
     <Compile Update="Views\PlotView.axaml.cs">
       <DependentUpon>PlotView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\WorkSurfaceView.axaml.cs">
+      <DependentUpon>WorkSurfaceView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

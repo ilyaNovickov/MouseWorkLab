@@ -26,6 +26,8 @@ namespace MouseLabAvalonia.ViewModels
         private HashSet<IDockable> deletedItems = new();
         private IDocument? plotDocument;
 
+        private IDocument? workSurfaceDocument;
+
         public DockFactory(ViewModelFactory viewModelFactory)
         {
             factory = viewModelFactory;
@@ -45,6 +47,15 @@ namespace MouseLabAvalonia.ViewModels
                 CanFloat = false//должен быть всегда `false`, иначе страшный баг
             };
 
+            workSurfaceDocument = new Document
+            {
+                Id = "WorkSurfaceViewModelDocument",
+                Title = "Рабочая поверхность",
+                Context = factory.WorkSurfaceViewModel,
+                CanClose = true,
+                CanFloat = true
+            };
+
             //Док для документов
             _documentDock = new DocumentDock
             {
@@ -52,8 +63,11 @@ namespace MouseLabAvalonia.ViewModels
                 Title = "Documents",
                 IsCollapsable = false,
                 CanCreateDocument = false,
-                ActiveDockable = plotDocument,
-                VisibleDockables = CreateList<IDockable>(plotDocument)
+                ActiveDockable = workSurfaceDocument,
+                VisibleDockables = CreateList<IDockable>
+                (
+                    plotDocument, workSurfaceDocument
+                )
             };
 
             //Корневой док
@@ -73,7 +87,8 @@ namespace MouseLabAvalonia.ViewModels
             {
                 ["Root"] = () => _rootDock,
                 ["Documents"] = () => _documentDock,
-                ["PlotViewModelDocument"] = () => plotDocument
+                ["PlotViewModelDocument"] = () => plotDocument,
+                ["WorkSurfaceViewModelDocument"] = () => workSurfaceDocument
             };
 
             HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>

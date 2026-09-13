@@ -33,6 +33,8 @@ namespace MouseLabAvalonia.ViewModels
             Layout = layout;
 
             MenuItems.Add(new MenuListViewModel("Графики", "PlotViewModelDocument", dockFactory));
+            MenuItems.Add(new MenuListViewModel("Рабочая поверхность", "WorkSurfaceViewModelDocument", dockFactory));
+            
         }
 
         public ObservableCollection<MenuListViewModel> MenuItems { get; } = new();
