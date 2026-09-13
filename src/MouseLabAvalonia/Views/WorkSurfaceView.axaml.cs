@@ -10,4 +10,10 @@ public partial class WorkSurfaceView : UserControl
     {
         InitializeComponent();
     }
+
+    
+    private void foo()
+    {
+
+    }
 }

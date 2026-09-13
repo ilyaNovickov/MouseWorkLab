@@ -3,6 +3,52 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="MouseLabAvalonia.Views.WorkSurfaceView">
-  Welcome to Avalonia!
+             xmlns:paz="using:Avalonia.Controls.PanAndZoom"
+             xmlns:vm="using:MouseLabAvalonia.ViewModels"
+             x:Class="MouseLabAvalonia.Views.WorkSurfaceView"
+             x:DataType="vm:WorkSurfaceViewModel">
+    <Design.DataContext>
+        <vm:WorkSurfaceViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <Style Selector="TextBlock.center">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Styles>
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="t"/>
+        </Menu>
+        <Border DockPanel.Dock="Bottom" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1" Classes="center" Text="Масштаб "/>
+                <TextBlock Grid.Column="2" Classes="center" Text="{Binding #zoomBorder.ZoomX, StringFormat='({0:0.00}'}"/>
+                <Button Grid.Column="3" Content="Сброс" Command="{Binding #zoomBorder.FitCommand}"/>
+            </Grid>
+        </Border>
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto">
+            <paz:ZoomBorder Name="zoomBorder"
+                            DoubleClickZoomMode="ZoomToFit"
+                            MinZoomX="0.2"
+                            MinZoomY="0.2"
+                            Background="DimGray"
+                            BoundsMode="KeepContentVisible"
+                            MinimumVisibleContentPercentage="0.01"
+                            AutoCalculateMaxZoom="True"
+                            MaxZoomPixelSize="200">
+                <Canvas Width="100" Height="100" Background="red">
+                    <Rectangle Width="2" Height="2" Fill="Green" Canvas.Top="0"
+                               Canvas.Left="0"
+                               Name="rect"/>
+                </Canvas>
+            </paz:ZoomBorder>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>

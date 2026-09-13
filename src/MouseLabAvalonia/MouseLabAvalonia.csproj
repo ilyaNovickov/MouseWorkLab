@@ -35,6 +35,7 @@
     <PackageReference Include="Dock.Model.Mvvm" Version="12.1.0.6" />
     <PackageReference Include="MessageBox.Avalonia" Version="12.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageReference Include="PanAndZoom" Version="12.1.1" />
     <PackageReference Include="ScottPlot.Avalonia" Version="5.1.59" />
     <PackageReference Include="StaticViewLocator" Version="0.7.0">
       <PrivateAssets>all</PrivateAssets>
