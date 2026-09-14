@@ -13,6 +13,7 @@
     <UserControl.Styles>
         <Style Selector="TextBlock.center">
             <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="1,0,1,0"/>
         </Style>
     </UserControl.Styles>
     <DockPanel LastChildFill="True">
@@ -27,8 +28,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="1" Classes="center" Text="Масштаб "/>
-                <TextBlock Grid.Column="2" Classes="center" Text="{Binding #zoomBorder.ZoomX, StringFormat='({0:0.00}'}"/>
+                <TextBlock Grid.Column="1" Classes="center" Text="Масштаб"/>
+                <TextBlock Grid.Column="2" Classes="center" Text="{Binding #zoomBorder.ZoomX, StringFormat={}{0:0.00}}"/>
                 <Button Grid.Column="3" Content="Сброс" Command="{Binding #zoomBorder.FitCommand}"/>
             </Grid>
         </Border>
@@ -43,11 +44,20 @@
                             MinimumVisibleContentPercentage="0.01"
                             AutoCalculateMaxZoom="True"
                             MaxZoomPixelSize="200">
-                <Canvas Width="100" Height="100" Background="red">
-                    <Rectangle Width="2" Height="2" Fill="Green" Canvas.Top="0"
-                               Canvas.Left="0"
-                               Name="rect"/>
+                <Grid Width="{Binding #image.Width}"
+                      Height="{Binding #image.Height}">
+                    <Image Name="image"
+                           Width="10"
+                           Height="10"
+                           Stretch="None"
+                           RenderOptions.BitmapInterpolationMode="None"
+                           RenderOptions.EdgeMode="Unspecified"
+                           Source="/Assets/avalonia-logo.ico"/>
+                    <Canvas Width="{Binding #image.Width}" 
+                            Height="{Binding #image.Height}" 
+                            Background="">
                 </Canvas>
+                </Grid>
             </paz:ZoomBorder>
         </ScrollViewer>
     </DockPanel>
