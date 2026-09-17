@@ -18,7 +18,24 @@
     </UserControl.Styles>
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="t"/>
+            <TextBlock Text="Сид"/>
+            <TextBox Name="seedTextBox"
+                     Margin="0,5,0,5" 
+                     Width="120"
+                     MaxWidth="120"
+                     MinWidth="120"
+                     MaxLength="9"
+                     TextInputOptions.ContentType="Number"
+                     Text="{Binding Seed}">
+                <TextBox.InnerRightContent>
+                    <Button Content="✕"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="4" 
+                            Command="{Binding #seedTextBox.Clear}"/>
+                </TextBox.InnerRightContent>
+            </TextBox>
+            <Button Content="Создать" Command="{Binding RandomizeSurfaceCommand}"/>
         </Menu>
         <Border DockPanel.Dock="Bottom" Margin="10,10,10,10">
             <Grid>
@@ -47,8 +64,8 @@
                 <Grid Width="{Binding #image.Width}"
                       Height="{Binding #image.Height}">
                     <Image Name="image"
-                           Width="10"
-                           Height="10"
+                           Width="{Binding SurfaceWidth, Mode=OneWay}"
+                           Height="{Binding SurfaceHeight, Mode=OneWay}"
                            Stretch="None"
                            RenderOptions.BitmapInterpolationMode="None"
                            RenderOptions.EdgeMode="Unspecified"

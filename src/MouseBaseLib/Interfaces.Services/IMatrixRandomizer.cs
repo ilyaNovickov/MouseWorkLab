@@ -38,6 +38,6 @@ namespace MouseBaseLib.Interfaces.Services
         /// <summary>
         /// Заполнение случайными значениями указанную матрицу
         /// </summary>
-        void Randomize(IMatrix dest, int Width, int Height, int? seed = null);
+        void Randomize(IMatrix dest, int? seed = null);
     }
 }

@@ -31,7 +31,7 @@ namespace MouseStdLib
             return matrix;
         }
 
-        public void Randomize(IMatrix dest, int Width, int Height, int? seed = null)
+        public void Randomize(IMatrix dest, int? seed = null)
         {
             Random random = seed is not null ? new Random(seed.Value) : new Random();
             random.NextBytes(dest.RawData.AsSpan<byte>());
