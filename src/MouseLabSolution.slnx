@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="MouseLab.Core/MouseLab.Core.csproj" Id="ea0256f7-9e5c-444a-9f39-c2e0507beab2" />
+  <Project Path="MouseLab.Services/MouseLab.Services.csproj" Id="f1d8c538-476e-4daf-b989-4fbabb34092a" />
   <Project Path="MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj" />
 </Solution>
