@@ -4,15 +4,27 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Компилируемые привязки по умолчанию: пути в Binding проверяются на этапе
+         сборки, а не в рантайме. Обязательно для NativeAOT - рефлексивные привязки
+         не выживают после тримминга. -->
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+
+    <!-- AOT-компиляция всех сборок Avalonia (а не только корневой). -->
 	<AotAssemblies>True</AotAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Каталоги переводов намеренно исключены: ProTranslate.SourceGenerator
+         компилирует их значения прямо в сборку, поэтому в рантайме файлы не нужны. -->
     <AvaloniaResource Include="Assets\**" Exclude="Assets\Translations\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- SourceGenerator читает эти файлы на этапе сборки и генерирует по ним
+         ProTranslateKeys, ProTranslateStrings и ProTranslateGeneratedTranslationProvider.
+         Добавление языка = добавление файла Strings.<код-культуры>.json,
+         пересборка проекта не требует правок в C#. -->
     <AdditionalFiles Include="Assets\Translations\Strings.*.json" />
   </ItemGroup>
 
@@ -28,12 +40,21 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+
+    <!-- Ядро ProTranslate: культуры, переводы, fallback, форматирование, кэш. -->
     <PackageReference Include="ProTranslate.Avalonia" Version="0.1.0" />
+    <!-- Регистрация сервисов в IServiceCollection. -->
     <PackageReference Include="ProTranslate.MicrosoftExtensions" Version="0.1.0" />
+
+    <!-- Генератор ключей, типизированных строк и провайдера из JSON-каталогов.
+         Подключается как анализатор, а не как обычная ссылка. -->
     <PackageReference Include="ProTranslate.SourceGenerator" Version="0.1.0">
       <OutputItemType>Analyzer</OutputItemType>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </PackageReference>
+
+    <!-- Проверки на этапе сборки: PTA001 неизвестный ключ, PTA002 несовпадение
+         числа плейсхолдеров, PTA003 пробел в переводе для какой-то культуры. -->
     <PackageReference Include="ProTranslate.Analyzers" Version="0.1.0">
       <PrivateAssets>all</PrivateAssets>
       <OutputItemType>Analyzer</OutputItemType>

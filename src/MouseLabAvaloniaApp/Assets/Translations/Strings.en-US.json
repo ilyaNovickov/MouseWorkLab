@@ -4,6 +4,7 @@
     "Greeting": "Welcome to MouseLab!",
     "GreetingWithName": "Hello, {0}. Your localized workspace is ready."
   },
+
   "Settings": {
     "Language": "Language",
     "LanguageDescription": "Choose the display language for the application.",
@@ -11,6 +12,7 @@
     "UserName": "User name",
     "CurrentCulture": "Current culture: {0}"
   },
+
   "Common": {
     "Save": "Save",
     "Cancel": "Cancel"

@@ -5,20 +5,21 @@ using MouseLabAvaloniaApp.ViewModels;
 namespace MouseLabAvaloniaApp;
 
 /// <summary>
-/// Maps a view model to the view that should render it inside a
-/// <see cref="Avalonia.Controls.ContentControl"/>.
+/// Сопоставляет модель представления с представлением, которое должно её отрисовать
+/// внутри <c>ContentControl</c>.
 /// </summary>
 /// <remarks>
 /// <para>
-/// The mapping is an explicit type switch rather than the reflection-based
-/// "ViewModel" -> "View" name lookup from the Avalonia template. Reflection over a
-/// computed type name cannot be statically analysed, so the trimmer removes it and a
-/// NativeAOT publish silently renders "Not Found" instead of the view.
+/// Соответствие задано явным switch по типу, а не рефлексивным поиском по имени
+/// из шаблона Avalonia ("ViewModel" -&gt; "View"). Рефлексия по вычисленному имени
+/// типа не анализируется статически, поэтому триммер её вырезает, и в NativeAOT-сборке
+/// вместо представления молча отрисуется "Not Found".
 /// </para>
 /// <para>
-/// <c>MainWindowViewModel</c> is deliberately not mapped: the main window is assigned
-/// directly in <c>App.OnFrameworkInitializationCompleted</c>, so mapping it here would
-/// only risk nesting the window inside itself. Add one case per secondary view.
+/// <c>MainWindowViewModel</c> намеренно не сопоставлен: главное окно создаётся
+/// напрямую в <c>App.OnFrameworkInitializationCompleted</c>, и сопоставление здесь
+/// лишь рисковало бы вложить окно в само себя. Добавляйте по одному случаю на
+/// каждое новое представление.
 /// </para>
 /// </remarks>
 public class ViewLocator : IDataTemplate
