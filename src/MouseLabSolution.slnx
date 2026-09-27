@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MouseLab.Core/MouseLab.Core.csproj" Id="ea0256f7-9e5c-444a-9f39-c2e0507beab2" />
+  <Project Path="MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj" />
+</Solution>
