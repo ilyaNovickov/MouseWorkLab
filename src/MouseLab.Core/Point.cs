@@ -28,6 +28,11 @@
             return new Point(a.X - b.X, a.Y - b.Y);
         }
 
+        public static Point operator -(Point a)
+        {
+            return new Point(-a.X, -a.Y);
+        }
+
         public static Point operator *(Point a, int x)
         {
             return new Point(a.X * x, a.Y * x);
