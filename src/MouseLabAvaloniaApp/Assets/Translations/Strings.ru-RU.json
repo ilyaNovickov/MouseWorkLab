@@ -1,3 +1,18 @@
 {
-  "AvaloniaGreeting": "Привет мир!"
+  "App": {
+    "Title": "MouseLab",
+    "Greeting": "Добро пожаловать в MouseLab!",
+    "GreetingWithName": "Привет, {0}. Ваше локализованное рабочее пространство готово."
+  },
+  "Settings": {
+    "Language": "Язык",
+    "LanguageDescription": "Выберите язык интерфейса приложения.",
+    "Theme": "Тема",
+    "UserName": "Имя пользователя",
+    "CurrentCulture": "Текущая культура: {0}"
+  },
+  "Common": {
+    "Save": "Сохранить",
+    "Cancel": "Отмена"
+  }
 }

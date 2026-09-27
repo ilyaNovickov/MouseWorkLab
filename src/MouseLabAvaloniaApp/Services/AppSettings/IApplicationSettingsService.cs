@@ -1,16 +1,18 @@
 ﻿using MouseLabAvaloniaApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MouseLabAvaloniaApp.Services.AppSettings
+namespace MouseLabAvaloniaApp.Services.AppSettings;
+
+public delegate void ThemeChangedEventHandler(object sender, ThemeChangedEventArgs e);
+
+public delegate void CultureChangedEventHandler(object sender, CultureChangedEventArgs e);
+
+public interface IApplicationSettingsService
 {
-    public delegate void ThemeChangedEventHandler(object sender, ThemeChangedEventArgs e);
+    Themes CurrentAppTheme { get; set; }
 
-    public interface IApplicationSettingsService
-    {
-        Themes CurrentAppTheme { get; set; }
+    string CurrentCultureName { get; set; }
 
-        event ThemeChangedEventHandler? ThemeChanged;
-    }
+    event ThemeChangedEventHandler? ThemeChanged;
+
+    event CultureChangedEventHandler? CultureChanged;
 }

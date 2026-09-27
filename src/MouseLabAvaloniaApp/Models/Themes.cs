@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text.Json.Serialization;
 
-namespace MouseLabAvaloniaApp.Models
+namespace MouseLabAvaloniaApp.Models;
+
+[JsonConverter(typeof(JsonStringEnumConverter<Themes>))]
+public enum Themes
 {
-    public enum Themes
-    {
-        Light,
-        Dark,
+    Light,
+    Dark,
 
-        Default
-    }
+    Default
 }

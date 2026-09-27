@@ -5,10 +5,15 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+	<AotAssemblies>True</AotAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\Translations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="Assets\Translations\Strings.*.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,5 +30,14 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     <PackageReference Include="ProTranslate.Avalonia" Version="0.1.0" />
     <PackageReference Include="ProTranslate.MicrosoftExtensions" Version="0.1.0" />
+    <PackageReference Include="ProTranslate.SourceGenerator" Version="0.1.0">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </PackageReference>
+    <PackageReference Include="ProTranslate.Analyzers" Version="0.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </PackageReference>
   </ItemGroup>
 </Project>

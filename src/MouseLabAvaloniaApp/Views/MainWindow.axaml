@@ -1,13 +1,16 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:MouseLabAvaloniaApp.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:models="using:MouseLabAvaloniaApp.Models"
+        xmlns:d="http://schemas.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="MouseLabAvaloniaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="MouseLabAvaloniaApp">
+        Title="{Binding Strings.AppTitle}"
+        Translation.Culture="{Binding Strings.Culture}"
+        Translation.AutoFlowDirection="True">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -15,6 +18,43 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <StackPanel Margin="24" Spacing="14">
+
+        <!-- Generated ProTranslateStrings property: the default path for compiled bindings. -->
+        <TextBlock Text="{Binding Strings.AppGreeting}" FontSize="20" />
+
+        <!-- Formatted text composed in the view model from the App.GreetingWithName key. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding Strings.SettingsUserName}" VerticalAlignment="Center" MinWidth="110" />
+            <TextBox Text="{Binding UserName}" Width="180" />
+        </StackPanel>
+        <TextBlock Text="{Binding GreetingText}" />
+
+        <!-- Do NOT use {Translate ...} / {Format ...} here: those markup extensions bind through a
+             reflection-based indexer path that Avalonia never invalidates, so the text is frozen at
+             startup and will not follow culture changes. They are also not AOT-safe. Bind the
+             generated ProTranslateStrings properties instead. -->
+        <TextBlock Text="{Binding Strings.SettingsLanguageDescription}"
+                   Opacity="0.7"
+                   TextWrapping="Wrap" />
+
+        <StackPanel Spacing="10">
+            <TextBlock Text="{Binding Strings.SettingsLanguage}" FontWeight="SemiBold" />
+
+            <ComboBox ItemsSource="{Binding AvailableCultures}"
+                      SelectedItem="{Binding SelectedCulture}"
+                      HorizontalAlignment="Left"
+                      MinWidth="280">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="models:CultureOption">
+                        <TextBlock Text="{Binding DisplayName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Text="{Binding CurrentCultureText}" Opacity="0.7" />
+        </StackPanel>
+
+    </StackPanel>
 
 </Window>

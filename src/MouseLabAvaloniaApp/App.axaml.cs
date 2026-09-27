@@ -1,69 +1,106 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
-using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
+using MouseLabAvaloniaApp.Models;
 using MouseLabAvaloniaApp.Services.AppSettings;
 using MouseLabAvaloniaApp.ViewModels;
 using MouseLabAvaloniaApp.Views;
 using ProTranslate;
+using ProTranslate.Avalonia;
+using ProTranslate.Generated;
+using System;
 using System.Globalization;
-using System.Linq;
 
 namespace MouseLabAvaloniaApp;
 
 public partial class App : Application
 {
+    private ServiceProvider? _serviceProvider;
+    private ThemeChangedEventHandler? _themeChangedHandler;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
     }
 
-    private ServiceCollection GetServicesCollection()
+    private static ServiceCollection GetServicesCollection(AppSettingsSnapshot snapshot, CultureInfo initialCulture)
     {
-        ServiceCollection services = new ServiceCollection();
+        ServiceCollection services = new();
 
-        services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>()
-            .AddProTranslate(
-                culture: CultureInfo.GetCultureInfo("en-US"),
-                cultureOptions: new CultureServiceOptions
-                {
-                    ApplyToCurrentThread = false,
-                    ApplyToDefaultThread = false
-                },
-                cacheOptions: new TranslationCacheOptions
-                {
-                    MaximumEntries = 2048
-                })
-            .AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<IApplicationSettingsService>(new ApplicationSettingsService(snapshot));
+
+        services.AddProTranslate(
+            provider: new ProTranslateGeneratedTranslationProvider("MouseLabCatalog"),
+            culture: initialCulture,
+            cultureOptions: new CultureServiceOptions
+            {
+                ApplyToCurrentThread = true,
+                ApplyToDefaultThread = true
+            },
+            translationOptions: new TranslationFallbackOptions
+            {
+                DefaultCulture = CultureInfo.GetCultureInfo(AppSettingsStore.DefaultCultureName)
+            },
+            cacheOptions: new TranslationCacheOptions
+            {
+                MaximumEntries = 2048
+            });
+
+        services.AddProTranslateAvalonia();
+        services.AddSingleton<MainWindowViewModel>();
 
         return services;
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        ServiceCollection services = GetServicesCollection();
+        AppSettingsSnapshot snapshot = AppSettingsStore.Load();
+        CultureInfo initialCulture = AppSettingsStore.ResolveCulture(snapshot.Culture);
 
-        using ServiceProvider serviceProvider = services.BuildServiceProvider();
+        _serviceProvider = GetServicesCollection(snapshot, initialCulture).BuildServiceProvider();
+        _serviceProvider.UseProTranslateAvalonia();
 
-        serviceProvider.GetService<IApplicationSettingsService>()?.ThemeChanged +=
-            (sender, e) => this.RequestedThemeVariant = e.NewTheme switch
-            {
-                Models.Themes.Light => ThemeVariant.Light,
-                Models.Themes.Dark => ThemeVariant.Dark,
-                Models.Themes.Default => ThemeVariant.Default,
-                _ => ThemeVariant.Light
-            };
+        IApplicationSettingsService settings = _serviceProvider.GetRequiredService<IApplicationSettingsService>();
+        _themeChangedHandler = (_, e) => ApplyTheme(e.NewTheme);
+        settings.ThemeChanged += _themeChangedHandler;
+        ApplyTheme(settings.CurrentAppTheme);
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = serviceProvider.GetService<MainWindowViewModel>(),
+                DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>(),
             };
+
+            desktop.Exit += (_, _) => Shutdown();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void ApplyTheme(Themes theme) =>
+        RequestedThemeVariant = theme switch
+        {
+            Themes.Light => ThemeVariant.Light,
+            Themes.Dark => ThemeVariant.Dark,
+            _ => ThemeVariant.Default
+        };
+
+    private void Shutdown()
+    {
+        if (_serviceProvider is null)
+            return;
+
+        if (_themeChangedHandler is not null &&
+            _serviceProvider.GetService<IApplicationSettingsService>() is { } settings)
+        {
+            settings.ThemeChanged -= _themeChangedHandler;
+        }
+
+        _themeChangedHandler = null;
+        _serviceProvider.Dispose();
+        _serviceProvider = null;
     }
 }
