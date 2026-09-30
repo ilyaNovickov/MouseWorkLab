@@ -11,12 +11,20 @@ namespace MouseLabAvalonia.Core
 {
     public class ModelingEnv : IModelingEnv
     {
+        //delete
         public ModelingEnv() 
         {
             this.ImageRandomizer = new ImageRandomizer();
+            this.Settings = new ModelingSettingsService();
 
             this.SurfaceWidth = 100;
             this.SurfaceHeight = 100;
+        }
+
+        public ModelingEnv(IMatrixRandomizer randomizer, IModelingSettings settings)
+        {
+            this.ImageRandomizer = randomizer;
+            this.Settings = settings;
         }
 
         private bool SurfaceNeedsToUpdate { get; set; }
@@ -57,6 +65,12 @@ namespace MouseLabAvalonia.Core
             private set;
         }
 
+        public IModelingSettings Settings
+        {
+            get;
+            private set;
+        }
+
         public void RandomizeSurface(int? seed = null)
         {
             this.Seed = seed;
@@ -77,10 +91,9 @@ namespace MouseLabAvalonia.Core
         }
         public IMatrixRandomizer ImageRandomizer { get; private set; }
 
-        public event EventHandler SurfaceChanged;
+        public event EventHandler? SurfaceChanged;
     }
 }
 /*
- Исправить вылед при генерации шума (продумать проброс его в View)
  Подумать над настройками
  */

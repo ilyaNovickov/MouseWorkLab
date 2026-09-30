@@ -54,6 +54,12 @@
     <Compile Update="Views\PlotView.axaml.cs">
       <DependentUpon>PlotView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\ModelingSettingsView.axaml.cs">
+      <DependentUpon>ModelingSettingsView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SettingsWindow.axaml.cs">
+      <DependentUpon>SettingsWindow.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\WorkSurfaceView.axaml.cs">
       <DependentUpon>WorkSurfaceView.axaml</DependentUpon>
     </Compile>

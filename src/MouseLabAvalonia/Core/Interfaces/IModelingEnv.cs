@@ -7,6 +7,8 @@ namespace MouseLabAvalonia.Core.Interfaces
 {
     public interface IModelingEnv
     {
-        public IMatrixRandomizer ImageRandomizer { get; }
+        IModelingSettings Settings { get; }
+
+        IMatrixRandomizer ImageRandomizer { get; }
     }
 }

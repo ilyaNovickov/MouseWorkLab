@@ -29,6 +29,9 @@
                         </ControlTheme>
                     </MenuItem.ItemContainerTheme>
                 </MenuItem>
+                <MenuItem Header="Настройки">
+                    <MenuItem Header="Настройки моделирования"/>
+                </MenuItem>
             </Menu>
             <dock:DockControl Layout="{Binding Layout}"/>
         </DockPanel>

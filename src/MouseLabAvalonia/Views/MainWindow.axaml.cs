@@ -19,19 +19,21 @@ namespace MouseLabAvalonia.Views
 #endif
             InitializeComponent();
         }
-
-        private bool closing = false;
-        private bool confirmPending = false;
-
         protected override void OnDataContextChanged(EventArgs e)
         {
             if (this.DataContext is MainWindowViewModel vm)
             {
                 this.Closing += (_, args) => Closing_MainWindow(args, vm);
-                
+
             }
             base.OnDataContextChanged(e);
         }
+
+        #region Cancaling
+        private bool closing = false;
+        private bool confirmPending = false;
+
+        
 
         private void Closing_MainWindow(WindowClosingEventArgs e, MainWindowViewModel vm)
         {
@@ -63,6 +65,12 @@ namespace MouseLabAvalonia.Views
                 Close();
             }
            
+        }
+        #endregion
+
+        private void foo()
+        {
+
         }
     }
 }
