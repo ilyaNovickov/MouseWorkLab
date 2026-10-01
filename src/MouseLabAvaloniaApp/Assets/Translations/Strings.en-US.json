@@ -6,7 +6,11 @@
   },
 
   "Settings": {
+    "WindowName": "Application settings",
     "Language": "Language",
+    "DarkTheme": "Dark",
+    "LightTheme": "Light",
+    "DefaultTheme": "Default",
     "LanguageDescription": "Choose the display language for the application.",
     "Theme": "Theme",
     "UserName": "User name",

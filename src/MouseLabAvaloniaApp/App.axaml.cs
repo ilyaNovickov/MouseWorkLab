@@ -5,7 +5,9 @@ using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using MouseLabAvaloniaApp.Models;
 using MouseLabAvaloniaApp.Services.AppSettings;
+using MouseLabAvaloniaApp.Services.WindowsManager;
 using MouseLabAvaloniaApp.ViewModels;
+using MouseLabAvaloniaApp.ViewModels.Settings;
 using MouseLabAvaloniaApp.Views;
 using ProTranslate;
 using ProTranslate.Avalonia;
@@ -31,7 +33,12 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    private static ServiceCollection GetServicesCollection(AppSettingsSnapshot snapshot, CultureInfo initialCulture)
+#if DEBUG
+    public
+#else
+    private 
+#endif
+        static ServiceCollection GetServicesCollection(AppSettingsSnapshot snapshot, CultureInfo initialCulture)
     {
         ServiceCollection services = new();
 
@@ -78,8 +85,18 @@ public partial class App : Application
         // разметочные расширения и статический ProTranslate.Avalonia.TranslationService.
         services.AddProTranslateAvalonia();
 
+        services.AddSingleton<IWindowsManagerService, WindowsManagerService>();
+
+        services.AddTransient<AppSettingsViewModel>();
+        services.AddTransient<SettingsWindowViewModel>();
+
         // MainWindowViewModel - синглтон, т.к. он же DataContext главного окна.
         services.AddSingleton<MainWindowViewModel>();
+
+        #region Views
+        services.AddTransient<MainWindow>();
+        services.AddTransient<SettingsWindow>();
+        #endregion
 
         return services;
     }
@@ -106,11 +123,10 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>(),
-            };
+            MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>();
 
+            desktop.MainWindow = mainWindow;
             desktop.Exit += (_, _) => Shutdown();
         }
 
@@ -144,3 +160,25 @@ public partial class App : Application
         _serviceProvider = null;
     }
 }
+
+#if DEBUG
+public static class DesignVM
+{
+    private readonly static ServiceProvider _serviceProvider;
+    static DesignVM()
+    {
+        // Читаем настройки до сборки контейнера: культура обязана быть известна заранее.
+        AppSettingsSnapshot snapshot = AppSettingsStore.Load();
+        CultureInfo initialCulture = AppSettingsStore.ResolveCulture(snapshot.Culture);
+
+        _serviceProvider = App.GetServicesCollection(snapshot, initialCulture).BuildServiceProvider();
+
+        // Обязательный шаг после BuildServiceProvider: передаёт адаптеру те же сервисы
+        // культуры и переводов, которыми пользуется приложение. Без него статический
+        // binding source остался бы с пустым InMemory-провайдером по умолчанию.
+        _serviceProvider.UseProTranslateAvalonia();
+    }
+
+    public static ServiceProvider Provider => _serviceProvider;
+}
+#endif

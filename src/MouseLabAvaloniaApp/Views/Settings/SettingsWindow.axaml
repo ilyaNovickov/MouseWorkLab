@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="using:MouseLabAvaloniaApp.ViewModels.Settings"
+        xmlns:v="using:MouseLabAvaloniaApp.Views"
+        x:Class="MouseLabAvaloniaApp.Views.SettingsWindow"
+        x:DataType="vm:SettingsWindowViewModel"
+        Title="{Binding Strings.SettingsWindowName}"
+        Translation.Culture="{Binding Strings.Culture}"
+        Translation.AutoFlowDirection="True"
+        Name="settingWindow">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="BorderColor">RoyalBlue</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="BorderColor">RoyalBlue</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.Styles>
+        <Style Selector="Border.decoBoard">
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Margin" Value="2,2,2,2"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+        </Style>
+    </Window.Styles>
+    <DockPanel LastChildFill="True">
+        <Border DockPanel.Dock="Bottom">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" Content="f" Command="{Binding AppSettings.SaveSettingsCommand}"/>
+                <Button Grid.Column="2" Content="z" />
+            </Grid>
+        </Border>
+        <TabControl TabStripPlacement="Left">
+            <TabItem Header="foo">
+                <Border Classes="decoBoard">
+                    <ScrollViewer>
+                        <v:AppSettingsView DataContext="{Binding AppSettings}"/>
+                    </ScrollViewer>
+                </Border>
+            </TabItem>
+            <TabItem Header="foo2">
+                <Label Content="z"/>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

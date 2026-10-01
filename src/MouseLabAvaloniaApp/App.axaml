@@ -5,6 +5,21 @@
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
+             <Application.Styles>
+                 <Style Selector="TextBlock.settings">
+                     <Setter Property="TextAlignment" Value="Right"/>
+                     <Setter Property="VerticalAlignment" Value="Center"/>
+                     <Setter Property="Margin" Value="3,3,3,3"/>
+                 </Style>
+                 <Style Selector="ComboBox.settings">
+                     <Setter Property="MinWidth" Value="280"/>
+                     <Setter Property="HorizontalAlignment" Value="Left"/>
+                     <Setter Property="VerticalAlignment" Value="Center"/>
+                     <Setter Property="Margin" Value="3,3,3,3"/>
+                 </Style>
+             </Application.Styles>
+
+
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>

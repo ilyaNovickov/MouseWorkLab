@@ -6,7 +6,11 @@
   },
 
   "Settings": {
+    "WindowName": "Настройки приложения",
     "Language": "Язык",
+    "DarkTheme": "Тёмная",
+    "LightTheme": "Светлая",
+    "DefaultTheme": "По умолчанию",
     "LanguageDescription": "Выберите язык интерфейса приложения.",
     "Theme": "Тема",
     "UserName": "Имя пользователя",

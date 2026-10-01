@@ -31,52 +31,9 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <StackPanel Margin="24" Spacing="14">
-
-        <!-- Способ 1: свойство сгенерированного ProTranslateStrings.
-             SourceGenerator создаёт его по ключу App.Greeting из каталога.
-             Обновляется само при смене культуры, компилируемая привязка, AOT-безопасно. -->
-        <TextBlock Text="{Binding Strings.AppGreeting}" FontSize="20" />
-
-        <!-- Способ 2: текст, собираемый в модели представления из перевода и данных.
-             Ключ App.GreetingWithName содержит плейсхолдер {0}. -->
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="{Binding Strings.SettingsUserName}" VerticalAlignment="Center" MinWidth="110" />
-            <TextBox Text="{Binding UserName}" Width="180" />
-        </StackPanel>
-        <TextBlock Text="{Binding GreetingText}" />
-
-        <!-- НЕ используйте здесь {Translate ...} и {Format ...}.
-             Эти разметочные расширения ProTranslate создают привязку по пути-индексеру
-             "[key]", который Avalonia не перевычисляет: адаптер шлёт PropertyChanged
-             с именем "Item[]" (соглашение WPF), а Avalonia его игнорирует. В итоге текст
-             замораживается на стартовом языке до перезапуска приложения. Кроме того,
-             индексатор — это рефлексия, а значит несовместимо с NativeAOT.
-             Для изменяемого текста используйте {Binding Strings.Key}. -->
-        <TextBlock Text="{Binding Strings.SettingsLanguageDescription}"
-                   Opacity="0.7"
-                   TextWrapping="Wrap" />
-
-        <StackPanel Spacing="10">
-            <TextBlock Text="{Binding Strings.SettingsLanguage}" FontWeight="SemiBold" />
-
-            <!-- SelectedItem связан двусторонне: выбор пользователя попадает в
-                 MainWindowViewModel.SelectedCulture, который сохраняет настройку
-                 и вызывает ICultureService.SetCulture. -->
-            <ComboBox ItemsSource="{Binding AvailableCultures}"
-                      SelectedItem="{Binding SelectedCulture}"
-                      HorizontalAlignment="Left"
-                      MinWidth="280">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate DataType="models:CultureOption">
-                        <TextBlock Text="{Binding DisplayName}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
-            <TextBlock Text="{Binding CurrentCultureText}" Opacity="0.7" />
-        </StackPanel>
-
-    </StackPanel>
-
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <Button Content="foo" Command="{Binding OpenSettingsWindowCommand}"/>
+        </Menu>
+    </DockPanel>
 </Window>

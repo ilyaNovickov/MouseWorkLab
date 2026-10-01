@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:models="using:MouseLabAvaloniaApp.Models"
+             xmlns:vm="using:MouseLabAvaloniaApp.ViewModels.Settings"
+             x:Class="MouseLabAvaloniaApp.Views.AppSettingsView"
+             x:DataType="vm:AppSettingsViewModel"
+             Translation.Culture="{Binding Strings.Culture}"
+             Translation.AutoFlowDirection="True">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.25*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Classes="settings" Grid.Column="0" Grid.Row="0" Text="{Binding Strings.SettingsLanguage}"/>
+        <ComboBox Classes="settings" 
+                  Grid.Column="1" Grid.Row="0"
+                  ItemsSource="{Binding AvailableCultures}"
+                  SelectedItem="{Binding SelectedCulture}"/>
+        <TextBlock Classes="settings" Grid.Column="0" Grid.Row="1" Text="{Binding Strings.SettingsTheme}"/>
+        <ComboBox Classes="settings"
+                  Grid.Column="1" Grid.Row="2"
+                  ItemsSource="{Binding AvailableThemes}"
+                  SelectedItem="{Binding SelectedTheme}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="models:ThemeOption">
+                    <TextBlock Text="{Binding DisplayName.Value}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </Grid>
+</UserControl>

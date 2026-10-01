@@ -61,4 +61,13 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\Settings\SettingsWindow.axaml.cs">
+      <DependentUpon>SettingsWindow.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Settings\AppSettingsView.axaml.cs">
+      <DependentUpon>AppSettingsView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
