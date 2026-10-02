@@ -5,21 +5,16 @@ using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using MouseLabAvaloniaApp.Models;
 using MouseLabAvaloniaApp.Services.AppSettings;
-using MouseLabAvaloniaApp.Services.WindowsManager;
 using MouseLabAvaloniaApp.ViewModels;
-using MouseLabAvaloniaApp.ViewModels.Settings;
 using MouseLabAvaloniaApp.Views;
-using ProTranslate;
-using ProTranslate.Avalonia;
-using ProTranslate.Generated;
-using System;
-using System.Globalization;
 
 namespace MouseLabAvaloniaApp;
 
 public partial class App : Application
 {
-    AppServices? _serviceManager;
+    // Контейнер в поле, а не в локальной переменной: см. AppServices.
+    // Освобождается в Shutdown() по desktop.Exit.
+    private AppServices? _appServices;
 
     // Обработчик храним в поле, чтобы можно было отписаться от него при выходе.
     private ThemeChangedEventHandler? _themeChangedHandler;
@@ -31,10 +26,12 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Читаем настройки до сборки контейнера: культура обязана быть известна заранее.
-        _serviceManager = AppServices.CreateDefault();
-        
-        IApplicationSettingsService settings = _serviceManager.Provider.GetRequiredService<IApplicationSettingsService>();
+        // CreateDefault() читает settings.json и передаёт культуру в AddProTranslate,
+        // поэтому настройки обязаны быть прочитаны ДО сборки контейнера - этим и
+        // занимается AppServices, а не App.
+        _appServices = AppServices.CreateDefault();
+
+        IApplicationSettingsService settings = _appServices.Provider.GetRequiredService<IApplicationSettingsService>();
 
         // Тема применяется и сразу при старте, и на каждое изменение настроек.
         _themeChangedHandler = (_, e) => ApplyTheme(e.NewTheme);
@@ -43,8 +40,8 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            MainWindow mainWindow = _serviceManager.Provider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = _serviceManager.Provider.GetRequiredService<MainWindowViewModel>();
+            MainWindow mainWindow = _appServices.Provider.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = _appServices.Provider.GetRequiredService<MainWindowViewModel>();
 
             desktop.MainWindow = mainWindow;
             desktop.Exit += (_, _) => Shutdown();
@@ -64,19 +61,19 @@ public partial class App : Application
 
     private void Shutdown()
     {
-        if (_serviceManager is null)
+        if (_appServices is null)
             return;
 
         // Отписываемся от события перед Dispose, иначе обработчик остался бы висеть
         // на освобождаемом объекте.
         if (_themeChangedHandler is not null &&
-            _serviceManager.Provider.GetService<IApplicationSettingsService>() is { } settings)
+            _appServices.Provider.GetService<IApplicationSettingsService>() is { } settings)
         {
             settings.ThemeChanged -= _themeChangedHandler;
         }
 
         _themeChangedHandler = null;
-        _serviceManager.Dispose();
-        _serviceManager = null;
+        _appServices.Dispose();
+        _appServices = null;
     }
 }

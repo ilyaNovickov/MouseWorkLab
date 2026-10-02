@@ -25,6 +25,7 @@
 | `Services/AppSettings/AppSettingsStore.cs` | чтение/запись `%LOCALAPPDATA%\MouseLab\settings.json` |
 | `Services/AppSettings/ThemeChangedEventArgs.cs` | аргументы события темы |
 | `Services/AppSettings/CultureChangedEventArgs.cs` | аргументы события языка |
+| `AppServices.cs` | точка сборки графа объектов, чтение настроек, контейнер |
 
 ### Модели и представления
 
@@ -45,44 +46,89 @@
 
 ## Порядок запуска
 
-Всё происходит в `App.OnFrameworkInitializationCompleted`. Порядок важен:
+Регистрация сервисов вынесена в `AppServices`; `App` занимается только
+оркестрацией. Порядок важен:
 
 ```
-1. AppSettingsStore.Load()                      // прочитать settings.json
-2. AppSettingsStore.ResolveCulture(...)         // культура из настроек или en-US
-3. new ServiceCollection() / AddProTranslate / AddProTranslateAvalonia
-4. BuildServiceProvider()
-5. UseProTranslateAvalonia()                    // подключить адаптер
-6. применить тему из настроек
-7. new MainWindow { DataContext = ... }
-8. desktop.Exit += Shutdown                     // освободить контейнер при выходе
+App.OnFrameworkInitializationCompleted
+│
+├─ 1. AppServices.CreateDefault()               // AppServices.cs:130
+│        ├─ AppSettingsStore.Load()             // прочитать settings.json
+│        ├─ ResolveCulture(...)                 // культура из настроек или en-US
+│        ├─ AddSingleton<IApplicationSettingsService>(new ...(snapshot))
+│        ├─ AddProTranslate(culture: initialCulture)
+│        ├─ AddProTranslateAvalonia()
+│        ├─ AddTransient/AddSingleton для моделей и представлений
+│        ├─ BuildServiceProvider()               // AppServices.cs:42
+│        └─ provider.UseProTranslateAvalonia()  // AppServices.cs:46 — сразу после сборки
+│
+├─ 2. settings.ThemeChanged += ApplyTheme       // App.axaml.cs:37
+├─ 3. ApplyTheme(settings.CurrentAppTheme)      // применить тему из настроек
+├─ 4. new MainWindow { DataContext = ... }
+└─ 5. desktop.Exit += Shutdown                  // освободить контейнер при выходе
 ```
 
-Шаг 5 обязателен и часто забывается. `UseProTranslateAvalonia` передаёт
+Шаг `UseProTranslateAvalonia` обязателен и часто забывается. Он передаёт
 адаптеру те же `ITranslationService` и `ICultureService`, что использует
 приложение. Без него статический binding source адаптера остался бы
-настроенным на пустой провайдер по умолчанию.
+настроенным на пустой провайдер по умолчанию. Он находится **в том же методе**,
+что и `BuildServiceProvider`, чтобы порядок «сначала собрать, потом подключить
+адаптер» нельзя было нарушить извне.
 
 ### Почему контейнер в поле
 
 ```csharp
-private ServiceProvider? _serviceProvider;
+// AppServices.cs:28
+private readonly ServiceProvider _serviceProvider;
 ```
 
 Если написать `using ServiceProvider sp = ...`, контейнер будет уничтожен
 в момент выхода из метода, и все синглтоны (включая `MainWindowViewModel`,
 который живёт дольше) окажутся освобождёнными. Контейнер живёт до `desktop.Exit`,
-где вызывается `Shutdown()`: сначала отписка от события темы, потом `Dispose`.
+где вызывается `App.Shutdown()`: сначала отписка от события темы, потом
+`AppServices.Dispose()`.
+
+У `AppServices` **нет финализатора** — см. [dispose.md](dispose.md#у-appservices-нет-финализатора--и-это-не-упущение).
 
 ### Почему культура известна до сборки контейнера
 
 `AddProTranslate` принимает культуру аргументом, а читать настройки нужно
-раньше, чем появятся сервисы. Поэтому `IApplicationSettingsService`
-регистрируется **готовым экземпляром**:
+раньше, чем появятся сервисы. Поэтому `AppSettingsStore.Load()` и
+`ResolveCulture` выполняются в `AppServices.CreateDefault()` — **до** сборки
+контейнера — и готовый снимок передаётся в регистрацию:
 
 ```csharp
 services.AddSingleton<IApplicationSettingsService>(new ApplicationSettingsService(snapshot));
 ```
+
+### Контейнер дизайнера
+
+`AppServices.Instance` (только `#if DEBUG`) — отдельный контейнер, кэшируемый в
+статическом поле. Нужен вьюхам, чтобы превью в IDE могло создать модель
+представления с внедрёнными зависимостями:
+
+```csharp
+#if DEBUG
+        if (Design.IsDesignMode)
+            Design.SetDataContext(this, AppServices.Instance.Provider.GetRequiredService<MainWindowViewModel>());
+#endif
+```
+
+Три правила, из-за которых это работает:
+
+* **`Design.SetDataContext` — единственный способ.** Не ставьте модель
+  представления в `<Design.DataContext>` внутри XAML: такая модель требует
+  параметров конструктора и не создаётся. В XAML-варианте превью падало бы, а
+  код-behind с `SetDataContext` при этом молча игнорировался бы.
+* **`Instance` обязан кэшироваться.** Без кэша каждое обращение создавало бы
+  новый контейнер, перечитывало `settings.json` и переустанавливало статический
+  binding source ProTranslate.
+* **Контейнер дизайнера не должен быть рабочим.** У него собственный
+  `IApplicationSettingsService`, на который `App` не подписан, поэтому смена темы
+  в превью не доедет до `App.ApplyTheme`. Общий контейнер означал бы, что
+  превью влияет на живое приложение.
+
+Освобождать контейнер дизайнера не нужно — он живёт только в процессе превью.
 
 ## Поток смены языка и темы
 

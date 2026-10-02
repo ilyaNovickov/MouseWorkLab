@@ -117,19 +117,46 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
   `ShowDialog` path requires moving `openedWindows.Add`/`Show()` *after* the
   `await` — see the comment in the method.
 
-## Startup wiring (`App.axaml.cs`) — order is load-bearing
+## Startup wiring — order is load-bearing
 
-- The `ServiceProvider` is a **field**, disposed in `desktop.Exit`. Using
-  `using ServiceProvider` disposes every singleton (including the main window's
-  `DataContext`) the moment `OnFrameworkInitializationCompleted` returns. This
-  bug shipped once; don't reintroduce it.
-- `UseProTranslateAvalonia()` **must** be called after `BuildServiceProvider()`
-  and before any view is constructed. Skipping it leaves the adapter pointing at
-  an empty default provider.
-- `IApplicationSettingsService` is registered as a pre-built instance because the
-  culture must be known before DI exists.
+- DI registration lives in **`AppServices`**, not in `App`. `App` only
+  orchestrates: create `AppServices.CreateDefault()`, apply theme, build the main
+  window, wire `desktop.Exit`. Don't move registrations back into `App`.
+- `AppSettingsStore.Load()` + `ResolveCulture` happen **inside
+  `AppServices.CreateDefault()`**, before the container is built. The culture
+  must be known before DI exists, so `IApplicationSettingsService` is registered
+  from the already-read snapshot.
+- `UseProTranslateAvalonia()` lives in the same private method as
+  `BuildServiceProvider()` so the "build first, then attach the adapter" order
+  can't be broken from outside. Skipping it leaves the adapter pointing at an
+  empty default provider.
+- The `ServiceProvider` is a **field** of `AppServices`, disposed by
+  `App.Shutdown()` on `desktop.Exit`. Using `using ServiceProvider` disposes every
+  singleton (including the main window's `DataContext`) the moment
+  `OnFrameworkInitializationCompleted` returns. This bug shipped once; don't
+  reintroduce it.
+- **`AppServices` has no finalizer, on purpose.** `App` owns it and disposes it
+  deterministically. A finalizer would run `ServiceProvider.Dispose()` on the
+  finalizer thread at an arbitrary moment, and an exception there kills the
+  process without a usable stack.
 - `App.axaml.cs` does **not** call `AvaloniaXamlLoader` for views; only
   `App.Initialize()` loads `App.axaml`.
+
+## Designer support (`AppServices.Instance`)
+
+- `#if DEBUG` only. Views resolve their design-time VM in code-behind with
+  `Design.SetDataContext(this, AppServices.Instance.Provider.GetRequiredService<...>())`.
+- **Never** put a view model in `<Design.DataContext>` in XAML. It needs ctor
+  dependencies, so it cannot be instantiated, and the XAML form wins over
+  `Design.SetDataContext`, making the code-behind path dead. This broke
+  `MainWindow` before.
+- `Instance` **must** stay cached in a static field. Without the cache every
+  access built a new container, re-read `settings.json`, and re-set ProTranslate's
+  process-wide binding source.
+- The designer container is deliberately **not** the runtime container: it has
+  its own `IApplicationSettingsService`, which `App` is not subscribed to, so
+  theme switching in the preview never reaches `App.ApplyTheme`. Don't share it.
+- Do not dispose it — it dies with the previewer process.
 
 ## AOT constraints
 
