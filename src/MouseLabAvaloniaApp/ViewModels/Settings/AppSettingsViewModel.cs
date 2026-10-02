@@ -154,7 +154,16 @@ namespace MouseLabAvaloniaApp.ViewModels.Settings
         protected override void Dispose(bool disposing)
         {
             if (disposing)
+            {
                 _cultures.CultureChanged -= OnCultureChanged;
+
+                // Наблюдаемые строки в названиях тем созданы этим классом, значит
+                // и освобождать их должен он: ProTranslateStrings.Dispose() их не
+                // трогает, и без этого они остались бы подписаны на переводы до
+                // самого выхода из приложения.
+                foreach (ThemeOption option in AvailableThemes)
+                    option.Dispose();
+            }
 
             base.Dispose(disposing);
         }

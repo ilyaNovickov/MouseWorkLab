@@ -90,6 +90,32 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
    valid translation, not a miss.
 7. Every key must exist in **all** catalog files; a gap yields `PTA003` at build
    time and falls back to English at runtime.
+8. **A translated `ComboBox` item needs an `ItemTemplate`.** Without one Avalonia
+   renders the item via `ToString()`, which is a one-time string snapshot, so
+   labels freeze at the startup language until the window is recreated. Bind
+   `Text="{Binding DisplayName.Value}"` against the `IObservableLocalizedString`
+   from `Strings.Observe_*()`. Related trap: `nameof(SelectedTheme.DisplayName)`
+   evaluates to plain `"DisplayName"` and raises `PropertyChanged` on the *view
+   model*, not on the option — it can never refresh a list item.
+9. **`ProTranslateStrings.Dispose()` does not dispose what `Observe_*()` handed
+   out.** It only unsubscribes itself from `CultureChanged`. Whoever created the
+   observable strings owns them; `ThemeOption` is `IDisposable` for that reason.
+
+## Settings / theme flow
+
+- Language and theme are applied **by `SaveSettingsCommand`**, not by the
+  `Selected*` setters. The setters only `SetProperty`. To switch instantly,
+  uncomment the two lines in `AppSettingsViewModel.SelectedCulture`.
+- Theme reaches the UI via `IApplicationSettingsService.ThemeChanged` →
+  `App.ApplyTheme` → `RequestedThemeVariant`. Nothing else applies it.
+- `WindowsManagerService.ShowSettingsAsync` checks the open-window list **before**
+  resolving anything, and disposes the view model in `window.Closed`. Keep both:
+  the VM subscribes to a singleton's `CultureChanged`, so a missed unsubscribe
+  pins it for the rest of the session. `ViewModelBase.Dispose` is `_disposed`
+  guarded, so the DI container disposing the same transients again is safe.
+- `ShowSettingsAsync` is deliberately **not** `async`. Re-enabling the modal
+  `ShowDialog` path requires moving `openedWindows.Add`/`Show()` *after* the
+  `await` — see the comment in the method.
 
 ## Startup wiring (`App.axaml.cs`) — order is load-bearing
 

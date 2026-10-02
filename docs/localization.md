@@ -85,7 +85,7 @@ dotnet build src/MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj -t:Rebuild `
   -p:EmitCompilerGeneratedFiles=true -p:CompilerGeneratedFilesOutputPath=obj\gen
 ```
 
-## Три способа вывести перевод
+## Четыре способа вывести перевод
 
 ### 1. Свойство `Strings` — основной способ
 
@@ -136,6 +136,47 @@ public class MainWindowViewModel : ViewModelBase
 систему привязок. Недостаток: ключ не проверяется компилятором, опечатку
 поймает только `PTA001` по строковому литералу (а он строковые литералы
 не анализирует — так что фактически никак). Использовать точечно.
+
+### 4. Переводимые пункты в `ComboBox`
+
+Пункт списка — это объект, а не строка. Чтобы подпись пункта переводилась
+живым языком, нужен `ItemTemplate`:
+
+```xml
+<ComboBox ItemsSource="{Binding AvailableThemes}"
+          SelectedItem="{Binding SelectedTheme}">
+    <ComboBox.ItemTemplate>
+        <DataTemplate DataType="models:ThemeOption">
+            <TextBlock Text="{Binding DisplayName.Value}" />
+        </DataTemplate>
+    </ComboBox.ItemTemplate>
+</ComboBox>
+```
+
+`DisplayName` — это `IObservableLocalizedString` из
+`Strings.Observe_SettingsDarkTheme()`. Он сам подписан на смену культуры и
+поднимает `PropertyChanged`, поэтому привязка к `DisplayName.Value`
+перевычисляется сама.
+
+**Без `ItemTemplate` подписи замерзают.** Avalonia рисует пункт через
+`ContentPresenter`, а тот для обычного объекта вызывает `ToString()` и
+подставляет результат в `TextBlock.Text`. Это снимок строки на момент
+создания контейнера пункта: смена языка его уже не обновляет, и текст
+меняется только при пересоздании окна. Именно так выглядел баг
+«подписи тем не переводятся, пока не переоткроешь окно настроек».
+
+### `nameof` не переподнимает свойство вложенного объекта
+
+```csharp
+// НЕ ДЕЛАЕТ НИЧЕГО
+OnPropertyChanged(nameof(SelectedTheme.DisplayName));
+```
+
+`nameof` отбрасывает квалификатор, поэтому здесь поднимется
+`PropertyChanged("DisplayName")` у `AppSettingsViewModel` — а свойства с
+таким именем у него нет. Событие уходит в никуда, и `ThemeOption` о нём
+не узнаёт. Для пунктов списка единственный рабочий путь — привязка к
+`IObservableLocalizedString`, то есть `ItemTemplate` выше.
 
 ## Чего делать нельзя: `{Translate ...}` и `{Format ...}`
 
@@ -281,6 +322,22 @@ _cultures.SetCulture(value.Culture);               // применить
 ```
 
 `SetCulture` сам поднимает `CultureChanged`, на который подписаны
-`ProTranslateStrings` (обновляет строки) и `MainWindowViewModel`
+`ProTranslateStrings` (обновляет строки) и `AppSettingsViewModel`
 (переподнимает вычисляемые свойства). Поэтому вручную «обновлять» переводы
 не нужно — достаточно правильно переподнять свои собственные свойства.
+
+Ручной вызов `Strings.Refresh()` в обработчике не нужен: `ProTranslateStrings`
+подписан на `CultureChanged` сам и вызывает `Refresh()` из своего
+`OnCultureChanged`.
+
+### Когда происходит переключение
+
+Сейчас — **по кнопке Save**, а не сразу при выборе пункта. Свойства
+`SelectedCulture` и `SelectedTheme` только запоминают выбор
+(`AppSettingsViewModel`), а применяют его `SyncSelectedCultureToSettings()`
+и `SyncSelectedThemeToSettings()` из `SaveSettingsCommand`.
+
+Это осознанный выбор: язык и тема меняются вместе, одним действием.
+Чтобы вернуть мгновенное переключение, достаточно раскомментировать две
+строки в сеттерах `AppSettingsViewModel` — остальной механизм (события,
+`AppSettingsStore.Save`, обновление подписей) уже готов.

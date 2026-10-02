@@ -13,9 +13,11 @@
 |---|---|
 | Добавить новую строку перевода | [localization.md](localization.md#как-добавить-новую-строку) |
 | Добавить новый язык | [localization.md](localization.md#как-добавить-новый-язык) |
-| Вывести перевод в XAML | [localization.md](localization.md#три-способа-вывести-перевод) |
+| Вывести перевод в XAML | [localization.md](localization.md#четыре-способа-вывести-перевод) |
+| Переводимый пункт списка | [localization.md](localization.md#переводимые-пункты-в-combobox) |
 | Строка с параметром (`{0}`) | [localization.md](localization.md#строки-с-параметрами) |
 | Разобраться, что где лежит | [architecture.md](architecture.md) |
+| Когда нужен `Dispose`, а когда нет | [dispose.md](dispose.md) |
 | Что-то не переводится / ошибки сборки | [troubleshooting.md](troubleshooting.md) |
 
 ## Устройство решения
@@ -30,19 +32,24 @@ src/
       Strings.en-US.json                     каталог переводов (английский, США)
       Strings.ru-RU.json                     каталог переводов (русский, Россия)
       README.md                              соглашения по каталогам
-    App.axaml.cs                             старт приложения, DI, подключение ProTranslate
+    App.axaml.cs                             старт приложения, DI, тема, подключение ProTranslate
     ViewModels/ViewModelBase.cs              базовый класс с доступом к переводам
-    ViewModels/MainWindowViewModel.cs        пример: переключатель языка
-    Views/MainWindow.axaml                   пример: три способа вывода перевода
+    ViewModels/MainWindowViewModel.cs        открывает окно настроек
+    ViewModels/Settings/                     модели окна настроек: язык, тема, SaveSettingsCommand
+    Views/MainWindow.axaml                   главное окно
+    Views/Settings/SettingsWindow.axaml      окно настроек, кнопка Save
+    Views/Settings/AppSettingsView.axaml     выпадающие списки языка и темы
     Models/CultureOption.cs                  пункт выпадающего списка языков
+    Models/ThemeOption.cs                    пункт выпадающего списка тем
     Models/Themes.cs                         тема оформления
     Services/AppSettings/                    чтение и запись настроек
+    Services/WindowsManager/                 создание и закрытие окон
     ViewLocator.cs                           сопоставление ViewModel -> View
     MouseLabAvaloniaApp.csproj               пакеты, каталоги, AOT
 docs/                                        эта документация
 ```
 
-## Три правила, которые нельзя нарушать
+## Пять правил, которые нельзя нарушать
 
 Это самая частая причина «оно работало и сломалось».
 
@@ -57,14 +64,28 @@ docs/                                        эта документация
    обычное CLR-свойство, и без `OnPropertyChanged(nameof(GreetingText))`
    в обработчике смены культуры оно навсегда останется на стартовом языке.
 
-3. **Каталоги переводов — только в `MouseLabAvaloniaApp`.**
+3. **Переводимые пункты `ComboBox` обязаны иметь `ItemTemplate`.**
+   Без него Avalonia рисует пункт через `ToString()`, то есть берёт снимок
+   строки; смена языка такой текст уже не обновляет. Подробности — в
+   [localization.md](localization.md#переводимые-пункты-в-combobox).
+
+4. **Каталоги переводов — только в `MouseLabAvaloniaApp`.**
    Код, генерируемый SourceGenerator, попадает в сборку того проекта, который
    его запустил. При переносе моделей представления в `MouseLab.Core` или
    `MouseLab.Services` генератор придётся подключать и там.
    Подробности — в [architecture.md](architecture.md#перенос-моделей-представления-в-другой-проект).
+
+5. **Подписка на событие синглтона требует `Dispose`.**
+   `ICultureService` живёт всю сессию, поэтому модель, подписавшаяся на его
+   `CultureChanged`, без отписки остаётся живой до конца программы. Освобождать
+   нужно не только `Strings`, но и всё, что модель сама создала.
+   Подробности — в [dispose.md](dispose.md).
 
 ## Текущее состояние
 
 Поддерживаются `en-US` и `ru-RU`. Настройки хранятся в
 `%LOCALAPPDATA%\MouseLab\settings.json`. AOT-сборка (`PublishAot=true`)
 проходит без предупреждений.
+
+Язык и тема переключаются **по кнопке Save** в окне настроек: выбор только
+запоминается, применение и сохранение делает `SaveSettingsCommand`.

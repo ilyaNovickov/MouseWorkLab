@@ -31,10 +31,16 @@
 | Файл | Роль |
 |---|---|
 | `ViewModels/ViewModelBase.cs` | даёт каждой модели `Strings` и `Translations` |
-| `ViewModels/MainWindowViewModel.cs` | переключатель языка, примеры трёх способов вывода |
+| `ViewModels/MainWindowViewModel.cs` | открывает окно настроек |
+| `ViewModels/Settings/SettingsWindowViewModel.cs` | модель окна настроек, владеет `AppSettings` |
+| `ViewModels/Settings/AppSettingsViewModel.cs` | выбор языка и темы, `SaveSettingsCommand` |
 | `Models/CultureOption.cs` | пункт выпадающего списка языков |
+| `Models/ThemeOption.cs` | пункт выпадающего списка тем, `IDisposable` |
 | `Models/Themes.cs` | тема оформления |
-| `Views/MainWindow.axaml` | пример использования в XAML |
+| `Views/MainWindow.axaml` | кнопка открытия настроек |
+| `Views/Settings/SettingsWindow.axaml` | окно настроек, кнопка Save (`f`) |
+| `Views/Settings/AppSettingsView.axaml` | выпадающие списки языка и темы |
+| `Services/WindowsManager/WindowsManagerService.cs` | создаёт и закрывает окна |
 | `ViewLocator.cs` | сопоставление `ViewModel` → `View` |
 
 ## Порядок запуска
@@ -78,28 +84,45 @@ private ServiceProvider? _serviceProvider;
 services.AddSingleton<IApplicationSettingsService>(new ApplicationSettingsService(snapshot));
 ```
 
-## Поток смены языка
+## Поток смены языка и темы
+
+Переключение **происходит по кнопке Save**, а не сразу при выборе пункта.
+`SelectedCulture` и `SelectedTheme` только запоминают выбор; применяет его
+`SaveSettingsCommand`.
 
 ```
-пользователь выбирает язык в ComboBox
+пользователь выбирает язык/тему в ComboBox
         │
         ▼
-MainWindowViewModel.SelectedCulture (двусторонняя привязка)
+AppSettingsViewModel.SelectedCulture / SelectedTheme   (двусторонние привязки)
+        │   только SetProperty, ничего не применяют
+        ▼
+пользователь нажимает Save (кнопка "f" в SettingsWindow)
         │
-        ├─► IApplicationSettingsService.CurrentCultureName = "ru-RU"
-        │        └─► CultureChanged (приложения) ─► AppSettingsStore.Save()
-        │                                          settings.json перезаписан
+        ▼
+AppSettingsViewModel.SaveSettingsCommand
         │
-        └─► ICultureService.SetCulture("ru-RU")
-                 └─► CultureChanged (ProTranslate)
-                         ├─► ProTranslateStrings.Refresh()
-                         │        └─► PropertyChanged по КАЖДОМУ ключу
-                         │            └─► {Binding Strings.Ключ} обновляется
-                         │                    автоматически
-                         └─► MainWindowViewModel.OnCultureChanged
-                                  ├─► SyncSelectedCulture()  (выделение в ComboBox)
-                                  └─► OnPropertyChanged(GreetingText, CurrentCultureText)
-                                       └─► вычисляемые в VM свойства обновляются
+        ├─► SyncSelectedCultureToSettings()
+        │        ├─► IApplicationSettingsService.CurrentCultureName = "ru-RU"
+        │        │        └─► CultureChanged (приложения) ─► AppSettingsStore.Save()
+        │        │                                          settings.json перезаписан
+        │        │
+        │        └─► ICultureService.SetCulture("ru-RU")
+        │                 └─► CultureChanged (ProTranslate)
+        │                         ├─► ProTranslateStrings.Refresh()
+        │                         │        └─► PropertyChanged по КАЖДОМУ ключу
+        │                         │            └─► {Binding Strings.Ключ} обновляется
+        │                         │                автоматически
+        │                         ├─► ObservableLocalizedString.Value
+        │                         │        └─► подписи пунктов ComboBox
+        │                         │            (нужен ItemTemplate, см. localization.md)
+        │                         └─► AppSettingsViewModel.OnCultureChanged
+        │                                  └─► SyncSelectedCulture()
+        │
+        └─► SyncSelectedThemeToSettings()
+                 └─► IApplicationSettingsService.CurrentAppTheme = Themes.Dark
+                          └─► ThemeChanged ─► App.ApplyTheme()
+                                               └─► Application.RequestedThemeVariant
 ```
 
 **Ключевой момент:** `ProTranslateStrings` сам поднимает `PropertyChanged`
@@ -108,10 +131,43 @@ MainWindowViewModel.SelectedCulture (двусторонняя привязка)
 `ViewModel`, — обычные CLR-свойства, их переподнимать нужно руками.
 Забыть это — самая частая ошибка после переноса проекта на ProTranslate.
 
+Отдельно: `nameof(SelectedTheme.DisplayName)` **не** переподнимает свойство
+вложенного объекта. `nameof` отбрасывает квалификатор и даёт просто
+`"DisplayName"`, а событие уходит в `AppSettingsViewModel`, где свойства
+с таким именем нет. Чтобы обновить `ThemeOption`, нужна привязка к
+`IObservableLocalizedString` — то есть `ItemTemplate`. Подробности в
+[localization.md](localization.md#переводимые-пункты-в-combobox).
+
 Защита от рекурсии: `SetCulture` внутри себя сравнивает культуру и, если
 она не изменилась, событие не поднимает. Дополнительно `SyncSelectedCulture`
 сравнивает объекты по ссылке, чтобы не переустанавливать `SelectedCulture`
 из обработчика события.
+
+### Кто и когда освобождается
+
+`AppSettingsViewModel` подписан на `CultureChanged` синглтона `ICultureService`,
+поэтому событие держит его живым. Освобождается он в три шага, и каждый шаг
+обязателен:
+
+1. `WindowsManagerService` проверяет список открытых окон **до** создания
+   VM и окна — иначе повторный клик по меню создал бы вторую
+   `SettingsWindowViewModel` с подпиской, которую никто не отпишет.
+2. В обработчике `window.Closed` вызывается `viewModel.Dispose()`.
+   Само `ViewModelBase.Dispose` освобождает только `Strings`, поэтому
+   `SettingsWindowViewModel` дополнительно переопределяет `Dispose(bool)` и
+   освобождает `AppSettings`.
+3. `AppSettingsViewModel` в своём `Dispose(bool)` отписывается от `CultureChanged`
+   **и** освобождает `ThemeOption`. Последнее нужно потому, что
+   `ProTranslateStrings.Dispose()` отписывает только сам себя, а
+   `IObservableLocalizedString`, выданные `Strings.Observe_*()`, не трогает вовсе.
+
+Повторное освобождение безопасно: `ViewModelBase.Dispose` выставляет `_disposed`,
+поэтому контейнер DI в `Shutdown()` может освободить те же транзиентные
+объекты ещё раз.
+
+Общее правило «когда модели представления нужен `Dispose`, а когда нет» и разбор
+всех ошибок, которые с этим случались, — в
+[dispose.md](dispose.md).
 
 ## Хранение настроек
 
@@ -140,8 +196,11 @@ MainWindowViewModel.SelectedCulture (двусторонняя привязка)
   реальная ошибка формата может остаться незамеченной — при разборе
   проблем с настройками временно замените `catch` на вывод в лог.
 * **Настройки записываются целиком** на любое изменение темы или языка.
-  Тема, кстати, в интерфейсе пока не переключается — механизм готов,
-  но UI для неё нужно дописать (см. `Strings.Settings.Theme`).
+  Переключение происходит по кнопке Save в окне настроек: выбор только
+  запоминается в `AppSettingsViewModel`, а применяется и сохраняется в
+  `SaveSettingsCommand`. Тема доходит до интерфейса через
+  `IApplicationSettingsService.ThemeChanged` → `App.ApplyTheme()` →
+  `Application.RequestedThemeVariant`.
 
 ## Требования AOT
 
