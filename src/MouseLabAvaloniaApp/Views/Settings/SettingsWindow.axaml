@@ -7,7 +7,7 @@
         xmlns:v="using:MouseLabAvaloniaApp.Views"
         x:Class="MouseLabAvaloniaApp.Views.SettingsWindow"
         x:DataType="vm:SettingsWindowViewModel"
-        Title="{Binding Strings.SettingsWindowName}"
+        Title="{Binding Strings.SettingsWindowTitle}"
         Translation.Culture="{Binding Strings.Culture}"
         Translation.AutoFlowDirection="True"
         Name="settingWindow">
@@ -40,8 +40,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="1" Content="f" Command="{Binding AppSettings.SaveSettingsCommand}"/>
-                <Button Grid.Column="2" Content="z" />
+                <Button Grid.Column="1" Content="{Binding Strings.CommonSave}" Command="{Binding AppSettings.SaveSettingsCommand}"/>
+                <Button Grid.Column="2" Content="{Binding Strings.CommonCancel}" Click="cancelButton_Click"/>
             </Grid>
         </Border>
         <TabControl TabStripPlacement="Left">

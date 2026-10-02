@@ -1,20 +1,15 @@
 {
-  "App": {
-    "Title": "MouseLab",
-    "Greeting": "Welcome to MouseLab!",
-    "GreetingWithName": "Hello, {0}. Your localized workspace is ready."
+  "MainWindow": {
+    "Title": "MouseLab"
   },
 
-  "Settings": {
-    "WindowName": "Application settings",
+  "SettingsWindow": {
+    "Title": "Application settings",
     "Language": "Language",
     "DarkTheme": "Dark",
     "LightTheme": "Light",
     "DefaultTheme": "Default",
-    "LanguageDescription": "Choose the display language for the application.",
-    "Theme": "Theme",
-    "UserName": "User name",
-    "CurrentCulture": "Current culture: {0}"
+    "Theme": "Theme"
   },
 
   "Common": {

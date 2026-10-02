@@ -21,7 +21,7 @@
         x:Class="MouseLabAvaloniaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="{Binding Strings.AppTitle}"
+        Title="{Binding Strings.MainWindowTitle}"
         Translation.Culture="{Binding Strings.Culture}"
         Translation.AutoFlowDirection="True">
 

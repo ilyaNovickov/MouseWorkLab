@@ -1,20 +1,15 @@
 {
-  "App": {
-    "Title": "MouseLab",
-    "Greeting": "Добро пожаловать в MouseLab!",
-    "GreetingWithName": "Привет, {0}. Ваше локализованное рабочее пространство готово."
+  "MainWindow": {
+    "Title": "MouseLab РУС"
   },
 
-  "Settings": {
-    "WindowName": "Настройки приложения",
+  "SettingsWindow": {
+    "Title": "Настройки приложения",
     "Language": "Язык",
     "DarkTheme": "Тёмная",
     "LightTheme": "Светлая",
     "DefaultTheme": "По умолчанию",
-    "LanguageDescription": "Выберите язык интерфейса приложения.",
-    "Theme": "Тема",
-    "UserName": "Имя пользователя",
-    "CurrentCulture": "Текущая культура: {0}"
+    "Theme": "Тема"
   },
 
   "Common": {
@@ -22,3 +17,6 @@
     "Cancel": "Отмена"
   }
 }
+
+
+

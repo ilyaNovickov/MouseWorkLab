@@ -19,4 +19,9 @@ public partial class SettingsWindow : Window
         }
 #endif
     }
+
+    private void cancelButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        this.Close();
+    }
 }
