@@ -25,12 +25,6 @@
         Translation.Culture="{Binding Strings.Culture}"
         Translation.AutoFlowDirection="True">
 
-    <Design.DataContext>
-        <!-- DataContext только для превью в IDE. Реальный DataContext
-             присваивается в коде, см. App.OnFrameworkInitializationCompleted. -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
-
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <Button Content="foo" Command="{Binding OpenSettingsWindowCommand}"/>

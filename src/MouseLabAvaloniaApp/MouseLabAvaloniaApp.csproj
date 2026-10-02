@@ -12,6 +12,15 @@
 
     <!-- AOT-компиляция всех сборок Avalonia (а не только корневой). -->
 	<AotAssemblies>True</AotAssemblies>
+	  
+	<!-- Предупреждения о несовместимости с тримером/AOT -->
+	<IsTrimmable>true</IsTrimmable>
+	<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+
+	  <!-- Покажет все проблемные места при сборке -->
+	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
+	  <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+	  <EnableAotAnalyzer>true</EnableAotAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>

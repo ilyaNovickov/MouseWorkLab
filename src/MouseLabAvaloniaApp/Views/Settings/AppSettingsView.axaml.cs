@@ -16,7 +16,7 @@ public partial class AppSettingsView : UserControl
 #if DEBUG
         if (Design.IsDesignMode)
         {
-            Design.SetDataContext(this, DesignVM.Provider.GetService<AppSettingsViewModel>());
+            Design.SetDataContext(this, AppServices.Instance.Provider.GetRequiredService<AppSettingsViewModel>());
         }
 #endif
     }
