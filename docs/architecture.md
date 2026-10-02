@@ -42,7 +42,7 @@
 | `Views/Settings/SettingsWindow.axaml` | окно настроек, кнопка Save (`f`) |
 | `Views/Settings/AppSettingsView.axaml` | выпадающие списки языка и темы |
 | `Services/WindowsManager/WindowsManagerService.cs` | создаёт и закрывает окна |
-| `ViewLocator.cs` | сопоставление `ViewModel` → `View` |
+| `ViewLocator.cs` | сопоставление `ViewModel` → `View`, таблица генерируется `StaticViewLocator` |
 
 ## Порядок запуска
 
@@ -260,17 +260,147 @@ AppSettingsViewModel.SaveSettingsCommand
 | Никаких `Type.GetType` / `Activator.CreateInstance` по вычисленному имени | имя вычисляется в рантайме, анализатор не может его разрешить |
 | `AppSettingsJsonContext` | см. выше |
 | `JsonStringEnumConverter<Themes>` | обобщённая версия без кодогенерации |
+| `StaticViewLocator` вместо ручного поиска представления | см. ниже |
 
-`ViewLocator` изначально был написан по шаблону Avalonia с
-`Type.GetType(...)` и `Activator.CreateInstance(...)`. Он заменён на обычный
-switch. Если будете добавлять вторичные представления (например,
-`SettingsView` для `SettingsViewModel`), добавляйте их **в `ViewLocator`
-явным случаем**, а не рассчитывайте на поиск по имени.
+### Анализаторы включены и на обычной сборке
+
+В `MouseLabAvaloniaApp.csproj` задано:
+
+```xml
+<IsTrimmable>true</IsTrimmable>
+<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+<TrimmerSingleWarn>false</TrimmerSingleWarn>
+<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+<EnableAotAnalyzer>true</EnableAotAnalyzer>
+```
+
+Поэтому обычный `dotnet build` уже ловит `IL2026` / `IL3050` / `IL2075`, а
+приходится ждать `PublishAot` только ради того, что анализатор видеть не может
+(см. «Что анализаторы не ловят»). `TrimmerSingleWarn=false` показывает все
+проблемные места, а не только первое в цепочке.
+
+`IsTrimmable` проставлен также в `MouseLab.Core` и `MouseLab.Services`. Сейчас
+эти проекты не подключены к приложению и в AOT-сборку не входят, но без флага их
+рефлексия всплыла бы только после добавления `ProjectReference` — то есть уже на
+этапе публикации, когда диагностировать дороже всего.
+
+### Представления ищутся без рефлексии
+
+`ViewLocator` — это сгенерированная таблица соответствий, а не поиск по имени:
+
+```csharp
+// obj/gen/StaticViewLocator/.../ViewLocator_StaticViewLocator.cs
+private static Dictionary<Type, Func<Control>> s_views = new()
+{
+    [typeof(AppSettingsViewModel)]   = () => new AppSettingsView(),
+    [typeof(SettingsWindowViewModel)] = () => new SettingsWindow(),
+};
+```
+
+`Build` и `Match` тоже генерируются (`GenerateIDataTemplate = true`), поэтому в
+`ViewLocator.cs` их писать нельзя: собственный `Build` обошёл бы таблицу и
+вернулся к небезопасному пути. Класс помечен:
+
+```csharp
+// ViewLocator.cs:61-66
+[StaticViewLocator(
+    GenerateIDataTemplate = true,
+    GenerateRuntimeTypeFallbackMethods = false,
+    DataTemplateMatchTypes = new[] { typeof(ViewModelBase) })]
+[StaticViewMapping(typeof(SettingsWindowViewModel), typeof(SettingsWindow))]
+[StaticViewMapping(typeof(AppSettingsViewModel), typeof(AppSettingsView))]
+public partial class ViewLocator { }
+```
+
+`GenerateRuntimeTypeFallbackMethods = false` важно: без него генератор умеет
+добавить обход базовых типов и интерфейсов в рантайме, а это снова рефлексия.
+
+Три модели представления сопоставлены явно, потому что **согласуется ни одна**:
+
+| Модель | Что выдало бы соглашение | Реальный тип |
+|---|---|---|
+| `AppSettingsViewModel` | `Views.Settings.AppSettingsView` | `Views.AppSettingsView` |
+| `SettingsWindowViewModel` | `Views.Settings.SettingsWindowView` | `Views.SettingsWindow` |
+| `MainWindowViewModel` | `Views.MainWindowView` | сопоставления нет намеренно |
+
+Первая расходится потому, что файл лежит в папке `Views\Settings\`, но объявлен
+в пространстве `MouseLabAvaloniaApp.Views` — это то самое расхождение папок и
+пространств имён, о котором сказано в `AGENTS.md`. `MainWindowViewModel` не
+сопоставляется: главное окно назначается в `desktop.MainWindow` напрямую, и
+сопоставление рисковало бы вложить окно в само себя. Он попадает в
+`s_missingViews`, а сгенерированный `Match` для него возвращает `false`.
+
+Если новое представление «не находится», сначала посмотрите `s_views` и
+`s_missingViews` в сгенерированном файле — там сразу видно, куда что ушло:
+
+```bash
+dotnet build src\MouseLabAvaloniaApp\MouseLabAvaloniaApp.csproj -t:Rebuild `
+  -p:EmitCompilerGeneratedFiles=true -p:CompilerGeneratedFilesOutputPath=obj\gen
+```
+
+Диагностика генератора: `SVL0001`–`SVL0008` (см. README пакета). `SVL0004`
+(нет конструктора без параметров) и `SVL0005` (класс не `partial`, вложенный или
+`static`) — самые частые.
+
+### Чего делать нельзя: искать тип по вычисленному имени
+
+Вот форма, которая **ломается молча**:
+
+```csharp
+// НЕЛЬЗЯ
+string name = vm.GetType().FullName!.Replace("ViewModel", "View");
+var type = Type.GetType(name);
+var view = (Control)Activator.CreateInstance(type)!;
+```
+
+Почему нет предупреждения: имя вычисляется в рантайме, поэтому триммер не может
+связать его с типом, конструктор представления вырезается как недостижимый, и
+сборка проходит чисто. Падение случится уже у пользователя — и только на том
+экране, который открывается по навигации.
+
+Именно это и было в `ViewLocator` из шаблона Avalonia, пока его не заменили на
+таблицу. Добавляйте соответствие либо атрибутом
+`[StaticViewMapping(typeof(Vm), typeof(View))]`, либо соглашением имён.
+
+### Что анализаторы не ловят
+
+* **Вычисленные имена типов** — см. выше.
+* **Привязки XAML без `x:DataType`.** Все три представления его имеют, и
+  `AvaloniaUseCompiledBindingsByDefault` страхует остальное. Если появится
+  привязка без `x:DataType`, она станет рефлексивной молча.
+* **Ошибки в рантайме AOT-сборки.** Собранный exe надо хотя бы раз запустить:
+  анализатор ничего не знает про загрузку ресурсов FluentTheme, регистрацию
+  встроенного шрифта `WithInterFont()` и статический binding source ProTranslate.
+
+### Внешних дескрипторов триммера нет
+
+Ни один из подключённых пакетов не поставляет `ILLink.Descriptors.xml`. Avalonia
+рассчитывает на атрибуты `[DynamicallyAccessedMembers]`, вкомпилированные в её
+собственные сборки. Практический вывод: чистая публикация — это заслуга аннотаций
+Avalonia, а не настройки проекта. После **обновления Avalonia** обязательно
+перепроверяйте публикацию: новая версия может принести предупреждения, которых
+раньше не было.
+
+### `InvariantGlobalization` должен оставаться выключенным
+
+Флага нет, и включать его нельзя. Это стандартная рекомендация при сборке AOT ради
+уменьшения размера, но здесь она сломает всё приложение: с
+`InvariantGlobalization=true` культура `ru-RU` деградирует до инвариантной, и
+поиск переводов вместе с fallback перестанет работать.
+
+### Размер собранного образа
+
+`MouseLabAvaloniaApp.exe` после `PublishAot` — около **19,7 МБ**. Из заметного:
+пакет `Avalonia.Fonts.Inter` добавляет 1,89 МБ управляемого кода, который
+`<AotAssemblies>True</AotAssemblies>` компилирует в нативный код целиком, хотя
+приложение нигде не задаёт `FontFamily` — `WithInterFont()` лишь делает семейство
+доступным. Удаление пакета уменьшило бы образ, но изменило бы вид шрифтов,
+поэтому пока оставлено осознанно.
 
 Проверка AOT-сборки:
 
 ```bash
-dotnet publish src/MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj `
+dotnet publish src\MouseLabAvaloniaApp\MouseLabAvaloniaApp.csproj `
   -c Release -r win-x64 -p:PublishAot=true
 ```
 

@@ -45,7 +45,7 @@ src/
     Models/Themes.cs                         тема оформления
     Services/AppSettings/                    чтение и запись настроек
     Services/WindowsManager/                 создание и закрытие окон
-    ViewLocator.cs                           сопоставление ViewModel -> View
+    ViewLocator.cs                           сопоставление ViewModel -> View (генерируется StaticViewLocator)
     MouseLabAvaloniaApp.csproj               пакеты, каталоги, AOT
 docs/                                        эта документация
 ```

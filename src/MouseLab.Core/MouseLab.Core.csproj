@@ -4,6 +4,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- Проект пока не подключён к приложению, поэтому в AOT-сборку не входит.
+         Флаг нужен, чтобы анализаторы триммера проверяли его сразу, как только
+         появится ProjectReference: без него опасная рефлексия всплывёт уже на
+         этапе PublishAot, а не на сборке. -->
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
 </Project>
