@@ -31,6 +31,11 @@
             <Setter Property="CornerRadius" Value="5"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
         </Style>
+        <Style Selector="Button.manage">
+            <Setter Property="Margin" Value="5,5,5,5"/>
+            <Setter Property="BorderThickness" Value="1.8"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+        </Style>
     </Window.Styles>
     <DockPanel LastChildFill="True">
         <Border DockPanel.Dock="Bottom">
@@ -40,12 +45,16 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="1" Content="{Binding Strings.CommonSave}" Command="{Binding AppSettings.SaveSettingsCommand}"/>
-                <Button Grid.Column="2" Content="{Binding Strings.CommonCancel}" Click="cancelButton_Click"/>
+                <Button Classes="manage" Grid.Column="1" 
+                        Content="{Binding Strings.CommonSave}" 
+                        Command="{Binding AppSettings.SaveSettingsCommand}"/>
+                <Button Classes="manage" Grid.Column="2" 
+                        Content="{Binding Strings.CommonCancel}" 
+                        Click="cancelButton_Click"/>
             </Grid>
         </Border>
         <TabControl TabStripPlacement="Left">
-            <TabItem Header="foo">
+            <TabItem Header="{Binding Strings.SettingsWindowAppSettings}">
                 <Border Classes="decoBoard">
                     <ScrollViewer>
                         <v:AppSettingsView DataContext="{Binding AppSettings}"/>

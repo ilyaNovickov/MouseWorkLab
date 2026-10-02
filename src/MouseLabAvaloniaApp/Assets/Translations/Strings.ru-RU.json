@@ -5,6 +5,9 @@
 
   "SettingsWindow": {
     "Title": "Настройки приложения",
+
+    "AppSettings": "Приложения",
+
     "Language": "Язык",
     "DarkTheme": "Тёмная",
     "LightTheme": "Светлая",
