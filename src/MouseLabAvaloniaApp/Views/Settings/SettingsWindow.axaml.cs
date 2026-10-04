@@ -24,4 +24,5 @@ public partial class SettingsWindow : Window
     {
         this.Close();
     }
+
 }
