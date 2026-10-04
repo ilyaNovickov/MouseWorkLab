@@ -13,7 +13,7 @@ namespace MouseLabAvaloniaApp.Services.AppSettings;
 public sealed class AppSettingsSnapshot
 {
     [JsonPropertyName("culture")]
-    public string? Culture { get; init; }
+    public string? Culture { get; init; } = CultureInfo.CurrentCulture.Name;
 
     [JsonPropertyName("theme")]
     public Themes Theme { get; init; } = Themes.Default;
@@ -41,7 +41,7 @@ public sealed partial class AppSettingsJsonContext : JsonSerializerContext;
 public static class AppSettingsStore
 {
     /// <summary>Культура по умолчанию, если в настройках её нет или она неизвестна.</summary>
-    public const string DefaultCultureName = "en-US";
+    public const string DefaultCultureName = "ru-RU";
 
     // %LOCALAPPDATA%\MouseLab\settings.json на Windows, ~/.local/share/MouseLab на Linux.
     public static string SettingsFilePath { get; } = Path.Combine(

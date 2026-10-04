@@ -1,0 +1,158 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" 
+        xmlns:models="using:MouseLabAvaloniaApp.Models"
+        xmlns:vm="using:MouseLabAvaloniaApp.ViewModels.Welcome"
+        d:DesignWidth="600" 
+        d:DesignHeight="380"
+        Width="600"
+        Height="380"
+        x:Class="MouseLabAvaloniaApp.Views.WelcomeWindow"
+        x:DataType="vm:WelcomeWindowViewModel"
+        Translation.Culture="{Binding Strings.Culture}"
+        Translation.AutoFlowDirection="True"
+        Title="Window1">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="BorderColor">RoyalBlue</SolidColorBrush>
+                    <SolidColorBrush x:Key="HoverBorderColor">#2a4594</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="BorderColor">RoyalBlue</SolidColorBrush>
+                    <SolidColorBrush x:Key="HoverBorderColor">#2a4594</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.Styles>
+        <Style Selector="Button.manage">
+            <Setter Property="Margin" Value="5,5,5,5"/>
+            <Setter Property="BorderThickness" Value="1.8"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+        </Style>
+        <Style Selector="Button.manage:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource HoverBorderColor}"/>
+        </Style>
+        <Style Selector="GroupBox">
+            <Setter Property="Margin" Value="3,3,3,3"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style Selector="TextBlock.form">
+            <Setter Property="Margin" Value="5,5,5,5"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBox.form">
+            <Setter Property="Margin" Value="5,5,5,5"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="300"/>
+            <Setter Property="MaxWidth" Value="300"/>
+        </Style>
+    </Window.Styles>
+    <ScrollViewer>
+    <StackPanel>
+        <GroupBox Header="Информация о студенте">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Classes="form" 
+                           Grid.Column="0" 
+                           Grid.Row="0"
+                           Text="Имя"/>
+                <TextBox Classes="form" 
+                         Grid.Column="1" 
+                         Grid.Row="0"
+                         PlaceholderText="Имя"/>
+                <TextBlock Classes="form" 
+                           Grid.Column="0" 
+                           Grid.Row="1"
+                           Text="Фамилия"/>
+                <TextBox Classes="form" 
+                         Grid.Column="1" 
+                         Grid.Row="1"
+                         PlaceholderText="Фамилия"/>
+                <TextBlock Classes="form" 
+                           Grid.Column="0" 
+                           Grid.Row="2"
+                           Text="Отвество (при наличии)"/>
+                <TextBox Classes="form" 
+                         Grid.Column="1" 
+                         Grid.Row="2"
+                         PlaceholderText="Отчество"/>
+                <TextBlock Classes="form" 
+                           Grid.Column="0" 
+                           Grid.Row="3"
+                           Text="Группа"/>
+                <TextBox Classes="form" 
+                         Grid.Column="1" 
+                         Grid.Row="3"
+                         PlaceholderText="Группа"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Настройки приложения">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Classes="form" 
+                         Grid.Column="0" 
+                         Grid.Row="0"
+                         Text="Тема"/>
+                <ComboBox Classes="settings"
+                          Grid.Column="1" 
+                          Grid.Row="0"
+                          ItemsSource="{Binding AvailableThemes}"
+                          SelectedItem="{Binding SelectedTheme}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="models:ThemeOption">
+                            <TextBlock Text="{Binding DisplayName.Value}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock Classes="form" 
+                         Grid.Column="0" 
+                         Grid.Row="1"
+                         Text="Язык"/>
+                <ComboBox Classes="settings" 
+                          Grid.Column="1" Grid.Row="1"
+                          ItemsSource="{Binding AvailableCultures}"
+                          SelectedItem="{Binding SelectedCulture}"/>
+            </Grid>
+        </GroupBox>
+        <Border Margin="3,3,3,3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Classes="manage"
+                        Grid.Column="1" 
+                        Content="Потвердить"/>
+                <Button Classes="manage"
+                        Grid.Column="2" 
+                        Content="Выход"/>
+            </Grid>
+        </Border>
+    </StackPanel>
+    </ScrollViewer>
+</Window>

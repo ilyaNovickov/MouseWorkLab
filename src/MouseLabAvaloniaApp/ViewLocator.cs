@@ -1,5 +1,6 @@
 using MouseLabAvaloniaApp.ViewModels;
 using MouseLabAvaloniaApp.ViewModels.Settings;
+using MouseLabAvaloniaApp.ViewModels.Welcome;
 using MouseLabAvaloniaApp.Views;
 using StaticViewLocator;
 
@@ -63,6 +64,7 @@ namespace MouseLabAvaloniaApp;
     DataTemplateMatchTypes = new[] { typeof(ViewModelBase) })]
 [StaticViewMapping(typeof(SettingsWindowViewModel), typeof(SettingsWindow))]
 [StaticViewMapping(typeof(AppSettingsViewModel), typeof(AppSettingsView))]
+[StaticViewMapping(typeof(WelcomeWindowViewModel), typeof(WelcomeWindow))]
 public partial class ViewLocator
 {
 }

@@ -3,6 +3,7 @@ using MouseLabAvaloniaApp.Services.AppSettings;
 using MouseLabAvaloniaApp.Services.WindowsManager;
 using MouseLabAvaloniaApp.ViewModels;
 using MouseLabAvaloniaApp.ViewModels.Settings;
+using MouseLabAvaloniaApp.ViewModels.Welcome;
 using MouseLabAvaloniaApp.Views;
 using ProTranslate;
 using ProTranslate.Avalonia;
@@ -52,10 +53,9 @@ public sealed class AppServices : IDisposable
     {
         ServiceCollection services = new();
 
-        // Настройки регистрируем готовым экземпляром, потому что они нужны ДО сборки
-        // контейнера: стартовая культура определяется из файла и передаётся в AddProTranslate.
-        services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>(sp => new ApplicationSettingsService(snapshot));
+        #region Services
 
+        #region ProTranslate
         // Ядро ProTranslate: культура, поиск переводов, fallback, форматирование, кэш.
         //
         // provider - сгенерированный провайдер. ProTranslate.SourceGenerator на этапе сборки
@@ -94,14 +94,24 @@ public sealed class AppServices : IDisposable
         // Адаптер Avalonia: подключает TranslationBindingSource, через который работают
         // разметочные расширения и статический ProTranslate.Avalonia.TranslationService.
         services.AddProTranslateAvalonia();
+        #endregion
 
-        #region Services
+        services.AddKeyedSingleton<IApplicationSettingsService, TemporaryAppSettingsService>
+            ("Temporary", (sp, _) => new TemporaryAppSettingsService());
+
+        // Настройки регистрируем готовым экземпляром, потому что они нужны ДО сборки
+        // контейнера: стартовая культура определяется из файла и передаётся в AddProTranslate.
+        services.AddSingleton<IApplicationSettingsService, ApplicationSettingsService>(sp => new ApplicationSettingsService(snapshot));
 
         services.AddSingleton<IWindowsManagerService, WindowsManagerService>(sp => new WindowsManagerService(sp));
 
         #endregion
 
         #region ViewModels
+
+        services.AddTransient<WelcomeWindowViewModel>(sp => new WelcomeWindowViewModel(sp.GetRequiredService<ITranslationService>(),
+            sp.GetRequiredService<ICultureService>(),
+            sp.GetKeyedService<IApplicationSettingsService>("Temporary") ?? sp.GetRequiredService<IApplicationSettingsService>()));
 
         services.AddTransient<AppSettingsViewModel>(sp => new AppSettingsViewModel(sp.GetRequiredService<ITranslationService>(),
             sp.GetRequiredService<ICultureService>(),
@@ -116,6 +126,7 @@ public sealed class AppServices : IDisposable
         #endregion
 
         #region Views
+        services.AddTransient<WelcomeWindow>();
         services.AddTransient<MainWindow>();
         services.AddTransient<SettingsWindow>();
         #endregion

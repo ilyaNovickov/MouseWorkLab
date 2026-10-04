@@ -82,5 +82,8 @@
     <Compile Update="Views\Settings\AppSettingsView.axaml.cs">
       <DependentUpon>AppSettingsView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\WelcomeWindow.axaml.cs">
+      <DependentUpon>WelcomeWindow.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
