@@ -59,7 +59,7 @@
             </Grid>
         </Border>
         <TabControl TabStripPlacement="Left">
-            <TabItem Header="{Binding Strings.SettingsWindowAppSettings}">
+            <TabItem Header="{Binding Strings.CommonAppSettings}">
                 <Border Classes="decoBoard">
                     <ScrollViewer>
                         <v:AppSettingsView DataContext="{Binding AppSettings}"/>

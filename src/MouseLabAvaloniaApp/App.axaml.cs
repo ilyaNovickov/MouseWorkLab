@@ -1,12 +1,16 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using System;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using MouseLabAvaloniaApp.Models;
 using MouseLabAvaloniaApp.Services.AppSettings;
 using MouseLabAvaloniaApp.ViewModels;
+using MouseLabAvaloniaApp.ViewModels.Welcome;
 using MouseLabAvaloniaApp.Views;
+using ProTranslate;
 
 namespace MouseLabAvaloniaApp;
 
@@ -19,6 +23,25 @@ public partial class App : Application
     // Обработчик храним в поле, чтобы можно было отписаться от него при выходе.
     private ThemeChangedEventHandler? _themeChangedHandler;
 
+    // Обработчик темы временных настроек. Нужен, чтобы окно приветствия
+    // показывало выбранную тему сразу, и снимается при переходе к главному окну.
+    private ThemeChangedEventHandler? _welcomeThemeChangedHandler;
+
+    // Пользователь подтвердил данные. Различать подтверждение и закрытие
+    // окна важно: подтверждение ведёт к главному окну, закрытие крестиком или
+    // кнопкой выхода - к завершению приложения.
+    private bool _welcomeConfirmed;
+
+    // Защита от двойного перехода: кнопка подтверждения закрывает окно, а
+    // закрытие окна само вызывает переход. Без флага окно показалось бы дважды.
+    private bool _mainWindowStarted;
+
+    // Контейнер гарантированно создан в OnFrameworkInitializationCompleted до
+    // вызова ShowWelcome, но компилятор не может это доказать через границы
+    // методов - поэтому доступ идёт через это свойство с явной проверкой.
+    private AppServices Services =>
+        _appServices ?? throw new InvalidOperationException("AppServices ещё не создан: OnFrameworkInitializationCompleted не был вызван.");
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -26,28 +49,136 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // CreateDefault() читает settings.json и передаёт культуру в AddProTranslate,
-        // поэтому настройки обязаны быть прочитаны ДО сборки контейнера - этим и
-        // занимается AppServices, а не App.
+        // Настройки читаются ДО сборки контейнера - этим занимается
+        // AppServices.CreateDefault(). Постоянные настройки здесь ещё не
+        // применяются: пользователь на этом шаге неизвестен, его выбор будет
+        // разобран в окне приветствия.
         _appServices = AppServices.CreateDefault();
-
-        IApplicationSettingsService settings = _appServices.Provider.GetRequiredService<IApplicationSettingsService>();
-
-        // Тема применяется и сразу при старте, и на каждое изменение настроек.
-        _themeChangedHandler = (_, e) => ApplyTheme(e.NewTheme);
-        settings.ThemeChanged += _themeChangedHandler;
-        ApplyTheme(settings.CurrentAppTheme);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            MainWindow mainWindow = _appServices.Provider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = _appServices.Provider.GetRequiredService<MainWindowViewModel>();
-
-            desktop.MainWindow = mainWindow;
+            // Пока открыто окно приветствия, закрытие окна не должно завершать
+            // приложение: иначе закрытие крестиком убило бы приложение, а
+            // закрытие после подтверждения - убило бы раньше времени.
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             desktop.Exit += (_, _) => Shutdown();
+
+            ShowWelcome(desktop);
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void ShowWelcome(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        IApplicationSettingsService temporary =
+            Services.Provider.GetRequiredKeyedService<IApplicationSettingsService>(AppServices.TemporarySettingsKey);
+
+        // Окно приветствия намеренно игнорирует settings.json, поэтому и культура
+        // в рантайме должна совпадать с его выбором по умолчанию. Без этого
+        // ComboBox покажет "русский", а весь интерфейс останется на языке файла -
+        // пользователь увидит несоответствие прямо в первой строке.
+        // Когда появятся настройки конкретного пользователя, культура придёт
+        // сюда из них на шаге AdvanceToMainWindow.
+        ICultureService cultures = Services.Provider.GetRequiredService<ICultureService>();
+        cultures.SetCulture(AppSettingsStore.ResolveCulture(temporary.CurrentCultureName));
+
+        // Тему на время окна берём из временного хранилища: пользователь должен
+        // видеть результат до подтверждения, а постоянные настройки на этом шаге
+        // ещё не тронуты.
+        _welcomeThemeChangedHandler = (_, e) => ApplyTheme(e.NewTheme);
+        temporary.ThemeChanged += _welcomeThemeChangedHandler;
+        ApplyTheme(temporary.CurrentAppTheme);
+
+        WelcomeWindowViewModel vm = Services.Provider.GetRequiredService<WelcomeWindowViewModel>();
+        WelcomeWindow window = Services.Provider.GetRequiredService<WelcomeWindow>();
+        window.DataContext = vm;
+
+        // Обе кнопки только закрывают окно. Различие - в том, закрыли его после
+        // подтверждения или нет, а решает уже обработчик Closed. Так невозможно
+        // получить двойной переход из двух независимых вызовов Shutdown.
+        vm.Confirmed += (_, _) =>
+        {
+            _welcomeConfirmed = true;
+            window.Close();
+        };
+
+        vm.ExitRequested += (_, _) => window.Close();
+
+        window.Closed += (_, _) =>
+        {
+            vm.Dispose();
+            UnsubscribeWelcomeTheme(temporary);
+
+            if (_welcomeConfirmed)
+                AdvanceToMainWindow(desktop);
+            else
+                // Закрытие крестиком или кнопкой выхода: главного окна не будет,
+                // а при OnExplicitShutdown приложение осталось бы висеть без окон.
+                desktop.Shutdown();
+        };
+
+        // Показываем явно: desktop.MainWindow назначается только главному окну,
+        // поэтому lifetime ничего не покажет.
+        window.Show();
+    }
+
+    private void AdvanceToMainWindow(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        if (_mainWindowStarted)
+            return;
+
+        _mainWindowStarted = true;
+
+        // Переносим выбор из временного хранилища в постоянное: только здесь
+        // значения попадают в settings.json. Когда у каждого пользователя будут
+        // свои настройки, источником станет
+        // %LOCALAPPDATA%\MouseLab\{userhash}\settings.json - за это и отвечает
+        // AppSettingsServiceBase.LoadFrom.
+        IApplicationSettingsService temporary =
+            Services.Provider.GetRequiredKeyedService<IApplicationSettingsService>(AppServices.TemporarySettingsKey);
+        IApplicationSettingsService stored = Services.Provider.GetRequiredService<IApplicationSettingsService>();
+
+        stored.LoadFrom(new AppSettingsSnapshot
+        {
+            Culture = temporary.CurrentCultureName,
+            Theme = temporary.CurrentAppTheme,
+        });
+
+        // Тема постоянных настроек применяется здесь же: подписка на stored
+        // появляется только теперь, а до этого применялась тема из temporary.
+        _themeChangedHandler = (_, e) => ApplyTheme(e.NewTheme);
+        stored.ThemeChanged += _themeChangedHandler;
+        ApplyTheme(stored.CurrentAppTheme);
+
+        // Культуру применяем ещё раз безусловно: SetCulture внутри сравнивает
+        // культуру и ничего не делает, если она уже такая, так что повторный
+        // вызов безопасен и фиксирует именно сохранённый выбор.
+        ICultureService cultures = Services.Provider.GetRequiredService<ICultureService>();
+        cultures.SetCulture(AppSettingsStore.ResolveCulture(stored.CurrentCultureName));
+
+        MainWindowViewModel mainVm = Services.Provider.GetRequiredService<MainWindowViewModel>();
+        MainWindow mainWindow = Services.Provider.GetRequiredService<MainWindow>();
+        mainWindow.DataContext = mainVm;
+        mainWindow.Closed += (_, _) => mainVm.Dispose();
+
+        desktop.MainWindow = mainWindow;
+        desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
+        // Обязательно: ShowMainWindow() внутри lifetime уже отработал при старте,
+        // и само присваивание desktop.MainWindow окно не показывает. Проверка
+        // IsVisible страхует от двойного Show в другой версии Avalonia.
+        if (!mainWindow.IsVisible)
+            mainWindow.Show();
+    }
+
+    private void UnsubscribeWelcomeTheme(IApplicationSettingsService temporary)
+    {
+        if (_welcomeThemeChangedHandler is null)
+            return;
+
+        temporary.ThemeChanged -= _welcomeThemeChangedHandler;
+        _welcomeThemeChangedHandler = null;
     }
 
     // Themes.Default - это "следовать системной теме" (ThemeVariant.Default).
@@ -64,10 +195,10 @@ public partial class App : Application
         if (_appServices is null)
             return;
 
-        // Отписываемся от события перед Dispose, иначе обработчик остался бы висеть
-        // на освобождаемом объекте.
+        // Отписываемся от событий перед Dispose, иначе обработчик остался бы
+        // висеть на освобождаемом объекте.
         if (_themeChangedHandler is not null &&
-            _appServices.Provider.GetService<IApplicationSettingsService>() is { } settings)
+            Services.Provider.GetService<IApplicationSettingsService>() is { } settings)
         {
             settings.ThemeChanged -= _themeChangedHandler;
         }

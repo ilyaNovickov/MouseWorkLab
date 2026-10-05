@@ -1,25 +1,34 @@
 {
   "MainWindow": {
-    "Title": "MouseLab РУС"
+    "Title": "MouseLab Проект"
+  },
+
+  "WelcomeWindow": {
+    "Title": "Добро пожаловать",
+    "StudentInfo": "Информация о студенте",
+    "FirstName": "Имя",
+    "LastName": "Фамилия",
+    "MiddleName": "Отчество (при наличии)",
+    "Group": "Группа",
+    "Confirm": "Подтвердить",
+    "Exit": "Выход",
+    "FirstNameRequired": "Введите имя",
+    "LastNameRequired": "Введите фамилию",
+    "GroupRequired": "Введите группу"
   },
 
   "SettingsWindow": {
-    "Title": "Настройки приложения",
-
-    "AppSettings": "Приложения",
-
-    "Language": "Язык",
-    "DarkTheme": "Тёмная",
-    "LightTheme": "Светлая",
-    "DefaultTheme": "По умолчанию",
-    "Theme": "Тема"
+    "Title": "Настройки приложения"
   },
 
   "Common": {
     "Save": "Сохранить",
-    "Cancel": "Отмена"
+    "Cancel": "Отмена",
+    "AppSettings": "Настройки приложения",
+    "Theme": "Тема",
+    "Language": "Язык",
+    "DarkTheme": "Тёмная",
+    "LightTheme": "Светлая",
+    "DefaultTheme": "По умолчанию"
   }
 }
-
-
-

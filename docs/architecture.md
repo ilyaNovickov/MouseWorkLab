@@ -23,6 +23,9 @@
 | `Services/AppSettings/IApplicationSettingsService.cs` | контракт: тема, культура, два события |
 | `Services/AppSettings/ApplicationSettingsService.cs` | состояние в памяти + автосохранение |
 | `Services/AppSettings/AppSettingsStore.cs` | чтение/запись `%LOCALAPPDATA%\MouseLab\settings.json` |
+| `Services/AppSettings/AppSettingsServiceBase.cs` | общее состояние настроек и `LoadFrom` |
+| `Services/AppSettings/ApplicationSettingsService.cs` | постоянные настройки + автосохранение |
+| `Services/AppSettings/TemporaryAppSettingsService.cs` | настройки окна приветствия, без файла |
 | `Services/AppSettings/ThemeChangedEventArgs.cs` | аргументы события темы |
 | `Services/AppSettings/CultureChangedEventArgs.cs` | аргументы события языка |
 | `AppServices.cs` | точка сборки графа объектов, чтение настроек, контейнер |
@@ -33,13 +36,15 @@
 |---|---|
 | `ViewModels/ViewModelBase.cs` | даёт каждой модели `Strings` и `Translations` |
 | `ViewModels/MainWindowViewModel.cs` | открывает окно настроек |
+| `ViewModels/Welcome/WelcomeWindowViewModel.cs` | данные студента, проверка полей, `Confirm`/`Exit` |
 | `ViewModels/Settings/SettingsWindowViewModel.cs` | модель окна настроек, владеет `AppSettings` |
 | `ViewModels/Settings/AppSettingsViewModel.cs` | выбор языка и темы, `SaveSettingsCommand` |
 | `Models/CultureOption.cs` | пункт выпадающего списка языков |
 | `Models/ThemeOption.cs` | пункт выпадающего списка тем, `IDisposable` |
 | `Models/Themes.cs` | тема оформления |
 | `Views/MainWindow.axaml` | кнопка открытия настроек |
-| `Views/Settings/SettingsWindow.axaml` | окно настроек, кнопка Save (`f`) |
+| `Views/WelcomeWindow.axaml` | окно приветствия: форма, проверка полей, кнопки |
+| `Views/Settings/SettingsWindow.axaml` | окно настроек, кнопка Save |
 | `Views/Settings/AppSettingsView.axaml` | выпадающие списки языка и темы |
 | `Services/WindowsManager/WindowsManagerService.cs` | создаёт и закрывает окна |
 | `ViewLocator.cs` | сопоставление `ViewModel` → `View`, таблица генерируется `StaticViewLocator` |
@@ -47,25 +52,45 @@
 ## Порядок запуска
 
 Регистрация сервисов вынесена в `AppServices`; `App` занимается только
-оркестрацией. Порядок важен:
+оркестрацией. Приложение стартует в два шага: сначала окно приветствия,
+затем главное окно. Порядок важен:
 
 ```
-App.OnFrameworkInitializationCompleted
+App.OnFrameworkInitializationCompleted                        (App.axaml.cs:50)
 │
-├─ 1. AppServices.CreateDefault()               // AppServices.cs:130
-│        ├─ AppSettingsStore.Load()             // прочитать settings.json
-│        ├─ ResolveCulture(...)                 // культура из настроек или en-US
-│        ├─ AddSingleton<IApplicationSettingsService>(new ...(snapshot))
-│        ├─ AddProTranslate(culture: initialCulture)
-│        ├─ AddProTranslateAvalonia()
-│        ├─ AddTransient/AddSingleton для моделей и представлений
-│        ├─ BuildServiceProvider()               // AppServices.cs:42
-│        └─ provider.UseProTranslateAvalonia()  // AppServices.cs:46 — сразу после сборки
+├─ AppServices.CreateDefault()                                 (AppServices.cs:158)
+│     ├─ AppSettingsStore.Load()                              // settings.json
+│     ├─ ResolveCulture(...)
+│     ├─ AddSingleton<IApplicationSettingsService>(snapshot)   // постоянные
+│     ├─ AddKeyedSingleton<IApplicationSettingsService>("WelcomeWindow") // временные
+│     ├─ AddProTranslate(culture: initialCulture)
+│     ├─ AddProTranslateAvalonia()
+│     ├─ AddTransient/AddSingleton для моделей и представлений
+│     ├─ BuildServiceProvider()                                 (AppServices.cs:43)
+│     └─ provider.UseProTranslateAvalonia()                    (AppServices.cs:52)
 │
-├─ 2. settings.ThemeChanged += ApplyTheme       // App.axaml.cs:37
-├─ 3. ApplyTheme(settings.CurrentAppTheme)      // применить тему из настроек
-├─ 4. new MainWindow { DataContext = ... }
-└─ 5. desktop.Exit += Shutdown                  // освободить контейнер при выходе
+├─ desktop.ShutdownMode = OnExplicitShutdown                   (App.axaml.cs:63)
+├─ desktop.Exit += Shutdown
+│
+└─ ShowWelcome(desktop)                                        (App.axaml.cs:72)
+      ├─ SetCulture(временные настройки)  // окно не наследует язык из файла
+      ├─ temporary.ThemeChanged += ApplyTheme // предпросмотр темы
+      ├─ resolve WelcomeWindowViewModel + WelcomeWindow
+      ├─ vm.Confirmed  → _welcomeConfirmed = true; window.Close()
+      ├─ vm.ExitRequested → window.Close()
+      ├─ window.Closed → vm.Dispose(); переход или Shutdown
+      └─ window.Show()                                          (App.axaml.cs:123)
+
+                 ⋮  пользователь подтверждает данные
+
+AdvanceToMainWindow(desktop)                                   (App.axaml.cs:126)
+      ├─ stored.LoadFrom(временные)   // единственная запись в settings.json
+      ├─ stored.ThemeChanged += ApplyTheme
+      ├─ SetCulture(stored.CurrentCultureName)
+      ├─ resolve MainWindowViewModel + MainWindow
+      ├─ desktop.MainWindow = main
+      ├─ desktop.ShutdownMode = OnMainWindowClose               (App.axaml.cs:166)
+      └─ main.Show()                                            (App.axaml.cs:172)
 ```
 
 Шаг `UseProTranslateAvalonia` обязателен и часто забывается. Он передаёт
@@ -74,6 +99,58 @@ App.OnFrameworkInitializationCompleted
 настроенным на пустой провайдер по умолчанию. Он находится **в том же методе**,
 что и `BuildServiceProvider`, чтобы порядок «сначала собрать, потом подключить
 адаптер» нельзя было нарушить извне.
+
+### Почему `MainWindow` показывается вручную
+
+`desktop.MainWindow` в текущем Avalonia — обычное автосвойство. Показ происходит
+один раз, из `ShowMainWindow()`, которую lifetime вызывает **после** возврата из
+`OnFrameworkInitializationCompleted`. Поэтому окно приветствия показывается
+само (оно назначено в `desktop.MainWindow` до старта главного цикла), а главное
+окно — нет: оно назначается уже после. Без явного `mainWindow.Show()` приложение
+висело бы в главном цикле без единого окна. Проверка `!mainWindow.IsVisible`
+страхует от двойного показа в другой версии Avalonia.
+
+### Три пути выхода и почему их три
+
+| Действие | Результат |
+|---|---|
+| «Подтвердить» | `Confirmed` → `window.Close()` → `Closed` → `AdvanceToMainWindow` |
+| «Выход» | `ExitRequested` → `window.Close()` → `Closed` → `desktop.Shutdown()` |
+| Крестик | `Closed` → `desktop.Shutdown()` |
+
+Обе кнопки только закрывают окно, а различаются одним флагом `_welcomeConfirmed`.
+Так невозможно получить двойной переход: `AdvanceToMainWindow` дополнительно
+защищён флагом `_mainWindowStarted`.
+
+`ShutdownMode.OnExplicitShutdown` на время окна приветствия обязателен: при
+`OnMainWindowClose` закрытие крестиком завершило бы приложение, а закрытие после
+подтверждения убило бы его раньше времени. Без третьего пути (крестик) режим
+`OnExplicitShutdown` оставил бы процесс живым вообще без окон.
+
+### Два экземпляра настроек
+
+| Экземпляр | Ключ в контейнере | Жизненный цикл |
+|---|---|---|
+| `ApplicationSettingsService` | по умолчанию | читает и пишет `settings.json` |
+| `TemporaryAppSettingsService` | `"WelcomeWindow"` (`AppServices.TemporarySettingsKey`) | только память, никогда не пишет файл |
+
+Временный **намеренно** заполняется пустым снимком: у каждого пользователя будут
+свои настройки, поэтому окно приветствия стартует с умолчаний, а не из файла.
+Поэтому же `ShowWelcome` выставляет культуру в рантайм из временных настроек —
+иначе `ComboBox` показывал бы «русский», а весь интерфейс остался бы на языке
+файла.
+
+Временный сервис — **singleton**, а не transient: окно приветствия и `App` должны
+видеть один и тот же экземпляр, иначе перенос выбора в постоянные настройки
+записал бы значения по умолчанию.
+
+Перенос выполняется один раз, в `AdvanceToMainWindow`, через
+`AppSettingsServiceBase.LoadFrom`. Когда у пользователей появятся свои настройки
+(`%LOCALAPPDATA%\MouseLab\{userhash}\settings.json`), источником станет
+`LoadFrom(хранилище.LoadOrCreate(userHash))` — сам метод для этого и добавлен.
+
+Общее состояние обоих сервисов живёт в `AppSettingsServiceBase`: держать две
+почти одинаковые копии нельзя, через месяц они разъезжаются.
 
 ### Почему контейнер в поле
 
@@ -365,12 +442,50 @@ var view = (Control)Activator.CreateInstance(type)!;
 ### Что анализаторы не ловят
 
 * **Вычисленные имена типов** — см. выше.
-* **Привязки XAML без `x:DataType`.** Все три представления его имеют, и
+* **Привязки XAML без `x:DataType`.** Все представления их имеют, и
   `AvaloniaUseCompiledBindingsByDefault` страхует остальное. Если появится
   привязка без `x:DataType`, она станет рефлексивной молча.
 * **Ошибки в рантайме AOT-сборки.** Собранный exe надо хотя бы раз запустить:
   анализатор ничего не знает про загрузку ресурсов FluentTheme, регистрацию
   встроенного шрифта `WithInterFont()` и статический binding source ProTranslate.
+
+### Две ловушки, найденные при проверке AOT-сборки
+
+Обе проявились **только в AOT** и были полностью невидимы в обычной сборке и в
+headless-проверках. Это и есть цена того, что анализаторы не запускают
+приложение.
+
+**1. `<RowDefinition/>` без `Height` — это `1*`, а не `Auto`.** В WPF значение по
+умолчанию `Auto`, в Avalonia — звезда. Форма внутри `GroupBox` с такими строками
+измеряется против неограниченной высоты, и её итоговая высота не совпадает с
+ожидаемой. Все строки формы пишутся явно: `<RowDefinition Height="Auto"/>`.
+
+**2. Метрики шрифта в AOT отличаются от JIT.** `WithInterFont()` подгружает
+встроенный Inter, но под NativeAOT шрифт может быть недоступен, и тогда
+Avalonia подставляет замену с другими метриками. Контент окна приветствия
+становится примерно на 80px выше, чем в JIT-сборке, и нижний ряд с кнопками
+уезжает за границу окна: кнопки просто исчезают, форма выглядит нормально.
+
+Отсюда практическое правило: **высоту окна с фиксированным набором полей
+задавайте с запасом относительно JIT-сборки.** У `WelcomeWindow` стоит
+`Height="600"` именно поэтому. Не полагайтесь на `SizeToContent="Height"` — при
+расхождении метрик он считает высоту по одним и тем же неверным метрикам и
+ошибку не показывает.
+
+Проверять это можно только запуском обеих сборок: JIT- exe и AOT-exe рядом,
+и сравнивать, не уехал ли кто-нибудь за нижний край.
+
+### Проверка полей без рефлексии
+
+Проверка обязательных полей в `WelcomeWindowViewModel` сделана вручную:
+`HasFirstNameError` плюс `RelayCommand(CanExecute = ...)`, а подсветка идёт через
+`Classes.error="{Binding HasFirstNameError}"` и стиль `TextBox.error`.
+
+**Не используйте `System.ComponentModel.DataAnnotations` с
+`Validator.TryValidateObject` и не доставайтесь до `INotifyDataErrorInfo` через
+атрибуты.** Всё это работает через рефлексию по атрибутам, несовместимо с
+NativeAOT и при этом даёт чистую сборку — то есть тот же класс тихой поломки,
+что и `Type.GetType` по вычисленному имени.
 
 ### Внешних дескрипторов триммера нет
 

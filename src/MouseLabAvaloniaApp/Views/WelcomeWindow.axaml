@@ -1,29 +1,31 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:d="http://schemas.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" 
         xmlns:models="using:MouseLabAvaloniaApp.Models"
         xmlns:vm="using:MouseLabAvaloniaApp.ViewModels.Welcome"
-        d:DesignWidth="600" 
-        d:DesignHeight="380"
+        mc:Ignorable="d"
+        d:DesignWidth="600"
+        d:DesignHeight="600"
         Width="600"
-        Height="380"
+        Height="600"
         x:Class="MouseLabAvaloniaApp.Views.WelcomeWindow"
         x:DataType="vm:WelcomeWindowViewModel"
         Translation.Culture="{Binding Strings.Culture}"
         Translation.AutoFlowDirection="True"
-        Title="Window1">
+        Title="{Binding Strings.WelcomeWindowTitle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="BorderColor">RoyalBlue</SolidColorBrush>
                     <SolidColorBrush x:Key="HoverBorderColor">#2a4594</SolidColorBrush>
+                    <SolidColorBrush x:Key="ErrorColor">#C62828</SolidColorBrush>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="BorderColor">RoyalBlue</SolidColorBrush>
                     <SolidColorBrush x:Key="HoverBorderColor">#2a4594</SolidColorBrush>
+                    <SolidColorBrush x:Key="ErrorColor">#EF5350</SolidColorBrush>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
@@ -54,105 +56,146 @@
             <Setter Property="MinWidth" Value="300"/>
             <Setter Property="MaxWidth" Value="300"/>
         </Style>
+        <!-- Подсветка незаполненного обязательного поля. Класс .error ставится
+             привязкой Classes.error к свойству Has*Error в модели представления:
+             проверка сделана вручную, без INotifyDataErrorInfo и DataAnnotations,
+             потому что те работают через рефлексию и несовместимы с NativeAOT. -->
+        <Style Selector="TextBox.error">
+            <Setter Property="BorderBrush" Value="{DynamicResource ErrorColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style Selector="TextBlock.error">
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="MaxWidth" Value="300"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{DynamicResource ErrorColor}"/>
+        </Style>
     </Window.Styles>
-    <ScrollViewer>
+<!-- Фиксированная высота 520px подобрана так, чтобы форма и ряд кнопок
+         помещались целиком: при меньшей высоте кнопки уезжали за нижний край
+         окна. Поля набора фиксированы, поэтому прокрутка здесь не нужна. -->
     <StackPanel>
-        <GroupBox Header="Информация о студенте">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Classes="form" 
-                           Grid.Column="0" 
-                           Grid.Row="0"
-                           Text="Имя"/>
-                <TextBox Classes="form" 
-                         Grid.Column="1" 
-                         Grid.Row="0"
-                         PlaceholderText="Имя"/>
-                <TextBlock Classes="form" 
-                           Grid.Column="0" 
-                           Grid.Row="1"
-                           Text="Фамилия"/>
-                <TextBox Classes="form" 
-                         Grid.Column="1" 
-                         Grid.Row="1"
-                         PlaceholderText="Фамилия"/>
-                <TextBlock Classes="form" 
-                           Grid.Column="0" 
-                           Grid.Row="2"
-                           Text="Отвество (при наличии)"/>
-                <TextBox Classes="form" 
-                         Grid.Column="1" 
-                         Grid.Row="2"
-                         PlaceholderText="Отчество"/>
-                <TextBlock Classes="form" 
-                           Grid.Column="0" 
-                           Grid.Row="3"
-                           Text="Группа"/>
-                <TextBox Classes="form" 
-                         Grid.Column="1" 
-                         Grid.Row="3"
-                         PlaceholderText="Группа"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox Header="Настройки приложения">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Classes="form" 
-                         Grid.Column="0" 
-                         Grid.Row="0"
-                         Text="Тема"/>
-                <ComboBox Classes="settings"
-                          Grid.Column="1" 
-                          Grid.Row="0"
-                          ItemsSource="{Binding AvailableThemes}"
-                          SelectedItem="{Binding SelectedTheme}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="models:ThemeOption">
-                            <TextBlock Text="{Binding DisplayName.Value}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <TextBlock Classes="form" 
-                         Grid.Column="0" 
-                         Grid.Row="1"
-                         Text="Язык"/>
-                <ComboBox Classes="settings" 
-                          Grid.Column="1" Grid.Row="1"
-                          ItemsSource="{Binding AvailableCultures}"
-                          SelectedItem="{Binding SelectedCulture}"/>
-            </Grid>
-        </GroupBox>
+        <GroupBox Header="{Binding Strings.WelcomeWindowStudentInfo}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Classes="form"
+                               Grid.Column="0"
+                               Grid.Row="0"
+                               Text="{Binding Strings.WelcomeWindowFirstName}"/>
+                    <!-- Поле и подсказка об ошибке лежат в одной StackPanel: иначе
+                         пришлось бы накладывать их через Margin, что ломается
+                         при любой смене шрифта или темы. -->
+                    <StackPanel Grid.Column="1" Grid.Row="0">
+                        <TextBox Classes="form"
+                                 Classes.error="{Binding HasFirstNameError}"
+                                 Text="{Binding FirstName}"
+                                 PlaceholderText="{Binding Strings.WelcomeWindowFirstName}"/>
+                        <TextBlock Classes="error"
+                                   IsVisible="{Binding HasFirstNameError}"
+                                   Text="{Binding FirstNameError}"/>
+                    </StackPanel>
+
+                    <TextBlock Classes="form"
+                               Grid.Column="0"
+                               Grid.Row="1"
+                               Text="{Binding Strings.WelcomeWindowLastName}"/>
+                    <StackPanel Grid.Column="1" Grid.Row="1">
+                        <TextBox Classes="form"
+                                 Classes.error="{Binding HasLastNameError}"
+                                 Text="{Binding LastName}"
+                                 PlaceholderText="{Binding Strings.WelcomeWindowLastName}"/>
+                        <TextBlock Classes="error"
+                                   IsVisible="{Binding HasLastNameError}"
+                                   Text="{Binding LastNameError}"/>
+                    </StackPanel>
+
+                    <TextBlock Classes="form"
+                               Grid.Column="0"
+                               Grid.Row="2"
+                               Text="{Binding Strings.WelcomeWindowMiddleName}"/>
+                    <TextBox Classes="form"
+                             Grid.Column="1"
+                             Grid.Row="2"
+                             Text="{Binding MiddleName}"
+                             PlaceholderText="{Binding Strings.WelcomeWindowMiddleName}"/>
+
+                    <TextBlock Classes="form"
+                               Grid.Column="0"
+                               Grid.Row="3"
+                               Text="{Binding Strings.WelcomeWindowGroup}"/>
+                    <StackPanel Grid.Column="1" Grid.Row="3">
+                        <TextBox Classes="form"
+                                 Classes.error="{Binding HasGroupError}"
+                                 Text="{Binding Group}"
+                                 PlaceholderText="{Binding Strings.WelcomeWindowGroup}"/>
+                        <TextBlock Classes="error"
+                                   IsVisible="{Binding HasGroupError}"
+                                   Text="{Binding GroupError}"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="{Binding Strings.CommonAppSettings}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Classes="form"
+                               Grid.Column="0"
+                               Grid.Row="0"
+                               Text="{Binding Strings.CommonTheme}"/>
+                    <ComboBox Classes="settings"
+                              Grid.Column="1"
+                              Grid.Row="0"
+                              ItemsSource="{Binding AvailableThemes}"
+                              SelectedItem="{Binding SelectedTheme}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="models:ThemeOption">
+                                <TextBlock Text="{Binding DisplayName.Value}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Classes="form"
+                               Grid.Column="0"
+                               Grid.Row="1"
+                               Text="{Binding Strings.CommonLanguage}"/>
+                    <ComboBox Classes="settings"
+                              Grid.Column="1"
+                              Grid.Row="1"
+                              ItemsSource="{Binding AvailableCultures}"
+                              SelectedItem="{Binding SelectedCulture}"/>
+                </Grid>
+            </GroupBox>
         <Border Margin="3,3,3,3">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button Classes="manage"
-                        Grid.Column="1" 
-                        Content="Потвердить"/>
+                        Grid.Column="1"
+                        Content="{Binding Strings.WelcomeWindowConfirm}"
+                        Command="{Binding ConfirmCommand}"/>
                 <Button Classes="manage"
-                        Grid.Column="2" 
-                        Content="Выход"/>
+                        Grid.Column="2"
+                        Content="{Binding Strings.WelcomeWindowExit}"
+                        Command="{Binding ExitCommand}"/>
             </Grid>
         </Border>
     </StackPanel>
-    </ScrollViewer>
 </Window>

@@ -4,8 +4,9 @@
              xmlns:local="using:MouseLabAvaloniaApp"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
              <Application.Styles>
+                 <FluentTheme/>
+
                  <Style Selector="TextBlock.settings">
                      <Setter Property="TextAlignment" Value="Right"/>
                      <Setter Property="VerticalAlignment" Value="Center"/>
@@ -19,12 +20,7 @@
                  </Style>
              </Application.Styles>
 
-
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-  
-    <Application.Styles>
-        <FluentTheme />
-    </Application.Styles>
 </Application>

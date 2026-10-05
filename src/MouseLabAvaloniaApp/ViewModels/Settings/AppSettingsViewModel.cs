@@ -43,9 +43,9 @@ namespace MouseLabAvaloniaApp.ViewModels.Settings
 
             AvailableThemes =
             [
-                new ThemeOption(Strings.Observe_SettingsWindowDarkTheme(), Themes.Dark),
-                new ThemeOption(Strings.Observe_SettingsWindowLightTheme(), Themes.Light),
-                new ThemeOption(Strings.Observe_SettingsWindowDefaultTheme(), Themes.Default)
+                new ThemeOption(Strings.Observe_CommonDarkTheme(), Themes.Dark),
+                new ThemeOption(Strings.Observe_CommonLightTheme(), Themes.Light),
+                new ThemeOption(Strings.Observe_CommonDefaultTheme(), Themes.Default)
             ];
             // Подписываемся на смену культуры, чтобы пересчитать собственные вычисляемые
             // свойства. Отписка - в Dispose.

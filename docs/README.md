@@ -18,6 +18,7 @@
 | Строка с параметром (`{0}`) | [localization.md](localization.md#строки-с-параметрами) |
 | Разобраться, что где лежит | [architecture.md](architecture.md) |
 | Когда нужен `Dispose`, а когда нет | [dispose.md](dispose.md) |
+| Старт приложения и переход между окнами | [architecture.md](architecture.md#порядок-запуска) |
 | Что-то не переводится / ошибки сборки | [troubleshooting.md](troubleshooting.md) |
 
 ## Устройство решения
@@ -32,18 +33,20 @@ src/
       Strings.en-US.json                     каталог переводов (английский, США)
       Strings.ru-RU.json                     каталог переводов (русский, Россия)
       README.md                              соглашения по каталогам
-    App.axaml.cs                             оркестрация запуска: тема, главное окно, выход
+App.axaml.cs                             оркестрация запуска: приветствие → главное окно
     AppServices.cs                           точка сборки графа объектов (DI) + контейнер дизайнера
     ViewModels/ViewModelBase.cs              базовый класс с доступом к переводам
     ViewModels/MainWindowViewModel.cs        открывает окно настроек
+    ViewModels/Welcome/                      данные студента, проверка полей, Confirm/Exit
     ViewModels/Settings/                     модели окна настроек: язык, тема, SaveSettingsCommand
     Views/MainWindow.axaml                   главное окно
+    Views/WelcomeWindow.axaml                 окно приветствия (форма + кнопки)
     Views/Settings/SettingsWindow.axaml      окно настроек, кнопка Save
     Views/Settings/AppSettingsView.axaml     выпадающие списки языка и темы
     Models/CultureOption.cs                  пункт выпадающего списка языков
     Models/ThemeOption.cs                    пункт выпадающего списка тем
     Models/Themes.cs                         тема оформления
-    Services/AppSettings/                    чтение и запись настроек
+    Services/AppSettings/                    настройки: постоянные, временные, чтение/запись
     Services/WindowsManager/                 создание и закрытие окон
     ViewLocator.cs                           сопоставление ViewModel -> View (генерируется StaticViewLocator)
     MouseLabAvaloniaApp.csproj               пакеты, каталоги, AOT

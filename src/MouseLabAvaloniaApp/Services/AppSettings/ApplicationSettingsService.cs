@@ -4,24 +4,21 @@ using System;
 namespace MouseLabAvaloniaApp.Services.AppSettings;
 
 /// <summary>
-/// Состояние пользовательских настроек в памяти + автоматическое сохранение в файл.
+/// Постоянные пользовательские настройки: состояние в памяти плюс
+/// автосохранение в <c>%LOCALAPPDATA%\MouseLab\settings.json</c>.
 /// </summary>
-public sealed class ApplicationSettingsService : TemporaryAppSettingsService //IApplicationSettingsService
+public sealed class ApplicationSettingsService : AppSettingsServiceBase
 {
-    public ApplicationSettingsService(AppSettingsSnapshot snapshot)
+    public ApplicationSettingsService(AppSettingsSnapshot snapshot) : base(snapshot)
     {
-        // Стартовые значения выставляем напрямую в поля, не поднимая события:
-        // до подписки обработчиков это всё равно никто не услышит, а лишняя
-        // запись в settings.json при каждом запуске не нужна.
-        CurrentAppTheme = snapshot.Theme;
-        CurrentCultureName = AppSettingsStore.ResolveCulture(snapshot.Culture).Name;
-
-        // Одна и та же реакция на оба события: перезаписать файл настроек целиком.
-        // Сам снимок хранит и тему, и культуру, поэтому сохраняются оба значения.
+        // Подписка после base: стартовые значения выставлены в конструкторе базы
+        // и не должны приводить к записи файла при создании сервиса.
         ThemeChanged += OnSettingChanged;
         CultureChanged += OnSettingChanged;
     }
 
+    // Одна и та же реакция на оба события: перезаписать файл настроек целиком.
+    // Сам снимок хранит и тему, и культуру, поэтому сохраняются оба значения.
     private void OnSettingChanged(object sender, EventArgs e) =>
         AppSettingsStore.Save(new AppSettingsSnapshot
         {

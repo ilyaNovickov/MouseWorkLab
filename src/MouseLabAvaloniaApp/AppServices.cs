@@ -20,6 +20,11 @@ namespace MouseLabAvaloniaApp;
 /// </summary>
 public sealed class AppServices : IDisposable
 {
+    /// <summary>
+    /// Ключ временных настроек окна приветствия в контейнере.
+    /// </summary>
+    public const string TemporarySettingsKey = "WelcomeWindow";
+
     private bool _disposed;
 
     // Контейнер DI держим в поле, а не в локальной переменной: если использовать
@@ -96,8 +101,16 @@ public sealed class AppServices : IDisposable
         services.AddProTranslateAvalonia();
         #endregion
 
-        services.AddKeyedSingleton<IApplicationSettingsService, TemporaryAppSettingsService>
-            ("Temporary", (sp, _) => new TemporaryAppSettingsService());
+        // Временные настройки окна приветления: живут в памяти и никогда не
+        // пишутся в файл. Именно поэтому нужен ключ - два экземпляра
+        // IApplicationSettingsService должны быть различимы по назначению,
+        // а не по типу реализации.
+        //
+        // Именно singleton, а не transient: окно приветствия и App должны видеть
+        // ОДИН и тот же экземпляр. При transient повторное разрешение дало бы
+        // новый пустой объект, и перенос выбора в постоянные настройки
+        // записал бы вместо него значения по умолчанию.
+        services.AddKeyedSingleton<IApplicationSettingsService, TemporaryAppSettingsService>(TemporarySettingsKey);
 
         // Настройки регистрируем готовым экземпляром, потому что они нужны ДО сборки
         // контейнера: стартовая культура определяется из файла и передаётся в AddProTranslate.
@@ -109,9 +122,13 @@ public sealed class AppServices : IDisposable
 
         #region ViewModels
 
+        // Окно приветствия работает с временными настройками, а не с постоянными:
+        // у каждого пользователя будут свои настройки, поэтому settings.json на этом
+        // шаге не трогаем вообще. Постоянные заполняются один раз при переходе к
+        // главному окну, см. App.AdvanceToMainWindow.
         services.AddTransient<WelcomeWindowViewModel>(sp => new WelcomeWindowViewModel(sp.GetRequiredService<ITranslationService>(),
             sp.GetRequiredService<ICultureService>(),
-            sp.GetKeyedService<IApplicationSettingsService>("Temporary") ?? sp.GetRequiredService<IApplicationSettingsService>()));
+            sp.GetRequiredKeyedService<IApplicationSettingsService>(TemporarySettingsKey)));
 
         services.AddTransient<AppSettingsViewModel>(sp => new AppSettingsViewModel(sp.GetRequiredService<ITranslationService>(),
             sp.GetRequiredService<ICultureService>(),

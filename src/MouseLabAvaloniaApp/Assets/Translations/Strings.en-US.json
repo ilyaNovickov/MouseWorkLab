@@ -3,20 +3,32 @@
     "Title": "MouseLab"
   },
 
+  "WelcomeWindow": {
+    "Title": "Welcome",
+    "StudentInfo": "Student information",
+    "FirstName": "First name",
+    "LastName": "Last name",
+    "MiddleName": "Patronymic (optional)",
+    "Group": "Group",
+    "Confirm": "Confirm",
+    "Exit": "Exit",
+    "FirstNameRequired": "Enter your first name",
+    "LastNameRequired": "Enter your last name",
+    "GroupRequired": "Enter your group"
+  },
+
   "SettingsWindow": {
-    "Title": "Application settings",
-
-    "AppSettings": "Application",
-
-    "Language": "Language",
-    "DarkTheme": "Dark",
-    "LightTheme": "Light",
-    "DefaultTheme": "Default",
-    "Theme": "Theme"
+    "Title": "Application settings"
   },
 
   "Common": {
     "Save": "Save",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "AppSettings": "Application settings",
+    "Theme": "Theme",
+    "Language": "Language",
+    "DarkTheme": "Dark",
+    "LightTheme": "Light",
+    "DefaultTheme": "Default"
   }
 }

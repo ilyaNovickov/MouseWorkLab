@@ -119,9 +119,19 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
 
 ## Startup wiring — order is load-bearing
 
+- Startup is **two steps**: `App.ShowWelcome` (welcome window) → `App.AdvanceToMainWindow`
+  (main window). Trigger is the Confirm command, not window close; closing via X
+  or Exit shuts the app down. Keep all three paths — without the X path
+  `ShutdownMode.OnExplicitShutdown` leaves a process running with no windows.
 - DI registration lives in **`AppServices`**, not in `App`. `App` only
-  orchestrates: create `AppServices.CreateDefault()`, apply theme, build the main
-  window, wire `desktop.Exit`. Don't move registrations back into `App`.
+  orchestrates: create `AppServices.CreateDefault()`, show the welcome window,
+  swap to the main window, wire `desktop.Exit`. Don't move registrations back
+  into `App`.
+- **`desktop.MainWindow` does not show the window.** It's a plain auto-property;
+  the lifetime calls `ShowMainWindow()` once, *after*
+  `OnFrameworkInitializationCompleted` returns. The welcome window is shown by
+  that (it's assigned first). The main window needs an explicit
+  `mainWindow.Show()`, otherwise the app sits in the main loop with no windows.
 - `AppSettingsStore.Load()` + `ResolveCulture` happen **inside
   `AppServices.CreateDefault()`**, before the container is built. The culture
   must be known before DI exists, so `IApplicationSettingsService` is registered
@@ -141,6 +151,21 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
   process without a usable stack.
 - `App.axaml.cs` does **not** call `AvaloniaXamlLoader` for views; only
   `App.Initialize()` loads `App.axaml`.
+
+## Two settings instances — don't collapse them
+
+- `ApplicationSettingsService` (default key) reads/writes `settings.json`.
+- `TemporaryAppSettingsService` (`AppServices.TemporarySettingsKey`) is **memory
+  only** and starts from an **empty snapshot on purpose**: each user will have
+  their own settings, so the welcome window must not inherit the saved ones.
+  `ShowWelcome` therefore also sets the runtime culture from it — otherwise the
+  ComboBox says "Russian" while the whole UI is still in the file's language.
+- The temporary service is a keyed **singleton**, not transient: the window and
+  `App` must see the same instance, or the handoff writes defaults.
+- Handoff happens exactly once, via `AppSettingsServiceBase.LoadFrom`. When
+  per-user paths exist, it becomes `LoadFrom(store.LoadOrCreate(userHash))`.
+- Shared state lives in `AppSettingsServiceBase` — keep the two subclasses from
+  drifting back into duplicated copies.
 
 ## Designer support (`AppServices.Instance`)
 
@@ -189,7 +214,18 @@ Consequences already enforced in code:
   upgrade**, a new version can introduce warnings on its own.
 - Analyzers cannot see: computed type names, XAML bindings without `x:DataType`,
   and runtime-only AOT failures (FluentTheme resources, `WithInterFont()`,
-  ProTranslate's static binding source). Publish once and actually launch the exe.
+  ProTranslate's static binding source). Publish once and actually launch the exe —
+  **and compare against the JIT build**, because two layout bugs are AOT-only:
+  * `<RowDefinition/>` without `Height` means `1*` in Avalonia, **not** `Auto`
+    as in WPF. Always write `<RowDefinition Height="Auto"/>` in forms.
+  * AOT font metrics differ from JIT (`WithInterFont()` may fall back), so a
+    fixed window `Height` that fits in Debug can clip the bottom row in the AOT
+    exe. `WelcomeWindow` uses 600px for this reason; don't trust
+    `SizeToContent="Height"` to catch it.
+- Form validation must be **hand-written** (`Has*Error` + `RelayCommand(CanExecute)` +
+  `Classes.error` binding). `DataAnnotations` / `Validator.TryValidateObject` and
+  attribute-driven `INotifyDataErrorInfo` are reflection-based: clean build,
+  broken under AOT.
 - `MouseLab.Core` and `MouseLab.Services` carry `IsTrimmable` so the analyzers
   cover them the day a `ProjectReference` appears.
 

@@ -19,12 +19,12 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Classes="settings" Grid.Column="0" Grid.Row="0" Text="{Binding Strings.SettingsWindowLanguage}"/>
+        <TextBlock Classes="settings" Grid.Column="0" Grid.Row="0" Text="{Binding Strings.CommonLanguage}"/>
         <ComboBox Classes="settings" 
                   Grid.Column="1" Grid.Row="0"
                   ItemsSource="{Binding AvailableCultures}"
                   SelectedItem="{Binding SelectedCulture}"/>
-        <TextBlock Classes="settings" Grid.Column="0" Grid.Row="1" Text="{Binding Strings.SettingsWindowTheme}"/>
+        <TextBlock Classes="settings" Grid.Column="0" Grid.Row="1" Text="{Binding Strings.CommonTheme}"/>
         <ComboBox Classes="settings"
                   Grid.Column="1" Grid.Row="2"
                   ItemsSource="{Binding AvailableThemes}"

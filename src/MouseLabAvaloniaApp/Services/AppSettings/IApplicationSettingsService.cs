@@ -24,6 +24,18 @@ public interface IApplicationSettingsService
     /// <summary>Код выбранной культуры, например "en-US" или "ru-RU".</summary>
     string CurrentCultureName { get; set; }
 
+    /// <summary>
+    /// Заменяет текущие значения на значения из снимка, поднимая события только
+    /// для реально изменившихся полей.
+    /// </summary>
+    /// <remarks>
+    /// Нужна для смены настроек на лету: окно приветствия собирает выбор во
+    /// временном хранилище, а главное окно запускается уже с ним. Когда у
+    /// каждого пользователя будут свои настройки, источником станет
+    /// <c>%LOCALAPPDATA%\MouseLab\{userhash}\settings.json</c>.
+    /// </remarks>
+    void LoadFrom(AppSettingsSnapshot snapshot);
+
     event ThemeChangedEventHandler? ThemeChanged;
 
     event CultureChangedEventHandler? CultureChanged;
