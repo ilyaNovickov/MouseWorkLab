@@ -26,15 +26,19 @@ public interface IApplicationSettingsService
 
     /// <summary>
     /// Заменяет текущие значения на значения из снимка, поднимая события только
-    /// для реально изменившихся полей.
+    /// для реально изменившихся полей, и привязывает файл, в который пойдут
+    /// дальнейшие сохранения.
     /// </summary>
+    /// <param name="snapshot">Новые значения.</param>
+    /// <param name="filePath">
+    /// Путь к настройкам пользователя. На старте приложения пользователя ещё нет,
+    /// поэтому путь известен только здесь - в момент подтверждения данных.
+    /// </param>
     /// <remarks>
-    /// Нужна для смены настроек на лету: окно приветствия собирает выбор во
-    /// временном хранилище, а главное окно запускается уже с ним. Когда у
-    /// каждого пользователя будут свои настройки, источником станет
-    /// <c>%LOCALAPPDATA%\MouseLab\{userhash}\settings.json</c>.
+    /// Когда у пользователей появятся свои настройки, источником станет
+    /// <c>%LOCALAPPDATA%\MouseLab\{slug}-{hash}\settings.json</c>.
     /// </remarks>
-    void LoadFrom(AppSettingsSnapshot snapshot);
+    void LoadFrom(AppSettingsSnapshot snapshot, string filePath);
 
     event ThemeChangedEventHandler? ThemeChanged;
 

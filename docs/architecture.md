@@ -22,13 +22,17 @@
 |---|---|
 | `Services/AppSettings/IApplicationSettingsService.cs` | контракт: тема, культура, два события |
 | `Services/AppSettings/ApplicationSettingsService.cs` | состояние в памяти + автосохранение |
-| `Services/AppSettings/AppSettingsStore.cs` | чтение/запись `%LOCALAPPDATA%\MouseLab\settings.json` |
+| `Services/AppSettings/AppSettingsStore.cs` | чтение/запись `settings.json` пользователя, уборка старых каталогов |
 | `Services/AppSettings/AppSettingsServiceBase.cs` | общее состояние настроек и `LoadFrom` |
 | `Services/AppSettings/ApplicationSettingsService.cs` | постоянные настройки + автосохранение |
 | `Services/AppSettings/TemporaryAppSettingsService.cs` | настройки окна приветствия, без файла |
+ 
+| `Services/AppSettings/UserIdentity.cs` | нормализация ФИО, SHA-256, имя каталога пользователя |
+ 
+| `Models/UserProfile.cs` | личность пользователя внутри `settings.json` |
 | `Services/AppSettings/ThemeChangedEventArgs.cs` | аргументы события темы |
 | `Services/AppSettings/CultureChangedEventArgs.cs` | аргументы события языка |
-| `AppServices.cs` | точка сборки графа объектов, чтение настроек, контейнер |
+| `AppServices.cs` | точка сборки графа объектов, уборка старых каталогов, контейнер |
 
 ### Модели и представления
 
@@ -59,9 +63,9 @@
 App.OnFrameworkInitializationCompleted                        (App.axaml.cs:50)
 │
 ├─ AppServices.CreateDefault()                                 (AppServices.cs:158)
-│     ├─ AppSettingsStore.Load()                              // settings.json
+│     ├─ AppSettingsStore.CleanupOlderThan(365 дней)           // старые каталоги
 │     ├─ ResolveCulture(...)
-│     ├─ AddSingleton<IApplicationSettingsService>(snapshot)   // постоянные
+│     ├─ AddSingleton<IApplicationSettingsService>(пустой снимок) // постоянные
 │     ├─ AddKeyedSingleton<IApplicationSettingsService>("WelcomeWindow") // временные
 │     ├─ AddProTranslate(culture: initialCulture)
 │     ├─ AddProTranslateAvalonia()
@@ -78,13 +82,14 @@ App.OnFrameworkInitializationCompleted                        (App.axaml.cs:50)
       ├─ resolve WelcomeWindowViewModel + WelcomeWindow
       ├─ vm.Confirmed  → _welcomeConfirmed = true; window.Close()
       ├─ vm.ExitRequested → window.Close()
-      ├─ window.Closed → vm.Dispose(); переход или Shutdown
+      ├─ window.Closed → снимок vm.Profile; vm.Dispose(); переход или Shutdown
       └─ window.Show()                                          (App.axaml.cs:123)
 
                  ⋮  пользователь подтверждает данные
 
-AdvanceToMainWindow(desktop)                                   (App.axaml.cs:126)
-      ├─ stored.LoadFrom(временные)   // единственная запись в settings.json
+AdvanceToMainWindow(desktop, profile)                           (App.axaml.cs:126)
+      ├─ UserIdentity.ResolveSettingsPath(profile)  // каталог пользователя
+      ├─ stored.LoadFrom(снимок, путь)  // привязка пути + первый файл
       ├─ stored.ThemeChanged += ApplyTheme
       ├─ SetCulture(stored.CurrentCultureName)
       ├─ resolve MainWindowViewModel + MainWindow
@@ -131,7 +136,7 @@ AdvanceToMainWindow(desktop)                                   (App.axaml.cs:126
 
 | Экземпляр | Ключ в контейнере | Жизненный цикл |
 |---|---|---|
-| `ApplicationSettingsService` | по умолчанию | читает и пишет `settings.json` |
+| `ApplicationSettingsService` | по умолчанию | пишет `settings.json` **своего** каталога пользователя |
 | `TemporaryAppSettingsService` | `"WelcomeWindow"` (`AppServices.TemporarySettingsKey`) | только память, никогда не пишет файл |
 
 Временный **намеренно** заполняется пустым снимком: у каждого пользователя будут
@@ -144,13 +149,53 @@ AdvanceToMainWindow(desktop)                                   (App.axaml.cs:126
 видеть один и тот же экземпляр, иначе перенос выбора в постоянные настройки
 записал бы значения по умолчанию.
 
-Перенос выполняется один раз, в `AdvanceToMainWindow`, через
-`AppSettingsServiceBase.LoadFrom`. Когда у пользователей появятся свои настройки
-(`%LOCALAPPDATA%\MouseLab\{userhash}\settings.json`), источником станет
-`LoadFrom(хранилище.LoadOrCreate(userHash))` — сам метод для этого и добавлен.
+Перенос выполняется один раз, в `AdvanceToMainWindow(desktop, profile)`. Именно
+здесь личность из окна приветствия превращается в путь:
+
+```csharp
+string path = UserIdentity.ResolveSettingsPath(profile);
+stored.LoadFrom(new AppSettingsSnapshot { User = profile, ... }, path);
+```
+
+`LoadFrom` привязывает путь **и** создаёт файл, если его ещё нет
+(`ApplicationSettingsService.PersistIfMissing`). Без этого пользователь, принявший
+значения по умолчанию и ничего не менявший, не создал бы файл вовсе: `LoadFrom`
+поднимает события только для реально изменившихся полей, а события — единственный
+повод писать. Личность осталась бы в памяти и потерялась бы при выходе.
+
+Личность лежит в том же `settings.json` (`user.firstName`, `user.lastName`,
+`user.middleName`, `user.group`) и переписывается при каждой записи настроек.
+Потерять её нельзя, поэтому снимок в `ApplicationSettingsService.Write` всегда
+собирается заново из `User` и обоих текущих значений.
 
 Общее состояние обоих сервисов живёт в `AppSettingsServiceBase`: держать две
-почти одинаковые копии нельзя, через месяц они разъезжаются.
+почти одинаковые копии нельзя, через месяц они разъезжаются. Единственное
+различие — сохраняет ли сервис файл, поэтому и запись вынесена в переопределяемый
+хук `PersistIfMissing`: у временного сервиса он пустой.
+
+### Каталог пользователя и уборка старых
+
+Имя каталога строит `UserIdentity.ResolveDirectoryName`:
+
+```
+%LOCALAPPDATA%\MouseLab\{Фамилия}_{Имя}[_{Отчество}]_{Группа}-{16 символов SHA-256}
+```
+
+Хеш считается от нормализованного (обрезанные и схлопнутые пробелы,
+`ToUpperInvariant`) ФИО и группы. Он нужен не для безопасности — пароля нет и
+авторизации не существует, а только чтобы **развести** двух людей с одинаковым
+ФИО и группой: без него они получили бы один общий файл настроек.
+
+Следствие, о котором стоит помнить: нет настоящего входа в систему, поэтому
+опечатка в фамилии — это другой пользователь с другим каталогом, а не тот же
+самый. Сейчас окно приветствия не подставляет сохранённого пользователя, поэтому
+файлы только накапливаются; выбор «продолжить как прежний» — естественное
+следующее изменение.
+
+`AppSettingsStore.CleanupOlderThan` удаляет каталоги, у которых `settings.json`
+не менялся дольше года. Дата берётся из файла, а не из каталога: переименование
+каталога меняет его время, а содержимое файла остаётся прежним. Вызывается один
+раз при старте из `AppServices.CreateDefault()`.
 
 ### Почему контейнер в поле
 
@@ -169,10 +214,12 @@ private readonly ServiceProvider _serviceProvider;
 
 ### Почему культура известна до сборки контейнера
 
-`AddProTranslate` принимает культуру аргументом, а читать настройки нужно
-раньше, чем появятся сервисы. Поэтому `AppSettingsStore.Load()` и
-`ResolveCulture` выполняются в `AppServices.CreateDefault()` — **до** сборки
-контейнера — и готовый снимок передаётся в регистрацию:
+`AddProTranslate` принимает культуру аргументом, а знать её нужно раньше, чем
+появятся сервисы. Но читать при старте нечего: постоянный сервис поднимается с
+**пустым** снимком, потому что файла пользователя ещё не существует — личность
+приходит только из окна приветствия, а путь становится известен в
+`AdvanceToMainWindow`. Поэтому в `AppServices.CreateDefault()` остаётся только
+`ResolveCulture` от умолчания, и это происходит **до** сборки контейнера:
 
 ```csharp
 services.AddSingleton<IApplicationSettingsService>(new ApplicationSettingsService(snapshot));
@@ -198,8 +245,8 @@ services.AddSingleton<IApplicationSettingsService>(new ApplicationSettingsServic
   параметров конструктора и не создаётся. В XAML-варианте превью падало бы, а
   код-behind с `SetDataContext` при этом молча игнорировался бы.
 * **`Instance` обязан кэшироваться.** Без кэша каждое обращение создавало бы
-  новый контейнер, перечитывало `settings.json` и переустанавливало статический
-  binding source ProTranslate.
+  новый контейнер, заново прогоняло бы уборку старых каталогов и переустанавливало
+  статический binding source ProTranslate.
 * **Контейнер дизайнера не должен быть рабочим.** У него собственный
   `IApplicationSettingsService`, на который `App` не подписан, поэтому смена темы
   в превью не доедет до `App.ApplyTheme`. Общий контейнер означал бы, что
@@ -227,8 +274,9 @@ AppSettingsViewModel.SaveSettingsCommand
         │
         ├─► SyncSelectedCultureToSettings()
         │        ├─► IApplicationSettingsService.CurrentCultureName = "ru-RU"
-        │        │        └─► CultureChanged (приложения) ─► AppSettingsStore.Save()
-        │        │                                          settings.json перезаписан
+         │        │        └─► CultureChanged (приложения) ─► AppSettingsStore.Save()
+         │        │                                          settings.json пользователя перезаписан
+         │        │                                          (вместе с блоком user)
         │        │
         │        └─► ICultureService.SetCulture("ru-RU")
         │                 └─► CultureChanged (ProTranslate)
@@ -259,7 +307,7 @@ AppSettingsViewModel.SaveSettingsCommand
 `"DisplayName"`, а событие уходит в `AppSettingsViewModel`, где свойства
 с таким именем нет. Чтобы обновить `ThemeOption`, нужна привязка к
 `IObservableLocalizedString` — то есть `ItemTemplate`. Подробности в
-[localization.md](localization.md#переводимые-пункты-в-combobox).
+[localization.md](localization.md#4-переводимые-пункты-в-combobox).
 
 Защита от рекурсии: `SetCulture` внутри себя сравнивает культуру и, если
 она не изменилась, событие не поднимает. Дополнительно `SyncSelectedCulture`
@@ -294,15 +342,31 @@ AppSettingsViewModel.SaveSettingsCommand
 
 ## Хранение настроек
 
-Файл: `%LOCALAPPDATA%\MouseLab\settings.json`
-(`~/.local/share/MouseLab/settings.json` на Linux).
+У каждого пользователя свой каталог:
+
+```
+%LOCALAPPDATA%\MouseLab\{Фамилия}_{Имя}[_{Отчество}]_{Группа}-{16 символов SHA-256}\settings.json
+```
+
+(`~/.local/share/MouseLab/...` на Linux). Старый общий файл
+`%LOCALAPPDATA%\MouseLab\settings.json` больше не читается и не переписывается —
+он просто остаётся лежать. Имя каталога собирает `UserIdentity`, см.
+[«Каталог пользователя и уборка старых»](#каталог-пользователя-и-уборка-старых).
 
 ```json
 {
+  "user": {
+    "firstName": "Ада",
+    "lastName": "Лавлейс",
+    "group": "42"
+  },
   "culture": "ru-RU",
   "theme": "Light"
 }
 ```
+
+`middleName` и `culture` опускаются, если пустые. Личность обязана быть в каждом
+снимке: файл переписывается целиком, и снимок без `user` стёр бы её.
 
 Особенности реализации, о которых надо знать:
 
@@ -310,18 +374,23 @@ AppSettingsViewModel.SaveSettingsCommand
   `JsonSerializer.Serialize/Deserialize` помечены `IL2026`/`IL3050` — они
   опираются на рефлексию, и в AOT-сборке настройки молча перестали бы
   работать. `AppSettingsJsonContext` — это контекст
-  `System.Text.Json source generation`, сгенерированный компилятором.
+  `System.Text.Json source generation`, сгенерированный компилятором. Новый тип
+  в снимок обязан быть добавлен туда же: без строки `[JsonSerializable]` сборка
+  останется чистой, а тип не будет сериализован и упадёт в рантайме.
 * **`Themes` помечен `[JsonConverter(typeof(JsonStringEnumConverter<Themes>))]`.**
   Именно обобщённая версия: обычная `JsonStringEnumConverter` требует
   кодогенерации в рантайме и даёт `IL3050`.
+* **Имена записываются escape-последовательностями** (обычное поведение
+  `System.Text.Json`): `Ада` станет `Ада`. Файл читает только приложение, так
+  что менять кодировку ради читаемости глазами нецелесообразно.
 * **Ошибки чтения и записи проглатываются.** Битый JSON или
   `settings.json` в read-only не должны ронять приложение. Побочный эффект:
   реальная ошибка формата может остаться незамеченной — при разборе
   проблем с настройками временно замените `catch` на вывод в лог.
-* **Настройки записываются целиком** на любое изменение темы или языка.
-  Переключение происходит по кнопке Save в окне настроек: выбор только
-  запоминается в `AppSettingsViewModel`, а применяется и сохраняется в
-  `SaveSettingsCommand`. Тема доходит до интерфейса через
+* **Настройки записываются целиком** на любое изменение темы или языка, и
+  вместе с ними переписывается личность. Переключение происходит по кнопке Save в
+  окне настроек: выбор только запоминается в `AppSettingsViewModel`, а применяется
+  и сохраняется в `SaveSettingsCommand`. Тема доходит до интерфейса через
   `IApplicationSettingsService.ThemeChanged` → `App.ApplyTheme()` →
   `Application.RequestedThemeVariant`.
 

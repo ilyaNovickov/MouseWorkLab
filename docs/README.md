@@ -14,7 +14,7 @@
 | Добавить новую строку перевода | [localization.md](localization.md#как-добавить-новую-строку) |
 | Добавить новый язык | [localization.md](localization.md#как-добавить-новый-язык) |
 | Вывести перевод в XAML | [localization.md](localization.md#четыре-способа-вывести-перевод) |
-| Переводимый пункт списка | [localization.md](localization.md#переводимые-пункты-в-combobox) |
+| Переводимый пункт списка | [localization.md](localization.md#4-переводимые-пункты-в-combobox) |
 | Строка с параметром (`{0}`) | [localization.md](localization.md#строки-с-параметрами) |
 | Разобраться, что где лежит | [architecture.md](architecture.md) |
 | Когда нужен `Dispose`, а когда нет | [dispose.md](dispose.md) |
@@ -46,7 +46,9 @@ App.axaml.cs                             оркестрация запуска: 
     Models/CultureOption.cs                  пункт выпадающего списка языков
     Models/ThemeOption.cs                    пункт выпадающего списка тем
     Models/Themes.cs                         тема оформления
+    Models/UserProfile.cs                    личность пользователя в settings.json
     Services/AppSettings/                    настройки: постоянные, временные, чтение/запись
+    Services/AppSettings/UserIdentity.cs     нормализация ФИО и имя каталога пользователя
     Services/WindowsManager/                 создание и закрытие окон
     ViewLocator.cs                           сопоставление ViewModel -> View (генерируется StaticViewLocator)
     MouseLabAvaloniaApp.csproj               пакеты, каталоги, AOT
@@ -71,7 +73,7 @@ docs/                                        эта документация
 3. **Переводимые пункты `ComboBox` обязаны иметь `ItemTemplate`.**
    Без него Avalonia рисует пункт через `ToString()`, то есть берёт снимок
    строки; смена языка такой текст уже не обновляет. Подробности — в
-   [localization.md](localization.md#переводимые-пункты-в-combobox).
+   [localization.md](localization.md#4-переводимые-пункты-в-combobox).
 
 4. **Каталоги переводов — только в `MouseLabAvaloniaApp`.**
    Код, генерируемый SourceGenerator, попадает в сборку того проекта, который
@@ -95,9 +97,15 @@ docs/                                        эта документация
 
 ## Текущее состояние
 
-Поддерживаются `en-US` и `ru-RU`. Настройки хранятся в
-`%LOCALAPPDATA%\MouseLab\settings.json`. AOT-сборка (`PublishAot=true`)
-проходит без предупреждений.
+Поддерживаются `en-US` и `ru-RU`. Настройки хранятся у каждого пользователя
+отдельно, в
+`%LOCALAPPDATA%\MouseLab\{Фамилия}_{Имя}_{Группа}-{хеш}\settings.json`; каталоги с
+нетронутыми больше года файлами удаляются при запуске. AOT-сборка
+(`PublishAot=true`) проходит без предупреждений.
+
+Окно приветствия показывается при каждом запуске и не помнит прошлого
+пользователя: выбора «продолжить как прежний» пока нет, поэтому каталоги
+пользователей со временем накапливаются, пока уборка их не удалит.
 
 Язык и тема переключаются **по кнопке Save** в окне настроек: выбор только
 запоминается, применение и сохранение делает `SaveSettingsCommand`.

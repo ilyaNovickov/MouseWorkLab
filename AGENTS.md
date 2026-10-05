@@ -132,10 +132,11 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
   `OnFrameworkInitializationCompleted` returns. The welcome window is shown by
   that (it's assigned first). The main window needs an explicit
   `mainWindow.Show()`, otherwise the app sits in the main loop with no windows.
-- `AppSettingsStore.Load()` + `ResolveCulture` happen **inside
-  `AppServices.CreateDefault()`**, before the container is built. The culture
-  must be known before DI exists, so `IApplicationSettingsService` is registered
-  from the already-read snapshot.
+- **`AppServices.CreateDefault()` reads no settings file.** There is nothing to
+  read at startup: the user doesn't exist yet. It resolves the default culture and
+  runs `AppSettingsStore.CleanupOlderThan(365 дней)`. `IApplicationSettingsService`
+  is registered from an **empty** snapshot. The real file is bound later, in
+  `AdvanceToMainWindow`, once the welcome window has supplied a profile.
 - `UseProTranslateAvalonia()` lives in the same private method as
   `BuildServiceProvider()` so the "build first, then attach the adapter" order
   can't be broken from outside. Skipping it leaves the adapter pointing at an
@@ -154,7 +155,19 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
 
 ## Two settings instances — don't collapse them
 
-- `ApplicationSettingsService` (default key) reads/writes `settings.json`.
+- `ApplicationSettingsService` (default key) writes **one user's**
+  `settings.json`, at `%LOCALAPPDATA%\MouseLab\{slug}-{hash16}\settings.json`.
+  The path comes from `UserIdentity.ResolveSettingsPath(profile)` and is bound by
+  `LoadFrom(snapshot, filePath)`. Before that call the service is **unbound**:
+  values live in memory only and nothing is written.
+- **`LoadFrom` must create the file.** It only raises events for genuinely
+  changed values, and those events are the sole trigger for writing. A user who
+  accepts the defaults therefore changes nothing, and without
+  `ApplicationSettingsService.PersistIfMissing` no file would ever be created —
+  their identity would live in memory only and be lost on exit.
+- **Every snapshot written to disk must carry `User`.** The file is rewritten
+  whole on each change, so a snapshot without the identity erases it. That's why
+  `Write` always rebuilds the snapshot from `User` + the two live values.
 - `TemporaryAppSettingsService` (`AppServices.TemporarySettingsKey`) is **memory
   only** and starts from an **empty snapshot on purpose**: each user will have
   their own settings, so the welcome window must not inherit the saved ones.
@@ -162,10 +175,16 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
   ComboBox says "Russian" while the whole UI is still in the file's language.
 - The temporary service is a keyed **singleton**, not transient: the window and
   `App` must see the same instance, or the handoff writes defaults.
-- Handoff happens exactly once, via `AppSettingsServiceBase.LoadFrom`. When
-  per-user paths exist, it becomes `LoadFrom(store.LoadOrCreate(userHash))`.
+- Handoff happens exactly once, in `AdvanceToMainWindow(desktop, profile)`. It
+  snapshots `vm.Profile` **before** `vm.Dispose()` — the VM is already gone by the
+  time the window's `Closed` handler finishes.
+- There is no real sign-in, so a typo in the surname is a *different* user with a
+  *different* folder. The welcome window is stateless by decision: it does not
+  prefill a returning user, so profile files only accumulate until "continue as
+  before" is added.
 - Shared state lives in `AppSettingsServiceBase` — keep the two subclasses from
-  drifting back into duplicated copies.
+  drifting back into duplicated copies. The only intended difference is whether
+  the file is saved, which is why the write hook is a `virtual void`.
 
 ## Designer support (`AppServices.Instance`)
 
@@ -176,8 +195,8 @@ Full detail in `docs/localization.md`, `docs/architecture.md`,
   `Design.SetDataContext`, making the code-behind path dead. This broke
   `MainWindow` before.
 - `Instance` **must** stay cached in a static field. Without the cache every
-  access built a new container, re-read `settings.json`, and re-set ProTranslate's
-  process-wide binding source.
+  access built a new container, re-ran the old-profile cleanup, and re-set
+  ProTranslate's process-wide binding source.
 - The designer container is deliberately **not** the runtime container: it has
   its own `IApplicationSettingsService`, which `App` is not subscribed to, so
   theme switching in the preview never reaches `App.ApplyTheme`. Don't share it.
@@ -245,8 +264,10 @@ Consequences already enforced in code:
   because the main window is assigned directly as `desktop.MainWindow`.
   Nothing currently routes a view model through a `ContentControl`, so the
   locator is forward-looking, not load-bearing.
-- Settings persist to `%LOCALAPPDATA%\MouseLab\settings.json`. `AppSettingsStore`
-  swallows all exceptions by design so a corrupt file cannot block startup — a
-  real format bug will therefore be silent.
+- Settings persist per user to
+  `%LOCALAPPDATA%\MouseLab\{slug}-{hash16}\settings.json`; the old shared
+  `%LOCALAPPDATA%\MouseLab\settings.json` is left alone and no longer read.
+  `AppSettingsStore` swallows all exceptions by design so a corrupt file cannot
+  block startup — a real format bug will therefore be silent.
 - The theme setting is persisted and applied, but there is no theme picker in the
   UI yet (`Strings.Settings.Theme` exists unused).

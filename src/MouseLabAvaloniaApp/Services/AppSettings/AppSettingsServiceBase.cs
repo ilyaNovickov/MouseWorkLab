@@ -26,9 +26,22 @@ public abstract class AppSettingsServiceBase : IApplicationSettingsService
 
     protected AppSettingsServiceBase(AppSettingsSnapshot snapshot)
     {
+        User = snapshot.User;
         CurrentAppTheme = snapshot.Theme;
         _currentCultureName = AppSettingsStore.ResolveCulture(snapshot.Culture).Name;
     }
+
+    /// <summary>
+    /// Данные текущего пользователя. Приходят из снимка и сохраняются при любой
+    /// записи, иначе первая же смена темы стёрла бы личность из файла.
+    /// </summary>
+    protected UserProfile? User { get; private set; }
+
+    /// <summary>
+    /// Куда сохранять настройки. <c>null</c>, пока файл не привязан через
+    /// <see cref="LoadFrom"/>: на старте пользователя ещё нет.
+    /// </summary>
+    protected string? FilePath { get; private set; }
 
     public Themes CurrentAppTheme
     {
@@ -72,17 +85,36 @@ public abstract class AppSettingsServiceBase : IApplicationSettingsService
     /// Заменяет текущие значения на значения из снимка, поднимая события только
     /// для реально изменившихся полей.
     /// </summary>
+    /// <param name="snapshot">Новые значения.</param>
+    /// <param name="filePath">
+    /// Куда сохранять. Постоянные настройки создаются на старте, когда
+    /// пользователя ещё нет и путь неизвестен, поэтому файл привязывается здесь -
+    /// в момент, когда личность уже установлена.
+    /// </param>
     /// <remarks>
-    /// Существует для смены настроек на лету. Сейчас постоянные настройки
-    /// заполняются один раз в конструкторе, но окно приветствия изменит их
-    /// позже: когда у каждого пользователя будут свои настройки, сюда попадёт
-    /// снимок из <c>%LOCALAPPDATA%\MouseLab\{userhash}\settings.json</c>.
-    /// Значения, равные текущим, молча игнорируются - перезаписывать файл
-    /// без причины незачем.
+    /// Значения, равные текущим, молча игнорируются: перезаписывать файл без
+    /// причины незачем. Поэтому для нового пользователя, принявшего значения по
+    /// умолчанию, не изменится ничего - и без <see cref="PersistIfMissing"/> его
+    /// файл не появился бы вовсе.
     /// </remarks>
-    public void LoadFrom(AppSettingsSnapshot snapshot)
+    public void LoadFrom(AppSettingsSnapshot snapshot, string filePath)
     {
+        User = snapshot.User;
+        FilePath = filePath;
+
         CurrentAppTheme = snapshot.Theme;
         CurrentCultureName = AppSettingsStore.ResolveCulture(snapshot.Culture).Name;
+
+        PersistIfMissing();
     }
+
+    /// <summary>
+    /// Создаёт файл, если его ещё нет. Вызывается один раз - в момент привязки
+    /// пути.
+    /// </summary>
+    /// <remarks>
+    /// Пустая реализация в базе, потому что <see cref="TemporaryAppSettingsService"/>
+    /// не должен ничего писать. Переопределяет только постоянный сервис.
+    /// </remarks>
+    protected virtual void PersistIfMissing() { }
 }

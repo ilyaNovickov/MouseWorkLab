@@ -151,6 +151,17 @@ public partial class WelcomeWindowViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Данные пользователя в том виде, в каком их ввёл человек. Это и есть
+    /// личность приложения: отдельного логина нет, и путь к настройкам выводится
+    /// из этих полей.
+    /// </summary>
+    public UserProfile Profile => new(
+        FirstName.Trim(),
+        LastName.Trim(),
+        string.IsNullOrWhiteSpace(MiddleName) ? null : MiddleName.Trim(),
+        Group.Trim());
+
     #endregion
 
     #region Проверка полей

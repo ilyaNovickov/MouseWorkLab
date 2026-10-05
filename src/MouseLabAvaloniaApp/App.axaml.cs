@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using System;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +10,7 @@ using MouseLabAvaloniaApp.ViewModels;
 using MouseLabAvaloniaApp.ViewModels.Welcome;
 using MouseLabAvaloniaApp.Views;
 using ProTranslate;
+using System;
 
 namespace MouseLabAvaloniaApp;
 
@@ -105,13 +105,17 @@ public partial class App : Application
 
         vm.ExitRequested += (_, _) => window.Close();
 
+        // Данные пользователя снимаем ДО Dispose модели представления: после
+        // освобождения она уже недоступна.
         window.Closed += (_, _) =>
         {
+            UserProfile? profile = _welcomeConfirmed ? vm.Profile : null;
+
             vm.Dispose();
             UnsubscribeWelcomeTheme(temporary);
 
-            if (_welcomeConfirmed)
-                AdvanceToMainWindow(desktop);
+            if (profile is not null)
+                AdvanceToMainWindow(desktop, profile);
             else
                 // Закрытие крестиком или кнопкой выхода: главного окна не будет,
                 // а при OnExplicitShutdown приложение осталось бы висеть без окон.
@@ -123,27 +127,30 @@ public partial class App : Application
         window.Show();
     }
 
-    private void AdvanceToMainWindow(IClassicDesktopStyleApplicationLifetime desktop)
+    private void AdvanceToMainWindow(IClassicDesktopStyleApplicationLifetime desktop, UserProfile profile)
     {
         if (_mainWindowStarted)
             return;
 
         _mainWindowStarted = true;
 
-        // Переносим выбор из временного хранилища в постоянное: только здесь
-        // значения попадают в settings.json. Когда у каждого пользователя будут
-        // свои настройки, источником станет
-        // %LOCALAPPDATA%\MouseLab\{userhash}\settings.json - за это и отвечает
-        // AppSettingsServiceBase.LoadFrom.
+        // Переносим выбор из временного хранилища в постоянное. Это единственное
+        // место, где настройки попадают на диск, и единственный момент, когда
+        // известен пользователь: путь %LOCALAPPDATA%\MouseLab\{slug}-{hash}
+        // выводится из введённых данных. До подтверждения файла не существует,
+        // поэтому стартовое состояние постоянных настроек никуда не пишется.
         IApplicationSettingsService temporary =
             Services.Provider.GetRequiredKeyedService<IApplicationSettingsService>(AppServices.TemporarySettingsKey);
         IApplicationSettingsService stored = Services.Provider.GetRequiredService<IApplicationSettingsService>();
 
-        stored.LoadFrom(new AppSettingsSnapshot
-        {
-            Culture = temporary.CurrentCultureName,
-            Theme = temporary.CurrentAppTheme,
-        });
+        stored.LoadFrom(
+            new AppSettingsSnapshot
+            {
+                User = profile,
+                Culture = temporary.CurrentCultureName,
+                Theme = temporary.CurrentAppTheme,
+            },
+            UserIdentity.ResolveSettingsPath(profile));
 
         // Тема постоянных настроек применяется здесь же: подписка на stored
         // появляется только теперь, а до этого применялась тема из temporary.

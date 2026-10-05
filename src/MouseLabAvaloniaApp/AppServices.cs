@@ -152,13 +152,25 @@ public sealed class AppServices : IDisposable
     }
 
     /// <summary>
-    /// Читает settings.json и собирает контейнер. Вынесено, чтобы порядок
-    /// "прочитать настройки ДО сборки контейнера" был ровно в одном месте.
+    /// Собирает контейнер приложения.
     /// </summary>
+    /// <remarks>
+    /// Файлы настроек здесь не читаются: на старте пользователя ещё нет, а
+    /// настройки принадлежат конкретному человеку. Стартовая культура - это
+    /// умолчание приложения, а настройки пользователя подхватятся позже, в
+    /// <c>App.AdvanceToMainWindow</c>, через
+    /// <see cref="AppSettingsServiceBase.LoadFrom"/>.
+    /// </remarks>
     public static AppServices CreateDefault()
     {
-        AppSettingsSnapshot snapshot = AppSettingsStore.Load();
-        return new AppServices(snapshot, AppSettingsStore.ResolveCulture(snapshot.Culture));
+        // Уборка старых настроек: данные пользователей, которыми не пользовались
+        // дольше года, удаляются. Исключения внутри гасятся, уборка не должна
+        // мешать запуску.
+        AppSettingsStore.CleanupOlderThan(TimeSpan.FromDays(365));
+
+        return new AppServices(
+            new AppSettingsSnapshot(),
+            CultureInfo.GetCultureInfo(AppSettingsStore.DefaultCultureName));
     }
 
     // Финализатора здесь намеренно нет. Единственный владелец - App, который
