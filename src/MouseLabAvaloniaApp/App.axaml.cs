@@ -91,6 +91,13 @@ public partial class App : Application
         ApplyTheme(temporary.CurrentAppTheme);
 
         WelcomeWindowViewModel vm = Services.Provider.GetRequiredService<WelcomeWindowViewModel>();
+//for debug
+#if DEBUG
+        vm.FirstName = "TestName";
+        vm.LastName = "SurNameTest";
+        vm.MiddleName = "Patronim";
+        vm.Group = "TestGroup";
+#endif
         WelcomeWindow window = Services.Provider.GetRequiredService<WelcomeWindow>();
         window.DataContext = vm;
 
