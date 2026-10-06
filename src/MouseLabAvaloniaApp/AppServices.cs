@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Dock.Model.Core;
+using Microsoft.Extensions.DependencyInjection;
 using MouseLabAvaloniaApp.Services.AppSettings;
+using MouseLabAvaloniaApp.Services.Dock;
 using MouseLabAvaloniaApp.Services.WindowsManager;
 using MouseLabAvaloniaApp.ViewModels;
 using MouseLabAvaloniaApp.ViewModels.Settings;
@@ -118,6 +120,7 @@ public sealed class AppServices : IDisposable
 
         services.AddSingleton<IWindowsManagerService, WindowsManagerService>(sp => new WindowsManagerService(sp));
 
+        services.AddSingleton<IFactory, DockFactory>(sp => new DockFactory());
         #endregion
 
         #region ViewModels
@@ -139,7 +142,8 @@ public sealed class AppServices : IDisposable
 
         // MainWindowViewModel - синглтон, т.к. он же DataContext главного окна.
         services.AddSingleton<MainWindowViewModel>(sp => new MainWindowViewModel(sp.GetRequiredService<ITranslationService>(),
-            sp.GetRequiredService<IWindowsManagerService>()));
+            sp.GetRequiredService<IWindowsManagerService>(),
+            sp.GetRequiredService<IFactory>()));
         #endregion
 
         #region Views

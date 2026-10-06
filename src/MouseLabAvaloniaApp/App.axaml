@@ -6,6 +6,7 @@
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
              <Application.Styles>
                  <FluentTheme/>
+                 <DockFluentTheme />
 
                  <Style Selector="TextBlock.settings">
                      <Setter Property="TextAlignment" Value="Right"/>

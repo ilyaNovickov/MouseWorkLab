@@ -14,6 +14,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:MouseLabAvaloniaApp.ViewModels"
+        xmlns:v="using:MouseLabAvaloniaApp.Views"
         xmlns:models="using:MouseLabAvaloniaApp.Models"
         xmlns:d="http://schemas.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -25,7 +26,8 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding Strings.MainWindowTitle}"
         Translation.Culture="{Binding Strings.Culture}"
-        Translation.AutoFlowDirection="True">
+        Translation.AutoFlowDirection="True"
+        Name="mainWindow">
 
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
@@ -34,8 +36,6 @@
                             Command="{Binding OpenSettingsWindowCommand}"/>
             </MenuItem>
         </Menu>
-        <Grid>
-
-        </Grid>
+        <v:MainWindowDock DataContext="{Binding #mainWindow.DataContext}" />
     </DockPanel>
 </Window>

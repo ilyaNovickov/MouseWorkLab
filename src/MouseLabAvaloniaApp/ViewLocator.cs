@@ -3,6 +3,10 @@ using MouseLabAvaloniaApp.ViewModels.Settings;
 using MouseLabAvaloniaApp.ViewModels.Welcome;
 using MouseLabAvaloniaApp.Views;
 using StaticViewLocator;
+using Avalonia;
+using System;
+using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 
 namespace MouseLabAvaloniaApp;
 
@@ -65,6 +69,35 @@ namespace MouseLabAvaloniaApp;
 [StaticViewMapping(typeof(SettingsWindowViewModel), typeof(SettingsWindow))]
 [StaticViewMapping(typeof(AppSettingsViewModel), typeof(AppSettingsView))]
 [StaticViewMapping(typeof(WelcomeWindowViewModel), typeof(WelcomeWindow))]
-public partial class ViewLocator
+public partial class ViewLocator : IDataTemplate
 {
+    private readonly IServiceProvider _provider;
+
+    public ViewLocator(IServiceProvider provider)
+    {
+        _provider = provider;
+    }
+
+    public Control? Build(object? data)
+    {
+        if (data is null)
+            return null;
+
+        var type = data.GetType();
+        if (s_views.TryGetValue(type, out var func))
+            return func.Invoke();
+
+        throw new Exception($"Unable to create view for type: {type}");
+    }
+
+    public bool Match(object? data)
+    {
+        if (data is null)
+        {
+            return false;
+        }
+
+        var type = data.GetType();
+        return s_views.ContainsKey(type);
+    }
 }

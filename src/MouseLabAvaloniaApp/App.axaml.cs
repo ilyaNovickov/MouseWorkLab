@@ -20,6 +20,8 @@ public partial class App : Application
     // Освобождается в Shutdown() по desktop.Exit.
     private AppServices? _appServices;
 
+    private ViewLocator? viewLocator;
+
     // Обработчик храним в поле, чтобы можно было отписаться от него при выходе.
     private ThemeChangedEventHandler? _themeChangedHandler;
 
@@ -42,7 +44,7 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        AvaloniaXamlLoader.Load(this);
+        AvaloniaXamlLoader.Load(this); 
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -53,6 +55,9 @@ public partial class App : Application
         // разобран в окне приветствия.
         _appServices = AppServices.CreateDefault();
 
+        viewLocator = new ViewLocator(_appServices.Provider);
+        DataTemplates.Add(viewLocator);
+        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Пока открыто окно приветствия, закрытие окна не должно завершать
@@ -222,6 +227,12 @@ public partial class App : Application
             Services.Provider.GetService<IApplicationSettingsService>() is { } settings)
         {
             settings.ThemeChanged -= _themeChangedHandler;
+        }
+
+        if (viewLocator is not null)
+        {
+            DataTemplates.Remove(viewLocator);
+            viewLocator = null;
         }
 
         _themeChangedHandler = null;
