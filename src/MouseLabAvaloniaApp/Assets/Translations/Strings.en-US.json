@@ -1,6 +1,9 @@
 {
   "MainWindow": {
-    "Title": "MouseLab"
+    "Title": "MouseLab",
+    "View": "View",
+
+    "Settings": "Settings"
   },
 
   "WelcomeWindow": {
@@ -18,7 +21,7 @@
   },
 
   "SettingsWindow": {
-    "Title": "Application settings"
+    "Title": "Application"
   },
 
   "Common": {

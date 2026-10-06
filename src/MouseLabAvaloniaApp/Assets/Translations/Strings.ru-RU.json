@@ -1,6 +1,9 @@
 {
   "MainWindow": {
-    "Title": "MouseLab Проект"
+    "Title": "MouseLab Russian Edition",
+    "View": "Вид",
+
+    "Settings": "Настройки"
   },
 
   "WelcomeWindow": {
@@ -18,7 +21,7 @@
   },
 
   "SettingsWindow": {
-    "Title": "Настройки приложения"
+    "Title": "Приложение"
   },
 
   "Common": {

@@ -23,9 +23,7 @@ public partial class App : Application
     // Обработчик храним в поле, чтобы можно было отписаться от него при выходе.
     private ThemeChangedEventHandler? _themeChangedHandler;
 
-    // Обработчик темы временных настроек. Нужен, чтобы окно приветствия
-    // показывало выбранную тему сразу, и снимается при переходе к главному окну.
-    private ThemeChangedEventHandler? _welcomeThemeChangedHandler;
+    
 
     // Пользователь подтвердил данные. Различать подтверждение и закрытие
     // окна важно: подтверждение ведёт к главному окну, закрытие крестиком или
@@ -68,6 +66,11 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
     }
+
+#region ForWelcome
+    // Обработчик темы временных настроек. Нужен, чтобы окно приветствия
+    // показывало выбранную тему сразу, и снимается при переходе к главному окну.
+    private ThemeChangedEventHandler? _welcomeThemeChangedHandler;
 
     private void ShowWelcome(IClassicDesktopStyleApplicationLifetime desktop)
     {
@@ -134,6 +137,17 @@ public partial class App : Application
         window.Show();
     }
 
+    private void UnsubscribeWelcomeTheme(IApplicationSettingsService temporary)
+    {
+        if (_welcomeThemeChangedHandler is null)
+            return;
+
+        temporary.ThemeChanged -= _welcomeThemeChangedHandler;
+        _welcomeThemeChangedHandler = null;
+    }
+    #endregion
+
+#region ForMainWindow
     private void AdvanceToMainWindow(IClassicDesktopStyleApplicationLifetime desktop, UserProfile profile)
     {
         if (_mainWindowStarted)
@@ -185,15 +199,8 @@ public partial class App : Application
         if (!mainWindow.IsVisible)
             mainWindow.Show();
     }
-
-    private void UnsubscribeWelcomeTheme(IApplicationSettingsService temporary)
-    {
-        if (_welcomeThemeChangedHandler is null)
-            return;
-
-        temporary.ThemeChanged -= _welcomeThemeChangedHandler;
-        _welcomeThemeChangedHandler = null;
-    }
+#endregion
+    
 
     // Themes.Default - это "следовать системной теме" (ThemeVariant.Default).
     private void ApplyTheme(Themes theme) =>

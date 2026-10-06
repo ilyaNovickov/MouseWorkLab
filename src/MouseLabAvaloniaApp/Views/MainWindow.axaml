@@ -17,7 +17,9 @@
         xmlns:models="using:MouseLabAvaloniaApp.Models"
         xmlns:d="http://schemas.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" 
+        d:DesignWidth="800" 
+        d:DesignHeight="450"
         x:Class="MouseLabAvaloniaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
@@ -25,9 +27,15 @@
         Translation.Culture="{Binding Strings.Culture}"
         Translation.AutoFlowDirection="True">
 
-    <DockPanel>
+    <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
-            <Button Content="foo" Command="{Binding OpenSettingsWindowCommand}"/>
+            <MenuItem Header="{Binding Strings.MainWindowView}">
+                <MenuItem Header="{Binding Strings.MainWindowSettings}" 
+                            Command="{Binding OpenSettingsWindowCommand}"/>
+            </MenuItem>
         </Menu>
+        <Grid>
+
+        </Grid>
     </DockPanel>
 </Window>
