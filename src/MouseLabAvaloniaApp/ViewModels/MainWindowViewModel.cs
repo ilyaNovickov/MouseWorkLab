@@ -8,13 +8,12 @@ using ProTranslate.Generated;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using MouseLabAvaloniaApp.Services.WindowsManager;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using MouseLabAvaloniaApp.ViewModels.Dock;
 using Dock.Model.Core;
 using Dock.Model.Controls;
+using Dock.Model.Mvvm.Controls;
 using MouseLabAvaloniaApp.Services.Dock;
 
 namespace MouseLabAvaloniaApp.ViewModels;
@@ -34,11 +33,16 @@ public partial class MainWindowViewModel : ViewModelBase
         WindowsManager = winowsManagerService;
 
         this.dockFactory = dockFactory;
-        var layout = dockFactory.CreateLayout();
-        if (layout is null)
-            throw new Exception("");
-        dockFactory.InitLayout(layout);
-        Layout = layout;
+
+        IRootDock? created = dockFactory.CreateLayout()
+            ?? throw new InvalidOperationException("DockFactory.CreateLayout() вернул null.");
+
+        // InitLayout обязан выполняться здесь, а не через InitializeLayout="True"
+        // в XAML: именно он проставляет dockable.Factory, без чего DockControl
+        // прекращает инициализацию и макет остаётся пустым.
+        dockFactory.InitLayout(created);
+
+        Layout = created;
     }
 
     private IWindowsManagerService WindowsManager { get; }
@@ -51,7 +55,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await task;
     }
 
-    #region Dock
+#region Dock
 
     private readonly IFactory dockFactory;
 
@@ -64,77 +68,54 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-        /// Сброс макета до значений по умолчанию
-        /// </summary>
-        public void ResetLayout()
-        {
-            if (Layout is not null)
-            {
-                if (Layout.Close.CanExecute(null))
-                {
-                    Layout.Close.Execute(null);
-                }
-            }
-
-            var layout = dockFactory.CreateLayout();
-            if (layout is not null)
-            {
-                dockFactory.InitLayout(layout);
-                Layout = layout;
-            }
-        }
-
-        /// <summary>
-        /// Закрытие Dock макета
-        /// </summary>
-        public void CloseLayout()
-        {
-            if (Layout is null)
-                return;
-            if (Layout.Close.CanExecute(null))
-            {
-                Layout.Close.Execute(null); ;
-            }
-        }
-
-        public ObservableCollection<DocumentModel> Documents { get; } = new();
-
-        [RelayCommand]
-    private void AddDock()
+    /// Сброс макета к значениям по умолчанию
+    /// </summary>
+    public void ResetLayout()
     {
-        var doc = new DocumentModel(Strings.Observe_CommonCancel());
-        doc.Context = new BlankViewModel(this.Translations);
+        if (Layout is not null && Layout.Close.CanExecute(null))
+            Layout.Close.Execute(null);
 
-        Documents.Add(doc);
+        IRootDock? newLayout = dockFactory.CreateLayout();
+        if (newLayout is not null)
+        {
+            dockFactory.InitLayout(newLayout);
+            Layout = newLayout;
+        }
     }
 
-        [RelayCommand]
-    private void RemoveDock()
-    {
-        if (Documents.Count == 0)
-            return;
-        var doc = Documents.ElementAt(Documents.Count - 1);
-        Documents.RemoveAt(Documents.Count - 1);
-        doc.Context = null;
-        doc.Dispose();
-    }
-    /*
-    public ObservableCollection<BlankViewModel> Documents { get; } = new();
-
+    /// <summary>
+    /// Добавляет окно с содержимым <see cref="BlankViewModel"/> в док документов.
+    /// </summary>
     [RelayCommand]
     private void AddDock()
     {
-        Documents.Add(new BlankViewModel(this.Translations));
+        // DockFactory типизирован как IFactory, поэтому приводим к своему типу
+        // ради NewDocument: доков он создаёт сам, а нам нужен ещё и контекст.
+        if (dockFactory is not DockFactory factory || factory.DocumentDock is not IDocumentDock documentDock)
+            return;
+
+        Document document = factory.NewDocument("Рабочая поверхность");
+        document.Context = new BlankViewModel(Translations);
+
+        factory.AddDockable(documentDock, document);
     }
 
+    /// <summary>
+    /// Закрывает последнее открытое окно.
+    /// </summary>
     [RelayCommand]
     private void RemoveDock()
     {
-        if (Documents.Count == 0)
+        // Состав вкладок берём у самого дока: своя коллекция в модели
+        // представления неизбежно разошлась бы с деревом доков.
+        if (dockFactory is not DockFactory factory || factory.DocumentDock is not IDocumentDock documentDock)
             return;
 
-        Documents.RemoveAt(Documents.Count - 1);
+        if (documentDock.VisibleDockables is not IList<IDockable> dockables || dockables.Count == 0)
+            return;
+
+        IDockable last = dockables[^1];
+        factory.RemoveDockable(last, true);
     }
-    */
     #endregion
 }

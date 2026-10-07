@@ -3,46 +3,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MouseLabAvaloniaApp.ViewModels"
-             xmlns:v="using:MouseLabAvaloniaApp.Views.Dock"
              xmlns:dock="using:Dock.Avalonia.Controls"
-             xmlns:dockFactory="using:Dock.Model.Avalonia"
-             xmlns:dockModel="using:Dock.Model.Avalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MouseLabAvaloniaApp.Views.MainWindowDock"
              x:DataType="vm:MainWindowViewModel"
              Translation.Culture="{Binding Strings.Culture}"
-             Translation.AutoFlowDirection="True"
-             x:Name="RootWindow">
-             <DockPanel LastChildFill="true">
-              
-                <Menu DockPanel.Dock="Top">
-                  <Button Content="Add" Command="{Binding AddDockCommand}" />
-                  <Button Content="Remove" Command="{Binding RemoveDockCommand}" />
-                </Menu>
-                
-    <dock:DockControl InitializeLayout="True" InitializeFactory="True">
-    <dock:DockControl.Factory>
-        <dockFactory:Factory />
-    </dock:DockControl.Factory>
-    <dockModel:RootDock>
-        <dockModel:DocumentDock CanCreateDocument="False"
-                                ItemsSource="{Binding #RootWindow.((vm:MainWindowViewModel)DataContext).Documents}">
-            <dockModel:DocumentDock.DocumentTemplate>
-                <dockModel:DocumentTemplate>
-                    <StackPanel x:DataType="dockModel:Document" Margin="10">
-                        <ContentControl Content="{Binding Context}">
-                            <ContentControl.DataTemplates>
-                              <DataTemplate DataType="vm:Dock.BlankViewModel">
-                                <TextBlock Text="{Binding Name}" />
-                              </DataTemplate>
-                            </ContentControl.DataTemplates>
-                        </ContentControl>
-                    </StackPanel>
-                </dockModel:DocumentTemplate>
-            </dockModel:DocumentDock.DocumentTemplate>
-        </dockModel:DocumentDock>
-    </dockModel:RootDock>
-</dock:DockControl>
+             Translation.AutoFlowDirection="True">
 
-  </DockPanel>
+    <!-- Макет приходит из DockFactory: инлайновое дерево доков в разметке
+         создало бы вторую, не связанную с ним структуру. InitializeLayout здесь
+         не нужен - InitLayout уже вызван в конструкторе модели представления,
+         он и проставляет dockable.Factory. InitializeFactory оставлен: он
+         подставляет словари локаторов по умолчанию, без них не открываются
+         всплывающие окна. -->
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Окна">
+                <MenuItem Header="Добавить" Command="{Binding AddDockCommand}" />
+                <MenuItem Header="Убрать" Command="{Binding RemoveDockCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <dock:DockControl Layout="{Binding Layout}" InitializeFactory="True" />
+    </DockPanel>
 </UserControl>

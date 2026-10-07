@@ -1,7 +1,10 @@
+using Dock.Model.Core;
 using MouseLabAvaloniaApp.ViewModels;
+using MouseLabAvaloniaApp.ViewModels.Dock;
 using MouseLabAvaloniaApp.ViewModels.Settings;
 using MouseLabAvaloniaApp.ViewModels.Welcome;
 using MouseLabAvaloniaApp.Views;
+using MouseLabAvaloniaApp.Views.Dock;
 using StaticViewLocator;
 using Avalonia;
 using System;
@@ -49,6 +52,16 @@ namespace MouseLabAvaloniaApp;
 /// </description></item>
 /// </list>
 /// <para>
+/// <see cref="Dock.Model.Core.IDockable"/> разворачивается до <c>Context</c>.
+/// <c>DockControl</c> показывает содержимое вкладки не по <c>Context</c>, а по
+/// самому <c>IDockable</c>: в <c>DocumentControl</c> стоит
+/// <c>DockableControl DataContext="{Binding ActiveDockable}"</c>, и уже у него
+/// <c>DeferredContentControl Content="{Binding}"</c>. Поэтому в <c>Build</c>
+/// приходит объект дока, а не модель представления. Здесь <c>Context</c>
+/// достаётся вручную, а <c>DataContext</c> результата выставляется явно —
+/// иначе представление унаследовало бы контекст дока.
+/// </para>
+/// <para>
 /// Если новое представление не подхватывается, проверьте <c>s_views</c> в
 /// <c>obj/gen/StaticViewLocator/.../ViewLocator_StaticViewLocator.cs</c>: там видно,
 /// что ушло в таблицу, а что в <c>s_missingViews</c> с готовым объяснением.
@@ -69,6 +82,7 @@ namespace MouseLabAvaloniaApp;
 [StaticViewMapping(typeof(SettingsWindowViewModel), typeof(SettingsWindow))]
 [StaticViewMapping(typeof(AppSettingsViewModel), typeof(AppSettingsView))]
 [StaticViewMapping(typeof(WelcomeWindowViewModel), typeof(WelcomeWindow))]
+[StaticViewMapping(typeof(BlankViewModel), typeof(BlankView))]
 public partial class ViewLocator : IDataTemplate
 {
     private readonly IServiceProvider _provider;
@@ -83,11 +97,12 @@ public partial class ViewLocator : IDataTemplate
         if (data is null)
             return null;
 
-        var type = data.GetType();
-        if (s_views.TryGetValue(type, out var func))
-            return func.Invoke();
+        // Dock передаёт сюда сам IDockable, а не модель представления из его
+        // Context. Разворачиваем до Context и строим представление уже для него.
+        if (data is IDockable { Context: not null } dockable)
+            return BuildFor(dockable.Context, data);
 
-        throw new Exception($"Unable to create view for type: {type}");
+        return BuildFor(data, data);
     }
 
     public bool Match(object? data)
@@ -97,7 +112,28 @@ public partial class ViewLocator : IDataTemplate
             return false;
         }
 
-        var type = data.GetType();
-        return s_views.ContainsKey(type);
+        return MatchTarget(data is IDockable { Context: not null } dockable
+            ? dockable.Context
+            : data);
+    }
+
+    private static bool MatchTarget(object? target) => target is not null && s_views.ContainsKey(target.GetType());
+
+    private Control? BuildFor(object? target, object fallbackData)
+    {
+        if (target is null)
+            return null;
+
+        if (!s_views.TryGetValue(target.GetType(), out var func))
+            throw new Exception($"Unable to create view for type: {fallbackData.GetType()}");
+
+        Control? control = func.Invoke();
+
+        // DataContext выставляем явно: без этого представление унаследовало бы
+        // контекст дока, а не модель представления из Context.
+        if (control is not null && !ReferenceEquals(target, fallbackData))
+            control.DataContext = target;
+
+        return control;
     }
 }
