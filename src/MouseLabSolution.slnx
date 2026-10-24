@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="MouseLab.Core/MouseLab.Core.csproj" Id="ea0256f7-9e5c-444a-9f39-c2e0507beab2" />
   <Project Path="MouseLab.Services/MouseLab.Services.csproj" Id="f1d8c538-476e-4daf-b989-4fbabb34092a" />
+  <Project Path="MouseLab.Matcher/MouseLab.Matcher.csproj" Id="31f6d7f3-3a5e-4b82-9dbd-b81e1f7fb51c" />
+  <Project Path="tests/MouseLab.Matcher.Tests/MouseLab.Matcher.Tests.csproj" Id="8aabbe72-4a83-4bcb-9c25-4a20a6f79a46" />
   <Project Path="MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj" />
 </Solution>
