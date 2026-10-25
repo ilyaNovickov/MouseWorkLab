@@ -1,7 +1,7 @@
 using MouseLab.Core;
 using MouseLab.Core.Models;
 using MouseLab.Core.Providers;
-using MouseLab.Services;
+using MouseLab.Core.Impl.UnsafeVer2;
 using Xunit;
 
 namespace MouseLab.Services.Tests

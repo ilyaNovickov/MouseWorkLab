@@ -1,7 +1,7 @@
 using MouseLab.Core;
 using MouseLab.Core.Models;
 
-namespace MouseLab.Services
+namespace MouseLab.Core.Services
 {
     /// <summary>
     /// Определяет вектор смещения между двумя фрагментами, вырезанными

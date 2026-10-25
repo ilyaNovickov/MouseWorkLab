@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using MouseLab.Core.Providers;
+using MouseLab.Core.Models;
 
 namespace MouseLab.Core.Providers;
 

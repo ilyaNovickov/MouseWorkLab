@@ -1,5 +1,5 @@
 using MouseLab.Core;
-using MouseLab.Services;
+using MouseLab.Core.Impl.UnsafeVer2;
 using Xunit;
 
 namespace MouseLab.Matcher.Tests

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MouseLab.Services
+namespace MouseLab.Core.Services
 {
     public interface IMatrixCutter
     {

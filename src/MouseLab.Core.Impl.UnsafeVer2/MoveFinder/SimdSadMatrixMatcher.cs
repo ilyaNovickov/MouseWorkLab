@@ -4,9 +4,9 @@ using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using MouseLab.Core;
 using MouseLab.Core.Models;
-using MouseLab.Services;
+using MouseLab.Core.Services;
 
-namespace MouseLab.Matcher
+namespace MouseLab.Core.Impl.UnsafeVer2
 {
     /// <summary>
     /// Поиск вектора смещения полным перебором окна ±max по метрике SAD

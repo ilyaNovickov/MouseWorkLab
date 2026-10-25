@@ -24,17 +24,22 @@ public class Matrix : IMatrix
         _size = new Size(width, height);
     }
 
-    Size Size => _size;
+    public Size Size => _size;
 
-    int Width => _size.Width;
+    public int Width => _size.Width;
 
-    int Height => _size.Height;
+    public int Height => _size.Height;
 
-    ImmutableArray<byte> ImmutableBytes => _array.ToImmutableArray<byte>();
+    public ImmutableArray<byte> ImmutableBytes => _array.ToImmutableArray<byte>();
 
-    byte[] Bytes => _array;
+    public byte[] Bytes => _array;
 
-    Span<byte> SpanBytes => _array.AsSpan<byte>();
+    public Span<byte> SpanBytes => _array.AsSpan<byte>();
 
-    ReadOnlySpan<byte> ReadOnlySpanBytes => _array.AsSpan<byte>();
+    public ReadOnlySpan<byte> ReadOnlySpanBytes => _array.AsSpan<byte>();
+
+    public void Dispose()
+    {
+
+    }
 }

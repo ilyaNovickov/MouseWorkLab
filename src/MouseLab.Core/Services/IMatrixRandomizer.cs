@@ -2,7 +2,7 @@
 using MouseLab.Core.Models;
 using MouseLab.Core.Providers;
 
-namespace MouseLab.Services
+namespace MouseLab.Core.Services
 {
     public interface IMatrixRandomizer
     {
@@ -20,6 +20,6 @@ namespace MouseLab.Services
         IMatrix Randomize(Size size, int? seed = null)
         {
             return Randomize(size.Width, size.Height, seed);
-        }     
+        }
     }
 }
