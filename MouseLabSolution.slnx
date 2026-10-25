@@ -9,4 +9,7 @@
     <Project Path="src/tests/MouseLab.Services.Tests/MouseLab.Services.Tests.csproj" Id="a879417a-d6a4-4a11-b3e7-b6a6e6cbe411" />
     <Project Path="src/MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj" />
   </Folder>
+  <Folder Name="/src/benchmark/">
+    <Project Path="src/benchmark/Benchmark.MoveFinder/Benchmark.MoveFinder.csproj" />
+  </Folder>
 </Solution>

@@ -36,5 +36,7 @@
     <PackageVersion Include="ProTranslate.Analyzers" Version="0.1.0" />
 
     <PackageVersion Include="StaticViewLocator" Version="0.7.0" />
+
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
   </ItemGroup>
 </Project>

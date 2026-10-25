@@ -25,9 +25,9 @@ namespace MouseLab.Core
 
         }
 
-        public int Dx { get; init; }
+        public int Dx { get; set; }
 
-        public int Dy { get; init; }
+        public int Dy { get; set; }
 
         public bool Equals(Vector vector)
         {

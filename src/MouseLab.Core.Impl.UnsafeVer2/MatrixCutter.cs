@@ -22,12 +22,14 @@ namespace MouseLab.Core.Impl.UnsafeVer2
         // ниже него оплата потоков превосходит выигрыш.
         private const long ParallelCostThreshold = 1_000_000;
 
+        /*
         private readonly IMatrixProvider? _defaultProvider;
 
         public MatrixCutter(IMatrixProvider? defaultProvider = null)
         {
             _defaultProvider = defaultProvider;
         }
+        */
 
         public unsafe void Cut(IMatrix src, Point position, Size size, IMatrix dest, bool fillZero = true)
         {

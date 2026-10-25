@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "dotnet build (Debug)",
+            "label": "my dotnet build (Debug)",
             "type": "process",
             "command": "dotnet",
             "args": [
@@ -19,12 +19,24 @@
             }
         },
         {
-            "label": "dotnet clean",
+            "label": "my dotnet clean",
             "type": "process",
             "command": "dotnet",
             "args": [
                 "clean",
                 "${workspaceFolder}/MouseLabSolution.slnx"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "my benchmark build",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/benchmark/Benchmark.MoveFinder/Benchmark.MoveFinder.csproj",
+                "-c",
+                "Release"
             ],
             "problemMatcher": []
         }
