@@ -116,6 +116,7 @@ public class MoveFinderBenchmark
         return f6.Find(m1!, m2!, Scenario.PatchSize, Scenario.SearchRange);
     }
 
+    [Benchmark]
     public Vector NewImpl()
     {
         return f7.Match(m1!, m2!, Scenario.SearchRange, Scenario.SearchRange);
