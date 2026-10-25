@@ -1,0 +1,137 @@
+﻿using MouseLab.Core.Models;
+using MouseLab.Core;
+using MouseLab.Core.Services;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.Arm;
+using System.Runtime.Intrinsics.X86;
+using System.Text;
+
+namespace MouseLab.Core.Impl.UnsafeVer1
+{
+    public class MoveFinderSimdBoundary : MoveFinderSimdBase
+    {
+        public override unsafe Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)
+        {
+            {
+                Exception? exc = ArgsValidation(matrix1, matrix2, patchSize, searchRange);
+
+                if (exc != null)
+                    throw new ArgumentException("Ошибка в аргументе", exc);
+            }
+
+            int width = matrix1.Width;
+            int height = matrix1.Height;
+            int patchPositionX = (width - patchSize) / 2;
+            int patchPositionY = (height - patchSize) / 2;
+            byte outOfBoundsValue = fillZero ? (byte)0 : (byte)255;
+
+            ReadOnlySpan<byte> data1 = matrix1.ReadOnlySpanBytes;
+            ReadOnlySpan<byte> data2 = matrix2.ReadOnlySpanBytes;
+
+            int minValue = int.MaxValue;
+            Vector bestVector = new Vector();
+
+            // Создаем вектор из константы заполнения для SIMD
+            var vFill = Vector256.Create(outOfBoundsValue);
+            var vFill128 = Vector128.Create(outOfBoundsValue);
+
+            fixed (byte* pData1 = data1)
+            fixed (byte* pData2 = data2)
+            {
+                for (int dy = -searchRange; dy <= searchRange; dy++)
+                {
+                    for (int dx = -searchRange; dx <= searchRange; dx++)
+                    {
+                        int currentSum = 0;
+                        bool isBetter = true;
+
+                        // Определяем границы для текущего смещения dx/dy
+                        int currentMovingY = patchPositionY + dy;
+                        int currentMovingX = patchPositionX + dx;
+
+                        for (int y = 0; y < patchSize; y++)
+                        {
+                            int y1 = patchPositionY + y;
+                            int y2 = currentMovingY + y;
+
+                            byte* row1 = pData1 + (y1 * width + patchPositionX);
+
+                            // СЛУЧАЙ 1: Строка целиком вне изображения по вертикали
+                            if (y2 < 0 || y2 >= height)
+                            {
+                                currentSum += CalculateSADWithConstant(row1, outOfBoundsValue, patchSize);
+                            }
+                            else
+                            {
+                                // СЛУЧАЙ 2: Строка внутри по вертикали, проверяем горизонталь
+                                if (currentMovingX >= 0 && currentMovingX + patchSize <= width)
+                                {
+                                    // Подслучай А: Строка целиком внутри (самый быстрый путь)
+                                    byte* row2 = pData2 + (y2 * width + currentMovingX);
+                                    currentSum += CalculateSAD(row1, row2, patchSize);
+                                }
+                                else
+                                {
+                                    // Подслучай Б: Строка частично выходит за границы по горизонтали
+                                    currentSum += CalculateSADPartiallyOutOfBounds(row1, pData2, y2, currentMovingX, patchSize, width, outOfBoundsValue);
+                                }
+                            }
+
+                            if (currentSum >= minValue)
+                            {
+                                isBetter = false;
+                                break;
+                            }
+                        }
+
+                        if (isBetter && currentSum < minValue)
+                        {
+                            minValue = currentSum;
+                            bestVector = new Vector(dx, dy);
+                        }
+                    }
+                }
+            }
+
+            return -bestVector;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static unsafe int CalculateSADPartially(byte* row1, byte* pData2, int y2, int startX, int patchSize, int width, byte fillValue, byte* pTempRow)
+        {
+            // Быстрая очистка временного буфера текущим значением фона
+            new Span<byte>(pTempRow, patchSize).Fill(fillValue);
+
+            // Вычисляем область пересечения
+            int imageXStart = Math.Max(0, startX);
+            int imageXEnd = Math.Min(width, startX + patchSize);
+            int validWidth = imageXEnd - imageXStart;
+
+            if (validWidth > 0)
+            {
+                int offsetInPatch = imageXStart - startX;
+                byte* src = pData2 + (y2 * width + imageXStart);
+                byte* dst = pTempRow + offsetInPatch;
+                // Копируем только то, что попало в изображение
+                Buffer.MemoryCopy(src, dst, validWidth, validWidth);
+            }
+
+            // После сборки строки используем стандартный SIMD SAD
+            return CalculateSAD(row1, pTempRow, patchSize);
+        }
+
+        // Обработка строки, которая частично вылезла за левый или правый край
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected unsafe static int CalculateSADPartiallyOutOfBounds(byte* row1, byte* pData2, int y2, int startX, int patchSize, int width, byte fillValue)
+        {
+            // Используем stackalloc для временной сборки строки (быстро, без аллокаций в куче)
+            // Ограничим разумным пределом, например 2048 пикселей.
+            byte* tempRow = stackalloc byte[patchSize];
+
+            return CalculateSADPartially(row1, pData2, y2, startX, patchSize, width, fillValue, tempRow);
+        }
+    }
+}
