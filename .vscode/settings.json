@@ -1,0 +1,19 @@
+{
+    "dotnet.defaultSolution": "MouseLabSolution.slnx",
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp",
+        "editor.formatOnSave": true
+    },
+
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.jj": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.opencode": true,
+        "**/bin": true,
+        "**/obj": true
+    }
+}
