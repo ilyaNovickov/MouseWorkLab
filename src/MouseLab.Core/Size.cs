@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace MouseLab.Core
 {
-    public record struct Size
+    public struct Size
     {
-        private int _width; 
+        private int _width;
         private int _height;
 
         public Size(int width, int height)
@@ -49,6 +50,24 @@ namespace MouseLab.Core
             }
         }
 
+        public bool Equals(Size size)
+        {
+            return this.Width == size.Width && this.Height == size.Height;
+        }
+
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            if (obj is not Size size)
+                throw new Exception("The compared object is not size");
+
+            return this.Equals(size);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public static Size operator +(Size a, Size b)
         {
             return new Size(a.Width + b.Width, a.Height + b.Height);
@@ -67,6 +86,16 @@ namespace MouseLab.Core
         public static Size operator /(Size a, int x)
         {
             return new Size(a.Width / x, a.Height / x);
+        }
+
+        public static bool operator ==(Size a, Size b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Size a, Size b)
+        {
+            return a.Equals(b);
         }
     }
 }
