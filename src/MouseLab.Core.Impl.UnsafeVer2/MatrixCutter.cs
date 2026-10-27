@@ -26,7 +26,18 @@ namespace MouseLab.Core.Impl.UnsafeVer2
         #region PublicInterfaceMethods
         public void Cut(IMatrix src, Point position, Size size, IMatrix dest, bool fillZero = true)
         {
-            CutMatirx(src, position.X, position.Y, size.Width, size.Height, dest, fillZero);
+            if (dest.Width != size.Width || dest.Height != size.Height)
+                throw new ArgumentException("The dest matrix has to has the same size as target matrix");
+            CutMatrix(src.ReadOnlySpanBytes, src.Width, src.Height,
+                position.X, position.Y, size.Width, size.Height, dest.SpanBytes, fillZero);
+        }
+
+        #region WithNewMatrix
+        public IMatrix Cut(IMatrix src, int x, int y, int width, int height, bool fillZero = true)
+        {
+            var dest = new Matrix(width, height);
+            CutMatrix(src.ReadOnlySpanBytes, src.Width, src.Height, x, y, width, height, dest.SpanBytes, fillZero);
+            return dest;
         }
 
         public IMatrix Cut(IMatrix src, Point position, Size size, bool fillZero = true)
@@ -44,23 +55,23 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             return Cut(src, position.X, position.Y, width, height, fillZero);
         }
 
-        public IMatrix Cut(IMatrix src, int x, int y, int width, int height, bool fillZero = true)
-        {
-            var dest = new Matrix(width, height);
-            CutMatirx(src, x, y, width, height, dest, fillZero);
-            return dest;
-        }
+        #endregion WithNewMatrix
 
         #region  WithProvider
-        public IMatrix Cut(IMatrix src, Point position, Size size, IMatrixProvider provider, bool fillZero = true)
+        public IMatrix Cut(IMatrix src, int x, int y, int width, int height, IMatrixProvider provider, bool fillZero = true)
         {
             ArgumentNullException.ThrowIfNull(provider);
 
-            var dest = provider.Create(size.Width, size.Height);
-            Cut(src, position, size, dest, fillZero);
+            var dest = provider.Create(width, height);
+            CutMatrix(src.ReadOnlySpanBytes, src.Width, src.Height, x, y, width, height, dest.SpanBytes, fillZero);
+
             return dest;
         }
 
+        public IMatrix Cut(IMatrix src, Point position, Size size, IMatrixProvider provider, bool fillZero = true)
+        {
+            return Cut(src, position.X, position.Y, size.Width, size.Height, provider, fillZero);
+        }
 
         public IMatrix Cut(IMatrix src, int x, int y, Size size, IMatrixProvider provider, bool fillZero = true)
         {
@@ -72,16 +83,7 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             return Cut(src, position.X, position.Y, width, height, provider, fillZero);
         }
 
-        public IMatrix Cut(IMatrix src, int x, int y, int width, int height, IMatrixProvider provider, bool fillZero = true)
-        {
-            ArgumentNullException.ThrowIfNull(provider);
-
-            var dest = provider.Create(width, height);
-            CutMatirx(src, x, y, width, height, dest, fillZero);
-
-            return dest;
-        }
-        #endregion
+        #endregion WithProvider
 
         #endregion
 
@@ -94,16 +96,11 @@ namespace MouseLab.Core.Impl.UnsafeVer2
         // наравне с порогом MatrixRandomizer'а.
         private const long ParallelCostThreshold = 4_000_000;
 
-
-        private static unsafe void CutMatirx(IMatrix src, int x, int y, int width, int height, IMatrix dest, bool fillZero = true)
+        //можно заменить IMatrix dest на Span
+        private static unsafe void CutMatrix(ReadOnlySpan<byte> src, int srcWidth, int srcHeight,
+            int x, int y, int width, int height, Span<byte> dest, bool fillZero = true)
         {
-            ArgumentNullException.ThrowIfNull(src);
-            ArgumentNullException.ThrowIfNull(dest);
-
-            if (dest.Width != width || dest.Height != height)
-                throw new ArgumentException("Размер dest должен совпадать с size.");
-
-            if ((long)dest.Width * dest.Height == 0)
+            if ((long)width * height == 0)
                 return;
 
             byte fillValue = fillZero ? (byte)0 : (byte)255;
@@ -111,14 +108,14 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             // Фиксированные указатели нельзя захватить лямбдой (CS1764),
             // поэтому Parallel.For отделён в метод, принимающий указатели
             // параметрами.
-            if ((long)dest.Width * dest.Height > ParallelCostThreshold)
+            if ((long)width * height > ParallelCostThreshold)
             {
                 // Параллельная ветка — единственное место с пиннингом:
                 // оправдан он только на объёмах, распределённых между
                 // потоками.
-                fixed (byte* srcFixed = src.ReadOnlySpanBytes, dstFixed = dest.SpanBytes)
-                    CutParallel(srcFixed, dstFixed, src.Width, src.Height,
-                        dest.Width, dest.Height, x, y, fillValue);
+                fixed (byte* srcFixed = src, dstFixed = dest)
+                    CutParallel(srcFixed, dstFixed, srcWidth, srcHeight,
+                        width, height, x, y, fillValue);
             }
             else
             {
@@ -132,26 +129,24 @@ namespace MouseLab.Core.Impl.UnsafeVer2
                 // читаемые на КАЖДОЙ строке, стоят ~50-60 мкс на 384-строчном
                 // окне (92-93 против 34-39 мкс) — дешёвый сам по себе
                 // interface-вызов+отсутствие hoisting'а разом убивает ядро.
-                ReadOnlySpan<byte> srcData = src.ReadOnlySpanBytes;
-                Span<byte> dstData = dest.SpanBytes;
-                int srcW = src.Width, srcH = src.Height;
-                int dstW = dest.Width, dstH = dest.Height;
+                int dstW = width, dstH = height;
 
                 int from = Math.Max(0, -x);
-                int to = Math.Min(srcW - x, dstW);
+                int to = Math.Min(srcWidth - x, dstW);
+                bool fullFill = to <= from;
 
                 for (int row = 0; row < dstH; row++)
                 {
-                    var destRow = dstData.Slice(row * dstW, dstW);
+                    var destRow = dest.Slice(row * dstW, dstW);
                     int donorY = y + row;
 
-                    if ((uint)donorY >= (uint)srcH)
+                    if ((uint)donorY >= (uint)srcHeight)
                     {
                         destRow.Fill(fillValue);
                         continue;
                     }
 
-                    if (to <= from)
+                    if ((uint)donorY >= (uint)srcHeight || fullFill)
                     {
                         destRow.Fill(fillValue);
                         continue;
@@ -160,7 +155,7 @@ namespace MouseLab.Core.Impl.UnsafeVer2
                     if (from > 0)
                         destRow[..from].Fill(fillValue);
 
-                    srcData.Slice(donorY * srcW + x + from, to - from)
+                    src.Slice(donorY * srcWidth + x + from, to - from)
                         .CopyTo(destRow[from..to]);
 
                     if (to < dstW)
@@ -169,18 +164,23 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe void CutParallel(byte* srcBase, byte* dstBase, int srcWidth, int srcHeight,
                     int destWidth, int destHeight, int px, int py, byte fillValue)
         {
+            int from = Math.Max(0, -px);
+            int to = Math.Min(srcWidth - px, destWidth);
+            bool fullFill = to <= from;
+
             Parallel.For(0, destHeight, row =>
-                CutRow(srcBase, dstBase, srcWidth, srcHeight, destWidth, px, py, row, fillValue));
+                CutRow(srcBase, dstBase, srcWidth, srcHeight, destWidth, px, py, row, fillValue, from, to, fullFill));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe void CutRow(byte* srcBase, byte* dstBase, int srcWidth, int srcHeight,
-            int destWidth, int px, int py, int row, byte fillValue)
+            int destWidth, int px, int py, int row, byte fillValue,
+            int from, int to, bool fullFill)
         {
+
             var destRow = new Span<byte>(dstBase + (long)row * destWidth, destWidth);
             int donorY = py + row;
 
@@ -190,12 +190,7 @@ namespace MouseLab.Core.Impl.UnsafeVer2
                 return;
             }
 
-            // Столбцы dest, у которых донорский пиксель существует:
-            // donor col = px + col ∈ [0, srcWidth).
-            int from = Math.Max(0, -px);
-            int to = Math.Min(srcWidth - px, destWidth);
-
-            if (to <= from)
+            if ((uint)donorY >= (uint)srcHeight || fullFill)
             {
                 destRow.Fill(fillValue);
                 return;

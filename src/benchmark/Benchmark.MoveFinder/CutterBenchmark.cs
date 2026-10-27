@@ -8,6 +8,7 @@ using MouseLab.Core.Models;
 using MouseLab.Core.Providers;
 using MouseLab.Core;
 using MouseLab.Core.Services;
+using BenchmarkDotNet.Configs;
 
 namespace Benchmark.MoveFinder;
 
@@ -24,8 +25,9 @@ public class Scenario2
 }
 
 [MemoryDiagnoser]
-[ThreadingDiagnoser]
 [Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.Method)]
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+[CategoriesColumn]
 public class CutterBenchmark
 {
     public static IEnumerable<Scenario2> Scenarios => new[]
@@ -76,7 +78,7 @@ public class CutterBenchmark
     // Пул PhoenixProvider'а: для CutNewPooled.
     IMatrixProvider provider = new MatrixProvider();
 
-    [IterationSetup]
+    [GlobalSetup]
     public void Setup()
     {
         IMatrixRandomizer rnd = new MatrixRandomizer();
@@ -85,32 +87,47 @@ public class CutterBenchmark
         int size = (src.Width - Scenario.Resolution) / 2;
         pos = new Point(size, size);
         destSize = new Size(Scenario.Resolution, Scenario.Resolution);
+        dest = new Matrix(destSize.Width, destSize.Height);
     }
 
     // CutOld — базовая линия: остальные показываются относительно неё (ratio).
 
-    [Benchmark(Baseline = true)]
+    [BenchmarkCategory("Alloc"), Benchmark(Baseline = true)]
     public IMatrix CutOld()
     {
-        return cutterOld.Cut(src!, pos, Scenario.Resolution, Scenario.Resolution);
+        return cutterOld.Cut(src!, pos, destSize);
     }
 
-    [Benchmark()]
+    [BenchmarkCategory("Alloc"), Benchmark()]
     public IMatrix CutOldDirect()
     {
-        return cutterOldDirect.Cut(src!, pos, Scenario.Resolution, Scenario.Resolution);
+        return cutterOldDirect.Cut(src!, pos, destSize);
     }
 
-    [Benchmark]
+    [BenchmarkCategory("Alloc"), Benchmark()]
     public IMatrix CutNew()
     {
-        return cutter.Cut(src!, pos, Scenario.Resolution, Scenario.Resolution);
+        return cutter.Cut(src!, pos, destSize);
     }
 
-    [Benchmark]
-    public IMatrix CutNewDirect()
+    [BenchmarkCategory("Alloc"), Benchmark()]
+    public void CutNewDirect()
     {
-        return cutterDirect.Cut(src!, pos, destSize);
+        cutterDirect.Cut(src!, pos, destSize);
+    }
+
+    IMatrix dest = null!;
+
+    [BenchmarkCategory("Into"), Benchmark()]
+    public void CutOldDest()
+    {
+        cutterOld.Cut(src!, pos, destSize, dest!);
+    }
+
+    [BenchmarkCategory("Into"), Benchmark()]
+    public void CutNewDest()
+    {
+        cutter.Cut(src!, pos, destSize, dest!);
     }
     /*
     [Benchmark]
