@@ -5,6 +5,7 @@ using MouseLab.Core.Impl.UnsafeVer1;
 using MouseLab.Core.Impl.UnsafeVer2;
 using System.Collections.Generic;
 using MouseLab.Core.Models;
+using MouseLab.Core.Providers;
 using MouseLab.Core;
 using MouseLab.Core.Services;
 
@@ -29,6 +30,9 @@ public class CutterBenchmark
 {
     public static IEnumerable<Scenario2> Scenarios => new[]
     {
+        // Малые окна: окно в разы меньше исходника, много заполняемых строк
+        // и граней — стоимость вызова и аллокаций сопоставима с полезной
+        // работой.
         new Scenario2() { SrcResolution = 10, Resolution = 2 },
         new Scenario2() { SrcResolution = 10, Resolution = 5 },
         new Scenario2() { SrcResolution = 10, Resolution = 15 },
@@ -39,6 +43,14 @@ public class CutterBenchmark
         new Scenario2() { SrcResolution = 128, Resolution = 60 },
         new Scenario2() { SrcResolution = 128, Resolution = 96 },
         new Scenario2() { SrcResolution = 128, Resolution = 164 },
+        // Крупные: окно шире исходника — почти вся строка непрерывного
+        // копирования без граней (или полностью вне исходника).
+        new Scenario2() { SrcResolution = 512, Resolution = 384 },
+        // Порог параллельности Ver2 — dest > 1_000_000 px:
+        // ниже, на грани, и уверенно выше порога.
+        new Scenario2() { SrcResolution = 1024, Resolution = 768 },
+        new Scenario2() { SrcResolution = 1024, Resolution = 1024 },
+        new Scenario2() { SrcResolution = 1024, Resolution = 1400 },
     };
 
     [ParamsSource(nameof(Scenarios))]
@@ -46,10 +58,20 @@ public class CutterBenchmark
 
     IMatrix? src;
     Point pos;
+    Size destSize;
 
+    // Интерфейсное поле: реалистичный вызов через IMatrixCutter — здесь
+    // попадаем в интерфейсные default-методы (IFM-диспетчеризация).
     IMatrixCutter cutter = new MatrixCutter();
 
+    // Конкретный класс: без IFM-хопов; отделяет стоимость диспетчеризации
+    // от стоимости самого алгоритма.
+    MatrixCutter cutterDirect = new MatrixCutter();
+
     ImageCutter cutterOld = new ImageCutter();
+
+    // Пул PhoenixProvider'а: для CutNewPooled.
+    IMatrixProvider provider = new MatrixProvider();
 
     [IterationSetup]
     public void Setup()
@@ -59,6 +81,15 @@ public class CutterBenchmark
         src = rnd.Randomize(Scenario.SrcResolution, Scenario.SrcResolution);
         int size = (src.Width - Scenario.Resolution) / 2;
         pos = new Point(size, size);
+        destSize = new Size(Scenario.Resolution, Scenario.Resolution);
+    }
+
+    // CutOld — базовая линия: остальные показываются относительно неё (ratio).
+
+    [Benchmark(Baseline = true)]
+    public IMatrix CutOld()
+    {
+        return cutterOld.Cut(src!, pos, Scenario.Resolution, Scenario.Resolution);
     }
 
     [Benchmark]
@@ -68,9 +99,19 @@ public class CutterBenchmark
     }
 
     [Benchmark]
-    public IMatrix CutOld()
+    public IMatrix CutNewDirect()
     {
-        return cutterOld.Cut(src!, pos, Scenario.Resolution, Scenario.Resolution);
+        return cutterDirect.Cut(src!, pos, destSize);
+    }
+
+    [Benchmark]
+    public void CutNewPooled()
+    {
+        // Полный цикл через пул провайдера: аренда, копирование, возврат.
+        // В steady state Allocated должен показать ~0 B — это и есть
+        // главный выигрыш Ver2, который старый путь не даёт.
+        var dest = cutter.Cut(src!, pos, destSize, provider);
+        dest.Dispose();
     }
 }
 
