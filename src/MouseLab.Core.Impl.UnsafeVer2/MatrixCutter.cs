@@ -30,15 +30,6 @@ namespace MouseLab.Core.Impl.UnsafeVer2
         // наравне с порогом MatrixRandomizer'а.
         private const long ParallelCostThreshold = 4_000_000;
 
-        /*
-        private readonly IMatrixProvider? _defaultProvider;
-
-        public MatrixCutter(IMatrixProvider? defaultProvider = null)
-        {
-            _defaultProvider = defaultProvider;
-        }
-        */
-
         public unsafe void Cut(IMatrix src, Point position, Size size, IMatrix dest, bool fillZero = true)
         {
             ArgumentNullException.ThrowIfNull(src);
@@ -68,16 +59,51 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             {
                 // Однопоточная ветка — управляемые Span'ы, как в старом
                 // ImageCutter: без пиннинга, без указателей; Slice/CopyTo
-                // векторизуются так же, а на однопоточных размерах это
-                // измеримо дешевле (см. замер Benchmark.MoveFinder).
+                // векторизуются так же (см. замер Benchmark.MoveFinder).
+                //
+                // КЛЮЧЕВОЕ: interface-свойства src/dest — Width/Height —
+                // читаются один раз перед циклом. Изоляционный замер
+                // (CoreCutterBenchmark) показал, что те же самые свойства,
+                // читаемые на КАЖДОЙ строке, стоят ~50-60 мкс на 384-строчном
+                // окне (92-93 против 34-39 мкс) — дешёвый сам по себе
+                // interface-вызов+отсутствие hoisting'а разом убивает ядро.
                 ReadOnlySpan<byte> srcData = src.ReadOnlySpanBytes;
                 Span<byte> dstData = dest.SpanBytes;
+                int srcW = src.Width, srcH = src.Height;
+                int dstW = dest.Width, dstH = dest.Height;
 
-                for (int row = 0; row < dest.Height; row++)
-                    CutRowManaged(srcData, dstData, src.Width, src.Height,
-                        dest.Width, position.X, position.Y, row, fillValue);
+                int from = Math.Max(0, -position.X);
+                int to = Math.Min(srcW - position.X, dstW);
+
+                for (int row = 0; row < dstH; row++)
+                {
+                    var destRow = dstData.Slice(row * dstW, dstW);
+                    int donorY = position.Y + row;
+
+                    if ((uint)donorY >= (uint)srcH)
+                    {
+                        destRow.Fill(fillValue);
+                        continue;
+                    }
+
+                    if (to <= from)
+                    {
+                        destRow.Fill(fillValue);
+                        continue;
+                    }
+
+                    if (from > 0)
+                        destRow[..from].Fill(fillValue);
+
+                    srcData.Slice(donorY * srcW + position.X + from, to - from)
+                        .CopyTo(destRow[from..to]);
+
+                    if (to < dstW)
+                        destRow[to..].Fill(fillValue);
+                }
             }
         }
+
 
         private static unsafe void CutParallel(byte* srcBase, byte* dstBase, int srcWidth, int srcHeight,
             int destWidth, int destHeight, int px, int py, byte fillValue)
@@ -136,39 +162,6 @@ namespace MouseLab.Core.Impl.UnsafeVer2
                 destRow[to..].Fill(fillValue);
         }
 
-        // Управляемый двойник CutRow для однопоточной ветки: та же логика
-        // проверки строки и границ, но Slice/CopyTo вместо указателей.
-        private static void CutRowManaged(ReadOnlySpan<byte> srcBase, Span<byte> dstBase,
-            int srcWidth, int srcHeight, int destWidth, int px, int py, int row, byte fillValue)
-        {
-            var destRow = dstBase.Slice(row * destWidth, destWidth);
-            int donorY = py + row;
 
-            if ((uint)donorY >= (uint)srcHeight)
-            {
-                destRow.Fill(fillValue);
-                return;
-            }
-
-            // Столбцы dest, у которых донорский пиксель существует:
-            // donor col = px + col ∈ [0, srcWidth).
-            int from = Math.Max(0, -px);
-            int to = Math.Min(srcWidth - px, destWidth);
-
-            if (to <= from)
-            {
-                destRow.Fill(fillValue);
-                return;
-            }
-
-            if (from > 0)
-                destRow[..from].Fill(fillValue);
-
-            srcBase.Slice(donorY * srcWidth + px + from, to - from)
-                .CopyTo(destRow[from..to]);
-
-            if (to < destWidth)
-                destRow[to..].Fill(fillValue);
-        }
     }
 }
