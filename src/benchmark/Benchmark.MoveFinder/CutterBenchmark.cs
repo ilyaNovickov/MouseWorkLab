@@ -387,35 +387,72 @@ public class CoreCutterBenchmark
 /// <summary>
 /// Сервис вырезания области из матриц
 /// </summary>
-public class ImageCutter : IMatrixCutter
+public sealed class ImageCutter : IMatrixCutter
 {
+    #region PublicInterfaceMethods
     public void Cut(IMatrix src, Point position, Size size, IMatrix dest, bool fillZero = true)
     {
-        CutInto(src, position.X, position.Y, size.Width, size.Height, fillZero, dest.SpanBytes);
-    }
-
-    public IMatrix Cut(IMatrix src, Point position, Size size, IMatrixProvider provider, bool fillZero = true)
-    {
-        return Cut(src, position, size, fillZero);
+        CutInto(src, position.X, position.Y, size.Width, size.Height, dest.SpanBytes, fillZero);
     }
 
     public IMatrix Cut(IMatrix src, Point position, Size size, bool fillZero = true)
     {
-        return Cut(src, position, size.Width, size.Height, fillZero);
+        return Cut(src, position.X, position.Y, size.Width, size.Height, fillZero);
+    }
+
+    public IMatrix Cut(IMatrix src, int x, int y, Size size, bool fillZero = true)
+    {
+        return Cut(src, x, y, size.Width, size.Height, fillZero);
     }
 
     public IMatrix Cut(IMatrix src, Point position, int width, int height, bool fillZero = true)
     {
-        IMatrix result = new Matrix(width, height);
+        return Cut(src, position.X, position.Y, width, height, fillZero);
+    }
 
-        CutInto(src, position.X, position.Y, width, height, fillZero,
-            result.SpanBytes);
+    public IMatrix Cut(IMatrix src, int x, int y, int width, int height, bool fillZero = true)
+    {
+        var dest = new Matrix(width, height);
+        CutInto(src, x, y, width, height, dest.SpanBytes, fillZero);
+        return dest;
+    }
 
-        return result;
+    #region  WithProvider
+    public IMatrix Cut(IMatrix src, Point position, Size size, IMatrixProvider provider, bool fillZero = true)
+    {
+        ArgumentNullException.ThrowIfNull(provider);
+
+        var dest = provider.Create(size.Width, size.Height);
+        CutInto(src, position.X, position.Y, size.Width, size.Height, dest.SpanBytes, fillZero);
+        return dest;
     }
 
 
-    private static void CutInto(IMatrix src, int px, int py, int w, int h, bool fillZero, Span<byte> dst)
+    public IMatrix Cut(IMatrix src, int x, int y, Size size, IMatrixProvider provider, bool fillZero = true)
+    {
+        return Cut(src, x, y, size.Width, size.Height, provider, fillZero);
+    }
+
+    public IMatrix Cut(IMatrix src, Point position, int width, int height, IMatrixProvider provider, bool fillZero = true)
+    {
+        return Cut(src, position.X, position.Y, width, height, provider, fillZero);
+    }
+
+    public IMatrix Cut(IMatrix src, int x, int y, int width, int height, IMatrixProvider provider, bool fillZero = true)
+    {
+        ArgumentNullException.ThrowIfNull(provider);
+
+        var dest = provider.Create(width, height);
+        CutInto(src, x, y, width, height, dest.SpanBytes, fillZero);
+
+        return dest;
+    }
+    #endregion
+
+    #endregion
+
+
+    private static void CutInto(IMatrix src, int px, int py, int w, int h, Span<byte> dst, bool fillZero)
     {
         byte fill = fillZero ? byte.MinValue : byte.MaxValue;
 

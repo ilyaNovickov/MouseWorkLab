@@ -15,35 +15,17 @@ namespace MouseLab.Core.Services
 
         IMatrix Cut(IMatrix src, Point position, Size size, bool fillZero = true);
 
-        IMatrix Cut(IMatrix src, int x, int y, Size size, bool fillZero = true)
-        {
-            return Cut(src, new Point(x, y), size, fillZero);
-        }
+        IMatrix Cut(IMatrix src, int x, int y, Size size, bool fillZero = true);
 
-        IMatrix Cut(IMatrix src, Point position, int width, int height, bool fillZero = true)
-        {
-            return Cut(src, position, new Size(width, height), fillZero);
-        }
+        IMatrix Cut(IMatrix src, Point position, int width, int height, bool fillZero = true);
 
-        IMatrix Cut(IMatrix src, int x, int y, int width, int height, bool fillZero = true)
-        {
-            return Cut(src, new Point(x, y), new Size(width, height), fillZero);
-        }
+        IMatrix Cut(IMatrix src, int x, int y, int width, int height, bool fillZero = true);
 
-        IMatrix Cut(IMatrix src, int x, int y, Size size, IMatrixProvider provider, bool fillZero = true)
-        {
-            return Cut(src, new Point(x, y), size, provider, fillZero);
-        }
+        IMatrix Cut(IMatrix src, int x, int y, Size size, IMatrixProvider provider, bool fillZero = true);
 
-        IMatrix Cut(IMatrix src, Point position, int width, int height, IMatrixProvider provider, bool fillZero = true)
-        {
-            return Cut(src, position, new Size(width, height), provider, fillZero);
-        }
+        IMatrix Cut(IMatrix src, Point position, int width, int height, IMatrixProvider provider, bool fillZero = true);
 
-        IMatrix Cut(IMatrix src, int x, int y, int width, int height, IMatrixProvider provider, bool fillZero = true)
-        {
-            return Cut(src, new Point(x, y), new Size(width, height), provider, fillZero);
-        }
+        IMatrix Cut(IMatrix src, int x, int y, int width, int height, IMatrixProvider provider, bool fillZero = true);
 
 
     }
