@@ -11,6 +11,10 @@ namespace MouseLab.Core.Impl.UnsafeVer2
     /// донора, заполняется 0 (fillZero = true) или 255 (false).
     /// Копирование строк идёт через Span (JIT превращает в memmove),
     /// заполнение — Span.Fill; оба пути векторизованы в BCL.
+    /// Однопоточная ветка не пиннит буферы: `fixed` и указатели —
+    /// только в параллельной ветке. Замер показал, что Slice/CopyTo
+    /// на управляемых Span'ах векторизуются так же, а пиннинг стоит
+    /// дороже снятия bounds checks — отсюда расщепление веток.
     /// </summary>
     /// <remarks>
     /// Писатель перезаписывает каждый пиксель dest, поэтому арендованная
@@ -20,7 +24,11 @@ namespace MouseLab.Core.Impl.UnsafeVer2
     {
         // Порог параллельного разбиения по строкам dest;
         // ниже него оплата потоков превосходит выигрыш.
-        private const long ParallelCostThreshold = 1_000_000;
+        // Замер Benchmark.MoveFinder показал, что на окнах 1-2 млн px
+        // параллельная версия не даёт выигрыша против однопоточной
+        // (работу поглощает ThreadPool), поэтому порог поднят
+        // наравне с порогом MatrixRandomizer'а.
+        private const long ParallelCostThreshold = 4_000_000;
 
         /*
         private readonly IMatrixProvider? _defaultProvider;
@@ -44,22 +52,30 @@ namespace MouseLab.Core.Impl.UnsafeVer2
 
             byte fillValue = fillZero ? (byte)0 : (byte)255;
 
-            fixed (byte* srcFixed = src.ReadOnlySpanBytes, dstFixed = dest.SpanBytes)
+            // Фиксированные указатели нельзя захватить лямбдой (CS1764),
+            // поэтому Parallel.For отделён в метод, принимающий указатели
+            // параметрами.
+            if ((long)dest.Width * dest.Height > ParallelCostThreshold)
             {
-                // Фиксированные указатели нельзя захватить лямбдой (CS1764),
-                // поэтому Parallel.For отделён в метод, принимающий указатели
-                // параметрами.
-                if ((long)dest.Width * dest.Height > ParallelCostThreshold)
-                {
+                // Параллельная ветка — единственное место с пиннингом:
+                // оправдан он только на объёмах, распределённых между
+                // потоками.
+                fixed (byte* srcFixed = src.ReadOnlySpanBytes, dstFixed = dest.SpanBytes)
                     CutParallel(srcFixed, dstFixed, src.Width, src.Height,
                         dest.Width, dest.Height, position.X, position.Y, fillValue);
-                }
-                else
-                {
-                    for (int row = 0; row < dest.Height; row++)
-                        CutRow(srcFixed, dstFixed, src.Width, src.Height, dest.Width,
-                            position.X, position.Y, row, fillValue);
-                }
+            }
+            else
+            {
+                // Однопоточная ветка — управляемые Span'ы, как в старом
+                // ImageCutter: без пиннинга, без указателей; Slice/CopyTo
+                // векторизуются так же, а на однопоточных размерах это
+                // измеримо дешевле (см. замер Benchmark.MoveFinder).
+                ReadOnlySpan<byte> srcData = src.ReadOnlySpanBytes;
+                Span<byte> dstData = dest.SpanBytes;
+
+                for (int row = 0; row < dest.Height; row++)
+                    CutRowManaged(srcData, dstData, src.Width, src.Height,
+                        dest.Width, position.X, position.Y, row, fillValue);
             }
         }
 
@@ -115,6 +131,41 @@ namespace MouseLab.Core.Impl.UnsafeVer2
 
             var srcRow = new ReadOnlySpan<byte>(srcBase + (long)donorY * srcWidth + px + from, to - from);
             srcRow.CopyTo(destRow[from..to]);
+
+            if (to < destWidth)
+                destRow[to..].Fill(fillValue);
+        }
+
+        // Управляемый двойник CutRow для однопоточной ветки: та же логика
+        // проверки строки и границ, но Slice/CopyTo вместо указателей.
+        private static void CutRowManaged(ReadOnlySpan<byte> srcBase, Span<byte> dstBase,
+            int srcWidth, int srcHeight, int destWidth, int px, int py, int row, byte fillValue)
+        {
+            var destRow = dstBase.Slice(row * destWidth, destWidth);
+            int donorY = py + row;
+
+            if ((uint)donorY >= (uint)srcHeight)
+            {
+                destRow.Fill(fillValue);
+                return;
+            }
+
+            // Столбцы dest, у которых донорский пиксель существует:
+            // donor col = px + col ∈ [0, srcWidth).
+            int from = Math.Max(0, -px);
+            int to = Math.Min(srcWidth - px, destWidth);
+
+            if (to <= from)
+            {
+                destRow.Fill(fillValue);
+                return;
+            }
+
+            if (from > 0)
+                destRow[..from].Fill(fillValue);
+
+            srcBase.Slice(donorY * srcWidth + px + from, to - from)
+                .CopyTo(destRow[from..to]);
 
             if (to < destWidth)
                 destRow[to..].Fill(fillValue);

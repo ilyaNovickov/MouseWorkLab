@@ -46,11 +46,13 @@ public class CutterBenchmark
         // Крупные: окно шире исходника — почти вся строка непрерывного
         // копирования без граней (или полностью вне исходника).
         new Scenario2() { SrcResolution = 512, Resolution = 384 },
-        // Порог параллельности Ver2 — dest > 1_000_000 px:
-        // ниже, на грани, и уверенно выше порога.
+        // Порог параллельности Ver2 — dest > 4_000_000 px:
+        // 768, 1024/1024 и 1024/1400 — ниже порога (однопоточная ветка),
+        // 2048² = 4.19M px — единственный сценарий параллельной ветки.
         new Scenario2() { SrcResolution = 1024, Resolution = 768 },
         new Scenario2() { SrcResolution = 1024, Resolution = 1024 },
         new Scenario2() { SrcResolution = 1024, Resolution = 1400 },
+        new Scenario2() { SrcResolution = 2048, Resolution = 2048 },
     };
 
     [ParamsSource(nameof(Scenarios))]
