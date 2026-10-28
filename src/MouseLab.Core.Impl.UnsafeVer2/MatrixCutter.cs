@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using MouseLab.Core;
 using MouseLab.Core.Models;
 using MouseLab.Core.Providers;
@@ -149,6 +150,26 @@ namespace MouseLab.Core.Impl.UnsafeVer2
                 // interface-вызов+отсутствие hoisting'а разом убивает ядро.
                 int dstW = width, dstH = height;
 
+                // Fast path: entire cut region is inside source
+                if (x >= 0 && y >= 0 && dstW <= srcWidth - x && dstH <= srcHeight - y)
+                {
+                    ref byte srcBase = ref MemoryMarshal.GetReference(src);
+                    ref byte dstBase = ref MemoryMarshal.GetReference(dest);
+
+                    for (int row = 0; row < dstH; row++)
+                    {
+                        /*
+                        src.Slice((y + row) * srcWidth + x, dstW)
+                           .CopyTo(dest.Slice(row * dstW, dstW));
+                        */
+                        Unsafe.CopyBlockUnaligned(
+                            ref Unsafe.Add(ref dstBase, (nint)row * dstW),
+                            ref Unsafe.Add(ref srcBase, ((nint)y + row) * srcWidth + x),
+                            (uint)dstW);
+                    }
+                    return;
+                }
+
                 int from = Math.Max(0, -x);
                 int to = Math.Min(srcWidth - x, dstW);
 
@@ -182,46 +203,62 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             }
         }
 
-        private static unsafe void CutParallel(byte* srcBase, byte* dstBase, int srcWidth, int srcHeight,
-                    int destWidth, int destHeight, int px, int py, byte fillValue)
+        private static unsafe void CutParallel(byte* srcBase, byte* dstBase,
+            int srcWidth, int srcHeight,
+            int destWidth, int destHeight,
+            int px, int py, byte fillValue)
         {
+            // Fast path: entire region inside source
+            if (px >= 0 && py >= 0 &&
+                destWidth <= srcWidth - px &&
+                destHeight <= srcHeight - py)
+            {
+                Parallel.For(0, destHeight, row =>
+                {
+                    Unsafe.CopyBlockUnaligned(
+                        ref *(dstBase + (nint)row * destWidth),
+                        ref *(srcBase + ((nint)py + row) * srcWidth + px),
+                        (uint)destWidth);
+                });
+                return;
+            }
+
+            // Slow path: boundary handling
             int from = Math.Max(0, -px);
             int to = Math.Min(srcWidth - px, destWidth);
+
             if (to <= from)
             {
-                new Span<byte>(dstBase, (int)((long)destWidth * destHeight)).Fill(fillValue);
+                new Span<byte>(dstBase, destWidth * destHeight).Fill(fillValue);
                 return;
             }
+
+            int copyLen = to - from;
+            int srcXOffset = px + from;
 
             Parallel.For(0, destHeight, row =>
-                CutRow(srcBase, dstBase, srcWidth, srcHeight, destWidth, px, py, row, fillValue, from, to));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void CutRow(byte* srcBase, byte* dstBase, int srcWidth, int srcHeight,
-            int destWidth, int px, int py, int row, byte fillValue,
-            int from, int to)
-        {
-
-            var destRow = new Span<byte>(dstBase + (long)row * destWidth, destWidth);
-            int donorY = py + row;
-
-            if ((uint)donorY >= (uint)srcHeight)
             {
-                destRow.Fill(fillValue);
-                return;
-            }
+                byte* dst = dstBase + (nint)row * destWidth;
+                int donorY = py + row;
 
-            if (from > 0)
-                destRow[..from].Fill(fillValue);
+                if ((uint)donorY >= (uint)srcHeight)
+                {
+                    new Span<byte>(dst, destWidth).Fill(fillValue);
+                    return;
+                }
 
-            var srcRow = new ReadOnlySpan<byte>(srcBase + (long)donorY * srcWidth + px + from, to - from);
-            srcRow.CopyTo(destRow[from..to]);
+                if (from > 0)
+                    new Span<byte>(dst, from).Fill(fillValue);
 
-            if (to < destWidth)
-                destRow[to..].Fill(fillValue);
+                Unsafe.CopyBlockUnaligned(
+                    ref *(dst + from),
+                    ref *(srcBase + (nint)donorY * srcWidth + srcXOffset),
+                    (uint)copyLen);
+
+                if (to < destWidth)
+                    new Span<byte>(dst + to, destWidth - to).Fill(fillValue);
+            });
         }
-
 
 
         #endregion

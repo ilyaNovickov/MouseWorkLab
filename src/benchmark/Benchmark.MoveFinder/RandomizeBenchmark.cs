@@ -13,6 +13,7 @@ namespace Benchmark.MoveFinder;
 [MemoryDiagnoser]
 [ThreadingDiagnoser]
 [Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.Method)]
+[DisassemblyDiagnoser(maxDepth: 3, printSource: true)]
 public class RandomizeBenchmark
 {
     [Params(10, 20, 40, 64, 128, 512, 1024)]

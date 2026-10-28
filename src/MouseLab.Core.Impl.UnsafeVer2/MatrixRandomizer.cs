@@ -26,7 +26,8 @@ namespace MouseLab.Core.Impl.UnsafeVer2;
 public sealed class MatrixRandomizer : IMatrixRandomizer
 {
     // Порог параллельного разбиения по кускам буфера.
-    private const long ParallelCostThreshold = 4_000_000;
+    private static readonly long ParallelCostThreshold =
+        Environment.ProcessorCount >= 4 ? 4_000_000 : long.MaxValue;
 
     // Размер куска при параллельном заполнении (~1 млн байт).
     private const int ChunkSize = 1_048_576;
@@ -69,16 +70,7 @@ public sealed class MatrixRandomizer : IMatrixRandomizer
 
         if (count > ParallelCostThreshold)
         {
-            long chunks = (count + ChunkSize - 1) / ChunkSize;
-
-            Parallel.For(0, (int)chunks, chunk =>
-            {
-                long start = (long)chunk * ChunkSize;
-                long length = Math.Min(ChunkSize, count - start);
-                uint chunkState = baseState ^ (uint)chunk * LaneStride ^ 0x85EBCA6Bu;
-
-                FillChunk(pBuffer + start, length, chunkState);
-            });
+            FillParallel(pBuffer, count, baseState);
         }
         else
         {
@@ -86,23 +78,49 @@ public sealed class MatrixRandomizer : IMatrixRandomizer
         }
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static unsafe void FillParallel(byte* pBuffer, long count, uint baseState)
+    {
+        long chunks = (count + ChunkSize - 1) / ChunkSize;
+        Parallel.For(0, (int)chunks, chunk =>
+        {
+            long start = (long)chunk * ChunkSize;
+            long length = Math.Min(ChunkSize, count - start);
+            uint chunkState = baseState ^ (uint)chunk * LaneStride ^ 0x85EBCA6Bu;
+            FillChunk(pBuffer + start, length, chunkState);
+        });
+    }
+
+    // Можно убрать `AggressiveInlinig` для внутренних меодов если нужно
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe void FillChunk(byte* p, long count, uint baseState)
     {
-        if (!Vector256.IsHardwareAccelerated)
+        if (Vector256.IsHardwareAccelerated)
+        {
+            FillVector256(p, count, baseState);
+        }
+        else if (Vector128.IsHardwareAccelerated)
+        {
+            FillVector128(p, count, baseState);
+        }
+        else
         {
             FillScalar(p, count, baseState);
-            return;
         }
+    }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static unsafe void FillVector256(byte* p, long count, uint baseState)
+    {
         var state = Vector256.Create(
-            baseState,
-            baseState + LaneStride,
-            baseState + unchecked(2u * LaneStride),
-            baseState + unchecked(3u * LaneStride),
-            baseState + unchecked(4u * LaneStride),
-            baseState + unchecked(5u * LaneStride),
-            baseState + unchecked(6u * LaneStride),
-            baseState + unchecked(7u * LaneStride));
+            (baseState) | 1u,
+            (baseState + LaneStride) | 1u,
+            (baseState + unchecked(2u * LaneStride)) | 1u,
+            (baseState + unchecked(3u * LaneStride)) | 1u,
+            (baseState + unchecked(4u * LaneStride)) | 1u,
+            (baseState + unchecked(5u * LaneStride)) | 1u,
+            (baseState + unchecked(6u * LaneStride)) | 1u,
+            (baseState + unchecked(7u * LaneStride)) | 1u);
 
         nuint vectorEnd = (nuint)count & ~((nuint)Vector256<byte>.Count - 1);
 
@@ -111,9 +129,30 @@ public sealed class MatrixRandomizer : IMatrixRandomizer
             state = Vector256.Xor(state, Vector256.ShiftLeft(state, 13));
             state = Vector256.Xor(state, Vector256.ShiftRightLogical(state, 17));
             state = Vector256.Xor(state, Vector256.ShiftLeft(state, 5));
+            state.AsByte().Store(p + offset);
+        }
 
-            var bytes = Unsafe.As<Vector256<uint>, Vector256<byte>>(ref state);
-            Vector256.Store(bytes, p + offset);
+        if ((long)vectorEnd < count)
+            FillScalar(p + vectorEnd, count - (long)vectorEnd, baseState ^ 0x5F3A7FFDu);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static unsafe void FillVector128(byte* p, long count, uint baseState)
+    {
+        var state = Vector128.Create(
+            (baseState) | 1u,
+            (baseState + LaneStride) | 1u,
+            (baseState + unchecked(2u * LaneStride)) | 1u,
+            (baseState + unchecked(3u * LaneStride)) | 1u);
+
+        nuint vectorEnd = (nuint)count & ~((nuint)Vector128<byte>.Count - 1);
+
+        for (nuint offset = 0; offset < vectorEnd; offset += (nuint)Vector128<byte>.Count)
+        {
+            state = Vector128.Xor(state, Vector128.ShiftLeft(state, 13));
+            state = Vector128.Xor(state, Vector128.ShiftRightLogical(state, 17));
+            state = Vector128.Xor(state, Vector128.ShiftLeft(state, 5));
+            state.AsByte().Store(p + offset);
         }
 
         if ((long)vectorEnd < count)
@@ -123,6 +162,8 @@ public sealed class MatrixRandomizer : IMatrixRandomizer
     /// <summary>Свободный от SIMD путь: та же череда xorshift, но по 4 байта.</summary>
     private static unsafe void FillScalar(byte* p, long count, uint state)
     {
+        state |= 1u;
+
         long i = 0;
 
         for (; i + 4 <= count; i += 4)
@@ -130,11 +171,7 @@ public sealed class MatrixRandomizer : IMatrixRandomizer
             state ^= state << 13;
             state ^= state >> 17;
             state ^= state << 5;
-
-            p[i] = (byte)state;
-            p[i + 1] = (byte)(state >> 8);
-            p[i + 2] = (byte)(state >> 16);
-            p[i + 3] = (byte)(state >> 24);
+            *(uint*)(p + i) = state;
         }
 
         for (; i < count; i++)

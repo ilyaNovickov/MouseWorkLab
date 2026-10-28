@@ -37,6 +37,7 @@ public class CutterBenchmark
         // Малые окна: окно в разы меньше исходника, много заполняемых строк
         // и граней — стоимость вызова и аллокаций сопоставима с полезной
         // работой.
+        /*
         new Scenario2() { SrcResolution = 10, Resolution = 2 },
         new Scenario2() { SrcResolution = 10, Resolution = 5 },
         new Scenario2() { SrcResolution = 10, Resolution = 15 },
@@ -47,16 +48,20 @@ public class CutterBenchmark
         new Scenario2() { SrcResolution = 128, Resolution = 60 },
         new Scenario2() { SrcResolution = 128, Resolution = 96 },
         new Scenario2() { SrcResolution = 128, Resolution = 164 },
+        
         // Крупные: окно шире исходника — почти вся строка непрерывного
         // копирования без граней (или полностью вне исходника).
         new Scenario2() { SrcResolution = 512, Resolution = 384 },
         // Порог параллельности Ver2 — dest > 4_000_000 px:
         // 768, 1024/1024 и 1024/1400 — ниже порога (однопоточная ветка),
         // 2048² = 4.19M px — единственный сценарий параллельной ветки.
+        */
         new Scenario2() { SrcResolution = 1024, Resolution = 768 },
         new Scenario2() { SrcResolution = 1024, Resolution = 1024 },
         new Scenario2() { SrcResolution = 1024, Resolution = 1400 },
+        /*
         new Scenario2() { SrcResolution = 2048, Resolution = 2048 },
+        */
     };
 
     [ParamsSource(nameof(Scenarios))]
