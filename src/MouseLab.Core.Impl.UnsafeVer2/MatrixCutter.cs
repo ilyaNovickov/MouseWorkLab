@@ -94,7 +94,10 @@ namespace MouseLab.Core.Impl.UnsafeVer2
         // параллельная версия не даёт выигрыша против однопоточной
         // (работу поглощает ThreadPool), поэтому порог поднят
         // наравне с порогом MatrixRandomizer'а.
-        private const long ParallelCostThreshold = 4_000_000;
+        private static readonly long ParallelCostThreshold =
+            Environment.ProcessorCount >= 4
+            ? 4_000_000    // 4+ ядер: параллелизм оправдан
+            : long.MaxValue; // 2 ядра: отключён
 
         //можно заменить IMatrix dest на Span
         private static unsafe void CutMatrix(ReadOnlySpan<byte> src, int srcWidth, int srcHeight,
@@ -133,7 +136,13 @@ namespace MouseLab.Core.Impl.UnsafeVer2
 
                 int from = Math.Max(0, -x);
                 int to = Math.Min(srcWidth - x, dstW);
-                bool fullFill = to <= from;
+
+                if (to <= from)
+                {
+                    // Вся dest-область вне source по X — заполнить целиком
+                    dest.Slice(0, dstW * dstH).Fill(fillValue);
+                    return;
+                }
 
                 for (int row = 0; row < dstH; row++)
                 {
@@ -141,12 +150,6 @@ namespace MouseLab.Core.Impl.UnsafeVer2
                     int donorY = y + row;
 
                     if ((uint)donorY >= (uint)srcHeight)
-                    {
-                        destRow.Fill(fillValue);
-                        continue;
-                    }
-
-                    if ((uint)donorY >= (uint)srcHeight || fullFill)
                     {
                         destRow.Fill(fillValue);
                         continue;
@@ -169,28 +172,26 @@ namespace MouseLab.Core.Impl.UnsafeVer2
         {
             int from = Math.Max(0, -px);
             int to = Math.Min(srcWidth - px, destWidth);
-            bool fullFill = to <= from;
+            if (to <= from)
+            {
+                new Span<byte>(dstBase, (int)((long)destWidth * destHeight)).Fill(fillValue);
+                return;
+            }
 
             Parallel.For(0, destHeight, row =>
-                CutRow(srcBase, dstBase, srcWidth, srcHeight, destWidth, px, py, row, fillValue, from, to, fullFill));
+                CutRow(srcBase, dstBase, srcWidth, srcHeight, destWidth, px, py, row, fillValue, from, to));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe void CutRow(byte* srcBase, byte* dstBase, int srcWidth, int srcHeight,
             int destWidth, int px, int py, int row, byte fillValue,
-            int from, int to, bool fullFill)
+            int from, int to)
         {
 
             var destRow = new Span<byte>(dstBase + (long)row * destWidth, destWidth);
             int donorY = py + row;
 
             if ((uint)donorY >= (uint)srcHeight)
-            {
-                destRow.Fill(fillValue);
-                return;
-            }
-
-            if ((uint)donorY >= (uint)srcHeight || fullFill)
             {
                 destRow.Fill(fillValue);
                 return;

@@ -21,6 +21,12 @@ public class RandomizeBenchmark
     IMatrixRandomizer rndNew = new MatrixRandomizer();
     ImageRandomizer rndOld = new();
 
+    [GlobalSetup]
+    public void Setup()
+    {
+        dest = new Matrix(Resolution, Resolution);
+    }
+
 
     [Benchmark]
     public IMatrix RndNew()
@@ -32,6 +38,20 @@ public class RandomizeBenchmark
     public IMatrix RndOld()
     {
         return rndOld.Randomize(Resolution, Resolution);
+    }
+
+    IMatrix dest = null!;
+
+    [Benchmark]
+    public void RndNewInto()
+    {
+        rndNew.Randomize(dest);
+    }
+
+    [Benchmark]
+    public void RndOldInto()
+    {
+        rndOld.Randomize(dest);
     }
 }
 
