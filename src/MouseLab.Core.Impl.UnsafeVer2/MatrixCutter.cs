@@ -24,12 +24,27 @@ namespace MouseLab.Core.Impl.UnsafeVer2
     public sealed class MatrixCutter : IMatrixCutter
     {
         #region PublicInterfaceMethods
-        public void Cut(IMatrix src, Point position, Size size, IMatrix dest, bool fillZero = true)
+        public void Cut(IMatrix src, int x, int y, int width, int height, IMatrix dest, bool fillZero = true)
         {
-            if (dest.Width != size.Width || dest.Height != size.Height)
+            if (dest.Width != width || dest.Height != height)
                 throw new ArgumentException("The dest matrix has to has the same size as target matrix");
             CutMatrix(src.ReadOnlySpanBytes, src.Width, src.Height,
-                position.X, position.Y, size.Width, size.Height, dest.SpanBytes, fillZero);
+                x, y, width, height, dest.SpanBytes, fillZero);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Cut(IMatrix src, int x, int y, Size size, IMatrix dest, bool fillZero = true)
+        {
+            Cut(src, x, y, size.Width, size.Height, dest, fillZero);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Cut(IMatrix src, Point position, int width, int height, IMatrix dest, bool fillZero = true)
+        {
+            Cut(src, position.X, position.Y, width, height, dest, fillZero);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Cut(IMatrix src, Point position, Size size, IMatrix dest, bool fillZero = true)
+        {
+            Cut(src, position.X, position.Y, size.Width, size.Height, dest, fillZero);
         }
 
         #region WithNewMatrix
@@ -39,17 +54,17 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             CutMatrix(src.ReadOnlySpanBytes, src.Width, src.Height, x, y, width, height, dest.SpanBytes, fillZero);
             return dest;
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IMatrix Cut(IMatrix src, Point position, Size size, bool fillZero = true)
         {
             return Cut(src, position.X, position.Y, size.Width, size.Height, fillZero);
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IMatrix Cut(IMatrix src, int x, int y, Size size, bool fillZero = true)
         {
             return Cut(src, x, y, size.Width, size.Height, fillZero);
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IMatrix Cut(IMatrix src, Point position, int width, int height, bool fillZero = true)
         {
             return Cut(src, position.X, position.Y, width, height, fillZero);
@@ -67,17 +82,17 @@ namespace MouseLab.Core.Impl.UnsafeVer2
 
             return dest;
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IMatrix Cut(IMatrix src, Point position, Size size, IMatrixProvider provider, bool fillZero = true)
         {
             return Cut(src, position.X, position.Y, size.Width, size.Height, provider, fillZero);
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IMatrix Cut(IMatrix src, int x, int y, Size size, IMatrixProvider provider, bool fillZero = true)
         {
             return Cut(src, x, y, size.Width, size.Height, provider, fillZero);
         }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IMatrix Cut(IMatrix src, Point position, int width, int height, IMatrixProvider provider, bool fillZero = true)
         {
             return Cut(src, position.X, position.Y, width, height, provider, fillZero);
@@ -206,6 +221,8 @@ namespace MouseLab.Core.Impl.UnsafeVer2
             if (to < destWidth)
                 destRow[to..].Fill(fillValue);
         }
+
+
 
         #endregion
 

@@ -9,6 +9,7 @@ using MouseLab.Core.Providers;
 using MouseLab.Core;
 using MouseLab.Core.Services;
 using BenchmarkDotNet.Configs;
+using System.Runtime.CompilerServices;
 
 namespace Benchmark.MoveFinder;
 
@@ -28,6 +29,7 @@ public class Scenario2
 [Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.Method)]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 [CategoriesColumn]
+[DisassemblyDiagnoser(maxDepth: 3, printSource: true)]
 public class CutterBenchmark
 {
     public static IEnumerable<Scenario2> Scenarios => new[]
@@ -407,21 +409,39 @@ public class CoreCutterBenchmark
 public sealed class ImageCutter : IMatrixCutter
 {
     #region PublicInterfaceMethods
+    public void Cut(IMatrix src, int x, int y, int width, int height, IMatrix dest, bool fillZero = true)
+    {
+        if (dest.Width != width || dest.Height != height)
+            throw new ArgumentException("The dest matrix has to has the same size as target matrix");
+        CutInto(src, x, y, width, height, dest.SpanBytes, fillZero);
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Cut(IMatrix src, int x, int y, Size size, IMatrix dest, bool fillZero = true)
+    {
+        Cut(src, x, y, size.Width, size.Height, dest, fillZero);
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Cut(IMatrix src, Point position, int width, int height, IMatrix dest, bool fillZero = true)
+    {
+        Cut(src, position.X, position.Y, width, height, dest, fillZero);
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Cut(IMatrix src, Point position, Size size, IMatrix dest, bool fillZero = true)
     {
-        CutInto(src, position.X, position.Y, size.Width, size.Height, dest.SpanBytes, fillZero);
+        Cut(src, position.X, position.Y, size.Width, size.Height, dest, fillZero);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMatrix Cut(IMatrix src, Point position, Size size, bool fillZero = true)
     {
         return Cut(src, position.X, position.Y, size.Width, size.Height, fillZero);
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMatrix Cut(IMatrix src, int x, int y, Size size, bool fillZero = true)
     {
         return Cut(src, x, y, size.Width, size.Height, fillZero);
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMatrix Cut(IMatrix src, Point position, int width, int height, bool fillZero = true)
     {
         return Cut(src, position.X, position.Y, width, height, fillZero);
@@ -435,26 +455,23 @@ public sealed class ImageCutter : IMatrixCutter
     }
 
     #region  WithProvider
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMatrix Cut(IMatrix src, Point position, Size size, IMatrixProvider provider, bool fillZero = true)
     {
-        ArgumentNullException.ThrowIfNull(provider);
-
-        var dest = provider.Create(size.Width, size.Height);
-        CutInto(src, position.X, position.Y, size.Width, size.Height, dest.SpanBytes, fillZero);
-        return dest;
+        return Cut(src, position.X, position.Y, size.Width, size.Height, provider, fillZero);
     }
 
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMatrix Cut(IMatrix src, int x, int y, Size size, IMatrixProvider provider, bool fillZero = true)
     {
         return Cut(src, x, y, size.Width, size.Height, provider, fillZero);
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMatrix Cut(IMatrix src, Point position, int width, int height, IMatrixProvider provider, bool fillZero = true)
     {
         return Cut(src, position.X, position.Y, width, height, provider, fillZero);
     }
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMatrix Cut(IMatrix src, int x, int y, int width, int height, IMatrixProvider provider, bool fillZero = true)
     {
         ArgumentNullException.ThrowIfNull(provider);
