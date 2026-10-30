@@ -23,11 +23,6 @@ sealed class Program
             .WithInterFont()
             .LogToTrace();
 
-        if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") is not null)
-        {
-            builder = builder.UseWayland();
-        }
-
         return builder;
     }
 }

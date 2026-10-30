@@ -62,6 +62,6 @@ public class DockFactory : Factory
         Title = title,
 
         // Должен быть всегда `false`, иначе страшный баг.
-        CanFloat = false
+        CanFloat = true
     };
 }
