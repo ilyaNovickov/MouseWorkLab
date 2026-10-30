@@ -7,6 +7,9 @@ namespace MouseLab.Common.Services;
 
 public sealed class MoveFinderManager : IMoveFinderManager
 {
+    private const int MinCoresForParallel = 4;
+    private const double ParallelWorkThreshold = 44_100;
+
     private int _resolution = 12;
     private int _patchSize = 6;
     private int _searchRange = 3;
@@ -107,24 +110,36 @@ public sealed class MoveFinderManager : IMoveFinderManager
 
     private void UpdateFinder()
     {
-        // cost = p^2 * (2s + 1)^2
-        ulong cost = ((ulong)PatchSize * (ulong)PatchSize) * (2ul * (ulong)SearchRange + 1ul) * (2ul * (ulong)SearchRange + 1ul);
-
-        // p = 10 | s = 10
-        ulong thresholdCost = 44100ul;
-
-        bool useParallel = Environment.ProcessorCount >= 4 && cost > thresholdCost;
-
         bool useBoundary = SearchRange > (Resolution - PatchSize) / 2;
+        double work = EstimateWork(PatchSize, SearchRange);
+        bool useParallel = ShouldUseParallel(work, Environment.ProcessorCount, SearchRange);
 
-        if (useParallel)
+        SelectedFinder = (useParallel, useBoundary) switch
         {
-            SelectedFinder = useBoundary ? ParallelBoundaryFinder : ParallelFinder;
-        }
-        else
-        {
-            SelectedFinder = useBoundary ? SimpleBoundaryFinder : SimpleFinder;
-        }
+            (true, true) => ParallelBoundaryFinder,
+            (true, false) => ParallelFinder,
+            (false, true) => SimpleBoundaryFinder,
+            _ => SimpleFinder
+        };
+    }
+
+    // N = p^2 * (2s + 1)^2 — худшее число сравнений байтов.
+    private static double EstimateWork(int patchSize, int searchRange)
+    {
+        double candidates = 2.0 * searchRange + 1.0;
+        return (double)patchSize * patchSize * candidates * candidates;
+    }
+
+    private static bool ShouldUseParallel(double work, int cores, int searchRange)
+    {
+        if (cores < MinCoresForParallel)
+            return false;
+
+        // Parallel.For делит только dy: при searchRange = 0 потоков нет.
+        int iterations = 2 * searchRange + 1;
+        int usableCores = Math.Min(cores, iterations);
+
+        return usableCores >= 2 && work >= ParallelWorkThreshold;
     }
 
     public IMoveFinder SelectedFinder

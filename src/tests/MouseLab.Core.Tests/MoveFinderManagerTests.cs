@@ -21,6 +21,69 @@ namespace MouseLab.Core.Tests
         }
 
         [Fact]
+        public void DefaultsSelectSimpleFinder()
+        {
+            var factory = new MoveFinderFactory();
+            var manager = new MoveFinderManager(factory);
+
+            Assert.Same(factory.CreateSimpleFinder(), manager.SelectedFinder);
+        }
+
+        [Fact]
+        public void SearchRangeBeyondPatchOffsetSelectsBoundaryFinder()
+        {
+            var factory = new MoveFinderFactory();
+            var manager = new MoveFinderManager(factory);
+            manager.SearchRange = 4;
+
+            Assert.Same(factory.CreateSimpleBoundaryFinder(), manager.SelectedFinder);
+        }
+
+        [Fact]
+        public void LargeWorkSelectsParallelFinderWhenEnoughCores()
+        {
+            var factory = new MoveFinderFactory();
+            var manager = new MoveFinderManager(factory);
+            manager.Resolution = 128;
+            manager.PatchSize = 64;
+            manager.SearchRange = 32;
+
+            var expected = Environment.ProcessorCount >= 4
+                ? factory.CreateParallelFinder()
+                : factory.CreateSimpleFinder();
+
+            Assert.Same(expected, manager.SelectedFinder);
+        }
+
+        [Fact]
+        public void LargeWorkWithoutSearchIterationsStaysScalar()
+        {
+            var factory = new MoveFinderFactory();
+            var manager = new MoveFinderManager(factory);
+            manager.Resolution = 500;
+            manager.PatchSize = 500;
+            manager.SearchRange = 0;
+
+            Assert.Same(factory.CreateSimpleFinder(), manager.SelectedFinder);
+        }
+
+        [Fact]
+        public void LargeBoundaryWorkSelectsParallelBoundaryFinderWhenEnoughCores()
+        {
+            var factory = new MoveFinderFactory();
+            var manager = new MoveFinderManager(factory);
+            manager.Resolution = 40;
+            manager.PatchSize = 10;
+            manager.SearchRange = 20;
+
+            var expected = Environment.ProcessorCount >= 4
+                ? factory.CreateParallelBoundaryFinder()
+                : factory.CreateSimpleBoundaryFinder();
+
+            Assert.Same(expected, manager.SelectedFinder);
+        }
+
+        [Fact]
         public void ResolutionDecreaseClampsPatchAndSearch()
         {
             var manager = CreateManager();
