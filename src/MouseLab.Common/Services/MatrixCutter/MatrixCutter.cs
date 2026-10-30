@@ -5,7 +5,7 @@ using MouseLab.Core.Models;
 using MouseLab.Core.Providers;
 using MouseLab.Core.Services;
 
-namespace MouseLab.Core.Impl.UnsafeVer2
+namespace MouseLab.Common.Services
 {
     /// <summary>
     /// Вырезает фрагмент размером size с позиции position донора в dest:

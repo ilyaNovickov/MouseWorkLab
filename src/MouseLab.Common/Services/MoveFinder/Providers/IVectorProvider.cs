@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Intrinsics;
 using System.Text;
 
-namespace MouseLab.Core.Impl.UnsafeVer1.Provider
+namespace MouseLab.Common.Services.MoveFinder.Providers
 {
     internal interface IVectorProvider
     {

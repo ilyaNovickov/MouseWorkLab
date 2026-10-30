@@ -6,10 +6,11 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
+using MouseLab.Common.Services.MoveFinder;
 
-namespace MouseLab.Core.Impl.UnsafeVer1
+namespace MouseLab.Common.Services.MoveFinder.Scalars
 {
-    public class MoveFinderSimd : MoveFinderSimdBase
+    public sealed class MoveFinderSimd : BaseMoveFinder
     {
         public override Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)
         {
@@ -18,12 +19,8 @@ namespace MouseLab.Core.Impl.UnsafeVer1
 
         public unsafe Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange)
         {
-            {
-                Exception? exc = ArgsValidation(matrix1, matrix2, patchSize, searchRange);
+            ArgsValidation(matrix1, matrix2, patchSize, searchRange);
 
-                if (exc != null)
-                    throw new ArgumentException("Ошибка в аргументе", exc);
-            }
 
             // Позиция шаблона (центр)
             int patchPositionX = (matrix1.Width - patchSize) / 2;

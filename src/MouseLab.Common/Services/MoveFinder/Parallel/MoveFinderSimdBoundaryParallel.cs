@@ -8,18 +8,14 @@ using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 
-namespace MouseLab.Core.Impl.UnsafeVer1
+namespace MouseLab.Common.Services.MoveFinder.Parallels
 {
-    public class MoveFinderSimdBoundaryParallel : MoveFinderSimdBoundary
+    public sealed class MoveFinderSimdBoundaryParallel : BaseMoveFinder
     {
         public override unsafe Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)
         {
-            {
-                Exception? exc = ArgsValidation(matrix1, matrix2, patchSize, searchRange);
+            ArgsValidation(matrix1, matrix2, patchSize, searchRange);
 
-                if (exc != null)
-                    throw new ArgumentException("Ошибка в аргументе", exc);
-            }
 
             // 1. Валидация и начальные расчеты
             int width = matrix1.Width;
@@ -120,6 +116,30 @@ namespace MouseLab.Core.Impl.UnsafeVer1
             }
 
             return -globalBestVector;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static unsafe int CalculateSADPartially(byte* row1, byte* pData2, int y2, int startX, int patchSize, int width, byte fillValue, byte* pTempRow)
+        {
+            // Быстрая очистка временного буфера текущим значением фона
+            new Span<byte>(pTempRow, patchSize).Fill(fillValue);
+
+            // Вычисляем область пересечения
+            int imageXStart = Math.Max(0, startX);
+            int imageXEnd = Math.Min(width, startX + patchSize);
+            int validWidth = imageXEnd - imageXStart;
+
+            if (validWidth > 0)
+            {
+                int offsetInPatch = imageXStart - startX;
+                byte* src = pData2 + (y2 * width + imageXStart);
+                byte* dst = pTempRow + offsetInPatch;
+                // Копируем только то, что попало в изображение
+                Buffer.MemoryCopy(src, dst, validWidth, validWidth);
+            }
+
+            // После сборки строки используем стандартный SIMD SAD
+            return CalculateSAD(row1, pTempRow, patchSize);
         }
     }
 }

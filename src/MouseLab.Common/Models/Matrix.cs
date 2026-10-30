@@ -4,7 +4,7 @@ using MouseLab.Core.Models;
 
 namespace MouseLab.Core.Models;
 
-public class Matrix : IMatrix
+public sealed class Matrix : IMatrix
 {
     private byte[] _array;
 
@@ -17,8 +17,10 @@ public class Matrix : IMatrix
 
     public Matrix(byte[] array, int width, int height)
     {
+        if (width < 0 || height < 0)
+            throw new ArgumentException("Dimension must be positive");
         if (array.Length != width * height)
-            throw new Exception("Array has to be lendth equal width * height");
+            throw new Exception("Array has to be length equal width * height");
 
         _array = array;
         _size = new Size(width, height);

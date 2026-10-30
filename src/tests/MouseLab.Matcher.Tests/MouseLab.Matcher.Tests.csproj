@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../MouseLab.Core.Impl.UnsafeVer2/MouseLab.Core.Impl.UnsafeVer2.csproj" />
+    <ProjectReference Include="../../MouseLab.Common/MouseLab.Common.csproj" />
     <ProjectReference Include="..\..\MouseLab.Core\MouseLab.Core.csproj" />
   </ItemGroup>
 

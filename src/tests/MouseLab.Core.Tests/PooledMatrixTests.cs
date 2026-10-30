@@ -1,5 +1,5 @@
-using MouseLab.Core.Models;
-using MouseLab.Core.Providers;
+using MouseLab.Common.Models.PooledMatrix;
+using MouseLab.Common.Providers;
 using Xunit;
 
 namespace MouseLab.Core.Tests
@@ -45,7 +45,7 @@ namespace MouseLab.Core.Tests
         {
             // Контракт пула: арендованный буфер содержит мусор от прошлого
             // владельца; писатели обязаны полностью перезаписать его.
-            var provider = new MatrixProvider();
+            var provider = new PooledMatrixProvider();
             var matrix = (PooledMatrix)provider.Create(10, 10);
             matrix.SpanBytes.Fill(0xAA);
             matrix.Dispose();
@@ -63,7 +63,7 @@ namespace MouseLab.Core.Tests
         [Fact]
         public void CreateReturnsRightDimensions()
         {
-            using var matrix = (PooledMatrix)new MatrixProvider().Create(11, 5);
+            using var matrix = (PooledMatrix)new PooledMatrixProvider().Create(11, 5);
 
             Assert.Equal(11, matrix.Width);
             Assert.Equal(5, matrix.Height);
@@ -73,7 +73,7 @@ namespace MouseLab.Core.Tests
         [Fact]
         public void PoolReusesSameInstance()
         {
-            var provider = new MatrixProvider();
+            var provider = new PooledMatrixProvider();
 
             var first = (PooledMatrix)provider.Create(10, 10);
             first.Dispose();
@@ -85,7 +85,7 @@ namespace MouseLab.Core.Tests
         [Fact]
         public void DifferentDimensionsDoNotReuse()
         {
-            var provider = new MatrixProvider();
+            var provider = new PooledMatrixProvider();
 
             var first = (PooledMatrix)provider.Create(10, 10);
             first.Dispose();
@@ -97,8 +97,8 @@ namespace MouseLab.Core.Tests
         [Fact]
         public void SeparateProvidersDoNotSharePool()
         {
-            var one = new MatrixProvider();
-            var two = new MatrixProvider();
+            var one = new PooledMatrixProvider();
+            var two = new PooledMatrixProvider();
 
             var first = (PooledMatrix)one.Create(8, 8);
             first.Dispose();

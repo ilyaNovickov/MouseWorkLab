@@ -1,11 +1,12 @@
-﻿using MouseLab.Core.Services;
+using MouseLab.Core.Services;
 using MouseLab.Core.Models;
 using MouseLab.Core.Providers;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using MouseLab.Core;
 
-namespace MouseLab.Core.Impl.UnsafeVer2;
+
+namespace MouseLab.Common.Services;
 
 /// <summary>
 /// Заполняет матрицу белым шумом (равномерные байты 0..255).
@@ -25,33 +26,34 @@ namespace MouseLab.Core.Impl.UnsafeVer2;
 /// </remarks>
 public sealed class MatrixRandomizer : IMatrixRandomizer
 {
-    // Порог параллельного разбиения по кускам буфера.
-    private static readonly long ParallelCostThreshold =
-        Environment.ProcessorCount >= 4 ? 4_000_000 : long.MaxValue;
-
-    // Размер куска при параллельном заполнении (~1 млн байт).
-    private const int ChunkSize = 1_048_576;
-
-    // Шаг, разводящий состояния разных кусков и lane.
-    private const uint LaneStride = 0x9E3779B9u;
-
-    public unsafe void Randomize(IMatrix dest, int? seed = null)
+    #region PublicInterface
+    public unsafe void Randomize(Span<byte> dest, int? seed = null)
     {
-        ArgumentNullException.ThrowIfNull(dest);
-
         // seed ?? Random.Shared: интерфейс допускает вызов без seed —
         // тогда каждый вызов получает своё случайное состояние.
         uint baseState = (uint)(seed ?? Random.Shared.Next());
 
-        fixed (byte* buffer = dest.SpanBytes)
-            FillRange(buffer, (long)dest.Width * dest.Height, baseState);
+        fixed (byte* buffer = dest)
+            FillRange(buffer, dest.Length, baseState);
+    }
+
+    public void Randomize(IMatrix dest, int? seed = null)
+    {
+        ArgumentNullException.ThrowIfNull(dest);
+
+        Randomize(dest.SpanBytes, seed);
     }
 
     public IMatrix Randomize(int width, int height, int? seed = null)
     {
-        var dest = new PooledMatrix(width, height);
+        var dest = new Matrix(width, height);
         Randomize(dest, seed);
         return dest;
+    }
+
+    public IMatrix Randomize(Size size, int? seed = null)
+    {
+        return Randomize(size.Width, size.Height, seed);
     }
 
     public IMatrix Randomize(int width, int height, IMatrixProvider provider, int? seed = null)
@@ -62,6 +64,23 @@ public sealed class MatrixRandomizer : IMatrixRandomizer
         Randomize(dest, seed);
         return dest;
     }
+
+    public IMatrix Randomize(Size size, IMatrixProvider provider, int? seed = null)
+    {
+        return Randomize(size.Width, size.Height, provider, seed);
+    }
+    #endregion PublicInterface
+
+    #region  PrivateImpl
+    // Порог параллельного разбиения по кускам буфера.
+    private static readonly long ParallelCostThreshold =
+        Environment.ProcessorCount >= 4 ? 4_000_000 : long.MaxValue;
+
+    // Размер куска при параллельном заполнении (~1 млн байт).
+    private const int ChunkSize = 1_048_576;
+
+    // Шаг, разводящий состояния разных кусков и lane.
+    private const uint LaneStride = 0x9E3779B9u;
 
     private static unsafe void FillRange(byte* pBuffer, long count, uint baseState)
     {
@@ -182,4 +201,5 @@ public sealed class MatrixRandomizer : IMatrixRandomizer
             p[i] = (byte)state;
         }
     }
+    #endregion  PrivateImpl
 }

@@ -1,8 +1,10 @@
 using MouseLab.Core;
 using MouseLab.Core.Models;
 using MouseLab.Core.Providers;
-using MouseLab.Core.Impl.UnsafeVer2;
+using MouseLab.Common.Services;
 using Xunit;
+using MouseLab.Common.Providers;
+using MouseLab.Common.Models.PooledMatrix;
 
 namespace MouseLab.Services.Tests
 {
@@ -61,7 +63,7 @@ namespace MouseLab.Services.Tests
         {
             // Контракт: арендованный буфер с мусором после заполнения равен
             // свежему заполнению тем же seed.
-            var provider = new MatrixProvider();
+            var provider = new PooledMatrixProvider();
 
             var stale = (PooledMatrix)provider.Create(64, 64);
             stale.SpanBytes.Fill(0xAA);
@@ -78,7 +80,7 @@ namespace MouseLab.Services.Tests
         [Fact]
         public void DestOverloadFillsEveryByte()
         {
-            var provider = new MatrixProvider();
+            var provider = new PooledMatrixProvider();
             var dest = (PooledMatrix)provider.Create(17, 19);
             dest.SpanBytes.Fill(0xAA);
 

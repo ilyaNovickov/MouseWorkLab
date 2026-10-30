@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Num = System.Numerics;
 
-namespace MouseLab.Core.Impl.UnsafeVer1
+namespace MouseLab.Common.Services.MoveFinder.Parallels
 {
-    public class MoveFinderSimdParallel : MoveFinderSimdBase
+    public sealed class MoveFinderSimdParallel : BaseMoveFinder
     {
         public override Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)
         {
@@ -19,6 +19,8 @@ namespace MouseLab.Core.Impl.UnsafeVer1
         [SkipLocalsInit]
         public unsafe Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange)
         {
+            ArgsValidation(matrix1, matrix2, patchSize, searchRange);
+
             int patchPositionX = (matrix1.Width - patchSize) / 2;
             int patchPositionY = (matrix1.Height - patchSize) / 2;
 

@@ -5,7 +5,7 @@ using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 
-namespace MouseLab.Core.Impl.UnsafeVer1.Provider
+namespace MouseLab.Common.Services.MoveFinder.Providers
 {
     internal unsafe struct PointerProvider : IVectorProvider
     {

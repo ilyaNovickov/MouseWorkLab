@@ -1,12 +1,11 @@
 using BenchmarkDotNet.Attributes;
 using System;
 using System.Security.Cryptography;
-using MouseLab.Core.Impl.UnsafeVer1;
-using MouseLab.Core.Impl.UnsafeVer2;
 using System.Collections.Generic;
 using MouseLab.Core.Models;
 using MouseLab.Core;
 using MouseLab.Core.Services;
+using MouseLab.Common.Services;
 
 namespace Benchmark.MoveFinder;
 

@@ -6,7 +6,7 @@ using MouseLab.Core;
 using MouseLab.Core.Models;
 using MouseLab.Core.Services;
 
-namespace MouseLab.Core.Impl.UnsafeVer2
+namespace MouseLab.Common.Services.MoveFinder
 {
     /// <summary>
     /// Поиск вектора смещения полным перебором окна ±max по метрике SAD

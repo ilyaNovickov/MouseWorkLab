@@ -1,5 +1,5 @@
+using MouseLab.Common.Services.MoveFinder;
 using MouseLab.Core;
-using MouseLab.Core.Impl.UnsafeVer2;
 using Xunit;
 
 namespace MouseLab.Matcher.Tests

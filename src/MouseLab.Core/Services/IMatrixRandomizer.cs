@@ -6,20 +6,16 @@ namespace MouseLab.Core.Services
 {
     public interface IMatrixRandomizer
     {
+        void Randomize(Span<byte> dest, int? seed = null);
+
         void Randomize(IMatrix dest, int? seed = null);
 
         IMatrix Randomize(int width, int height, int? seed = null);
 
-        IMatrix Randomize(int Width, int Height, IMatrixProvider provider, int? seed = null);
+        IMatrix Randomize(Size size, int? seed = null);
 
-        IMatrix Randomize(Size size, IMatrixProvider provider, int? seed = null)
-        {
-            return Randomize(size.Width, size.Height, provider, seed);
-        }
+        IMatrix Randomize(int width, int height, IMatrixProvider provider, int? seed = null);
 
-        IMatrix Randomize(Size size, int? seed = null)
-        {
-            return Randomize(size.Width, size.Height, seed);
-        }
+        IMatrix Randomize(Size size, IMatrixProvider provider, int? seed = null);
     }
 }

@@ -3,7 +3,7 @@ using System.Numerics;
 using MouseLab.Core.Providers;
 using MouseLab.Core.Models;
 
-namespace MouseLab.Core.Providers;
+namespace MouseLab.Common.Providers;
 
 public class ClassicMatrixProvider : IMatrixProvider
 {

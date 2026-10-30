@@ -8,19 +8,17 @@ using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
+using MouseLab.Common.Services.MoveFinder;
 
-namespace MouseLab.Core.Impl.UnsafeVer1
+namespace MouseLab.Common.Services.MoveFinder.Scalars
 {
-    public class MoveFinderSimdBoundary : MoveFinderSimdBase
+    public sealed class MoveFinderSimdBoundary : BaseMoveFinder
     {
         public override unsafe Vector Find(IMatrix matrix1, IMatrix matrix2, int patchSize, int searchRange, bool fillZero = true)
         {
-            {
-                Exception? exc = ArgsValidation(matrix1, matrix2, patchSize, searchRange);
+            ArgsValidation(matrix1, matrix2, patchSize, searchRange);
 
-                if (exc != null)
-                    throw new ArgumentException("Ошибка в аргументе", exc);
-            }
+
 
             int width = matrix1.Width;
             int height = matrix1.Height;
@@ -100,7 +98,7 @@ namespace MouseLab.Core.Impl.UnsafeVer1
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected static unsafe int CalculateSADPartially(byte* row1, byte* pData2, int y2, int startX, int patchSize, int width, byte fillValue, byte* pTempRow)
+        private static unsafe int CalculateSADPartially(byte* row1, byte* pData2, int y2, int startX, int patchSize, int width, byte fillValue, byte* pTempRow)
         {
             // Быстрая очистка временного буфера текущим значением фона
             new Span<byte>(pTempRow, patchSize).Fill(fillValue);
@@ -125,7 +123,7 @@ namespace MouseLab.Core.Impl.UnsafeVer1
 
         // Обработка строки, которая частично вылезла за левый или правый край
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected unsafe static int CalculateSADPartiallyOutOfBounds(byte* row1, byte* pData2, int y2, int startX, int patchSize, int width, byte fillValue)
+        private unsafe static int CalculateSADPartiallyOutOfBounds(byte* row1, byte* pData2, int y2, int startX, int patchSize, int width, byte fillValue)
         {
             // Используем stackalloc для временной сборки строки (быстро, без аллокаций в куче)
             // Ограничим разумным пределом, например 2048 пикселей.

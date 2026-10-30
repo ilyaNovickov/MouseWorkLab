@@ -1,8 +1,9 @@
 using MouseLab.Core;
 using MouseLab.Core.Models;
-using MouseLab.Core.Providers;
-using MouseLab.Core.Impl.UnsafeVer2;
+using MouseLab.Common.Providers;
+using MouseLab.Common.Services;
 using Xunit;
+using MouseLab.Common.Models.PooledMatrix;
 
 namespace MouseLab.Services.Tests
 {
@@ -97,7 +98,7 @@ namespace MouseLab.Services.Tests
         public void ProviderPathMatchesManagedPath()
         {
             var src = Donor();
-            var provider = new MatrixProvider();
+            var provider = new PooledMatrixProvider();
 
             using var viaProvider = _cutter.Cut(src, new Point(1, 2), new Size(6, 4), provider, fillZero: false);
             using var managed = _cutter.Cut(src, new Point(1, 2), new Size(6, 4), fillZero: false);
