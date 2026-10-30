@@ -10,14 +10,12 @@ public sealed class MoveFinderManager : IMoveFinderManager
     private int _resolution = 12;
     private int _patchSize = 6;
     private int _searchRange = 3;
+    private bool _relateSearchWithPatch = false;
 
     private IMoveFinder SimpleFinder { get; }
     private IMoveFinder SimpleBoundaryFinder { get; }
     private IMoveFinder ParallelFinder { get; }
     private IMoveFinder ParallelBoundaryFinder { get; }
-
-    private bool _isFinderUpdating = false;
-
 
     public MoveFinderManager(IMoveFinderFactory factory)
     {
@@ -34,26 +32,14 @@ public sealed class MoveFinderManager : IMoveFinderManager
         get => _resolution;
         set
         {
-            if (value == Resolution)
-                return;
             if (value < 0)
-                throw new ArgumentException("Resolution can't be less than 0");
+                throw new ArgumentOutOfRangeException(nameof(value), "Resolution can't be less than 0");
+            if (value == _resolution)
+                return;
 
             _resolution = value;
-            OnResolutionUpdated();
+            Normalize();
         }
-    }
-
-    private void OnResolutionUpdated()
-    {
-        _isFinderUpdating = true;
-
-        if (Resolution < PatchSize)
-        {
-            PatchSize = Resolution;
-        }
-
-        UpdateFinder();
     }
 
     public int PatchSize
@@ -61,82 +47,66 @@ public sealed class MoveFinderManager : IMoveFinderManager
         get => _patchSize;
         set
         {
-            if (value == PatchSize)
-                return;
             if (value < 0)
-                throw new ArgumentException("Patch size can't be less than 0");
+                throw new ArgumentOutOfRangeException(nameof(value), "Patch size can't be less than 0");
+            if (value > _resolution)
+                throw new ArgumentOutOfRangeException(nameof(value), "Patch size can't be greater than resolution");
+            if (value == _patchSize)
+                return;
 
-            _patchSize = value > Resolution ? Resolution : value;
-            OnPatchSizeUpdated();
+            _patchSize = value;
+            Normalize();
         }
-    }
-
-    private void OnPatchSizeUpdated()
-    {
-        if (RelateSearchWithPatch)
-        {
-            SearchRange = (Resolution - PatchSize) / 2;
-            goto UpdateFinder;
-        }
-        else
-        {
-
-            int threshold = (Resolution + PatchSize) / 2;
-            if (SearchRange > threshold)
-            {
-                SearchRange = threshold;
-                goto UpdateFinder;
-            }
-        }
-    UpdateFinder:
-        if (_isFinderUpdating)
-            return;
-        _isFinderUpdating = true;
-        UpdateFinder();
     }
 
     public bool RelateSearchWithPatch
     {
-        get; set;
-    } = false;
+        get => _relateSearchWithPatch;
+        set
+        {
+            if (value == _relateSearchWithPatch)
+                return;
+
+            _relateSearchWithPatch = value;
+            Normalize();
+        }
+    }
 
     public int SearchRange
     {
         get => _searchRange;
         set
         {
-            if (value == SearchRange)
-                return;
+            if (_relateSearchWithPatch)
+                throw new InvalidOperationException("Search range is derived from resolution and patch size");
             if (value < 0)
-                throw new ArgumentException("Search range can't be less than 0");
-            if (RelateSearchWithPatch)
-            {
-                _searchRange = (Resolution - PatchSize) / 2;
+                throw new ArgumentOutOfRangeException(nameof(value), "Search range can't be less than 0");
+
+            int maxRange = (_resolution + _patchSize) / 2;
+            if (value > maxRange)
+                throw new ArgumentOutOfRangeException(nameof(value), "Search range can't be greater than (resolution + patch size) / 2");
+            if (value == _searchRange)
                 return;
-            }
-            int threshold = (Resolution + PatchSize) / 2;
-            _searchRange = value > threshold ? threshold : value;
-            OnSearchRangeUpdate();
+
+            _searchRange = value;
+            Normalize();
         }
     }
 
-    private void OnSearchRangeUpdate()
+    private void Normalize()
     {
-        if (_isFinderUpdating)
-            return;
-        _isFinderUpdating = true;
+        _patchSize = Math.Min(_patchSize, _resolution);
+
+        int maxRange = (_resolution + _patchSize) / 2;
+        _searchRange = _relateSearchWithPatch
+            ? (_resolution - _patchSize) / 2
+            : Math.Min(_searchRange, maxRange);
+
         UpdateFinder();
     }
 
-
-    private ulong ParallelThreshold = Environment.ProcessorCount >= 4 ?
-        1
-        : ulong.MaxValue;
-
     private void UpdateFinder()
     {
-        _isFinderUpdating = false;
-
         // cost = p^2 * (2s + 1)^2
         ulong cost = ((ulong)PatchSize * (ulong)PatchSize) * (2ul * (ulong)SearchRange + 1ul) * (2ul * (ulong)SearchRange + 1ul);
 
