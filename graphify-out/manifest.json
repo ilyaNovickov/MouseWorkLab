@@ -372,10 +372,10 @@
     "semantic_hash": "e255a28e566ecff657ab98817567cc92"
   },
   "src/MouseLab.Core/Point.cs": {
-    "mtime": 1791235875.1819243,
-    "seen": 1791294702.6459627,
-    "ast_hash": "f79b67bfd9c47ab9afcfec5a5a06d64f",
-    "semantic_hash": "f79b67bfd9c47ab9afcfec5a5a06d64f"
+    "mtime": 1792947846.2009792,
+    "seen": 1793387812.8701944,
+    "ast_hash": "1946fd0d9e77493c02e265e34e63075f",
+    "semantic_hash": "1946fd0d9e77493c02e265e34e63075f"
   },
   "src/MouseLab.Core/Providers/IMatrixProvider.cs": {
     "mtime": 1791235875.1819243,
@@ -384,58 +384,40 @@
     "semantic_hash": "94b7b980aad8250354b7c8dfb66f8e09"
   },
   "src/MouseLab.Core/Size.cs": {
-    "mtime": 1791235875.1819243,
-    "seen": 1791294702.6459687,
-    "ast_hash": "eef819f9702c3e099dd0fed757805034",
-    "semantic_hash": "eef819f9702c3e099dd0fed757805034"
+    "mtime": 1792942809.7969577,
+    "seen": 1793387812.8702362,
+    "ast_hash": "67b99d6e2a7be3c7965403610d728cae",
+    "semantic_hash": "67b99d6e2a7be3c7965403610d728cae"
   },
   "src/MouseLab.Core/Vector.cs": {
-    "mtime": 1791235875.1819243,
-    "seen": 1791294702.6459808,
-    "ast_hash": "61f421d4817c49c7031b4fdc2e8f796d",
-    "semantic_hash": "61f421d4817c49c7031b4fdc2e8f796d"
-  },
-  "src/MouseLab.Services/IMatrixCutter.cs": {
-    "mtime": 1791235875.1819243,
-    "seen": 1791294702.6459842,
-    "ast_hash": "33023825e343c4a75b71db8ebbf5949d",
-    "semantic_hash": "33023825e343c4a75b71db8ebbf5949d"
-  },
-  "src/MouseLab.Services/IMatrixRandomizer.cs": {
-    "mtime": 1791235875.1822515,
-    "seen": 1791294702.645987,
-    "ast_hash": "0989a8d7a6efc54a8712ec0eeb151507",
-    "semantic_hash": "0989a8d7a6efc54a8712ec0eeb151507"
-  },
-  "src/MouseLab.Services/MouseLab.Services.csproj": {
-    "mtime": 1791235875.1822515,
-    "seen": 1791294702.6459901,
-    "ast_hash": "4d6badd426a026daf286544959b15149",
-    "semantic_hash": "4d6badd426a026daf286544959b15149"
+    "mtime": 1792947739.5682526,
+    "seen": 1793387812.8702383,
+    "ast_hash": "a0c71c3eca47549b306ed8cbbc4555fa",
+    "semantic_hash": "a0c71c3eca47549b306ed8cbbc4555fa"
   },
   "src/MouseLabAvaloniaApp/App.axaml.cs": {
-    "mtime": 1791235875.182399,
-    "seen": 1791294702.645993,
-    "ast_hash": "4bb5ed7274f2c404d957b1ceef30d8c0",
-    "semantic_hash": "4bb5ed7274f2c404d957b1ceef30d8c0"
+    "mtime": 1791306186.7568622,
+    "seen": 1793387812.8702402,
+    "ast_hash": "50af267cc4de76045f20c14e32e445af",
+    "semantic_hash": "50af267cc4de76045f20c14e32e445af"
   },
   "src/MouseLabAvaloniaApp/AppServices.cs": {
-    "mtime": 1791235875.182399,
-    "seen": 1791294702.6459959,
-    "ast_hash": "958d46f92759857b161ea54b52380f48",
-    "semantic_hash": "958d46f92759857b161ea54b52380f48"
+    "mtime": 1791316671.0021548,
+    "seen": 1793387812.8702426,
+    "ast_hash": "687422b37e0be7db2e8fec2efb6c7133",
+    "semantic_hash": "687422b37e0be7db2e8fec2efb6c7133"
   },
   "src/MouseLabAvaloniaApp/Assets/Translations/Strings.en-US.json": {
-    "mtime": 1791235875.1826243,
-    "seen": 1791294702.6459985,
-    "ast_hash": "3aaa4215cb525ecb8a551baeee06cb6d",
-    "semantic_hash": "3aaa4215cb525ecb8a551baeee06cb6d"
+    "mtime": 1791303293.1124718,
+    "seen": 1793387812.8702452,
+    "ast_hash": "d512575035dba8f76421fba36778bafd",
+    "semantic_hash": "d512575035dba8f76421fba36778bafd"
   },
   "src/MouseLabAvaloniaApp/Assets/Translations/Strings.ru-RU.json": {
-    "mtime": 1791235875.1826243,
-    "seen": 1791294702.6460013,
-    "ast_hash": "bd34dce4c615b3476559c07ac73f2a55",
-    "semantic_hash": "bd34dce4c615b3476559c07ac73f2a55"
+    "mtime": 1791303287.087406,
+    "seen": 1793387812.8702474,
+    "ast_hash": "2be15499133c44dd0e4a07f286f6ac76",
+    "semantic_hash": "2be15499133c44dd0e4a07f286f6ac76"
   },
   "src/MouseLabAvaloniaApp/Models/CultureOption.cs": {
     "mtime": 1791235875.1826243,
@@ -462,16 +444,16 @@
     "semantic_hash": "058a88c0590d4f042f0d3eb3ee0bc250"
   },
   "src/MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj": {
-    "mtime": 1791235875.1831837,
-    "seen": 1791294702.64602,
-    "ast_hash": "57075dbfb891b1501785e7d0796d77a9",
-    "semantic_hash": "57075dbfb891b1501785e7d0796d77a9"
+    "mtime": 1793383853.1830766,
+    "seen": 1793387812.87026,
+    "ast_hash": "2d18465f251059eba161a221dfe77b00",
+    "semantic_hash": "2d18465f251059eba161a221dfe77b00"
   },
   "src/MouseLabAvaloniaApp/Program.cs": {
-    "mtime": 1791235875.1831837,
-    "seen": 1791294702.6460235,
-    "ast_hash": "edc4f97f5b5d356d5c4046272ceacce2",
-    "semantic_hash": "edc4f97f5b5d356d5c4046272ceacce2"
+    "mtime": 1793384050.4081619,
+    "seen": 1793387812.870262,
+    "ast_hash": "8b6671b7d26abbbcade9d03d5bff194c",
+    "semantic_hash": "8b6671b7d26abbbcade9d03d5bff194c"
   },
   "src/MouseLabAvaloniaApp/Properties/launchSettings.json": {
     "mtime": 1791235875.1831837,
@@ -484,12 +466,6 @@
     "seen": 1791294702.6460304,
     "ast_hash": "fe1afbb402ab8750118f70df9b20dab0",
     "semantic_hash": "fe1afbb402ab8750118f70df9b20dab0"
-  },
-  "src/MouseLabAvaloniaApp/Services/AppSettings/AppSettingsStore.cs": {
-    "mtime": 1791235875.1835523,
-    "seen": 1791294702.646033,
-    "ast_hash": "f1981f13595b34ec465f109c38da4df2",
-    "semantic_hash": "f1981f13595b34ec465f109c38da4df2"
   },
   "src/MouseLabAvaloniaApp/Services/AppSettings/ApplicationSettingsService.cs": {
     "mtime": 1791235875.1835523,
@@ -540,16 +516,16 @@
     "semantic_hash": "d967d40d7f935424a8782681e720cca5"
   },
   "src/MouseLabAvaloniaApp/ViewLocator.cs": {
-    "mtime": 1791235875.1838658,
-    "seen": 1791294702.6460652,
-    "ast_hash": "1a1003bf032de999e9d5cda57924d32b",
-    "semantic_hash": "1a1003bf032de999e9d5cda57924d32b"
+    "mtime": 1793387248.621748,
+    "seen": 1793387812.8702962,
+    "ast_hash": "02be131b1d6dcbfd723d585fe277a396",
+    "semantic_hash": "02be131b1d6dcbfd723d585fe277a396"
   },
   "src/MouseLabAvaloniaApp/ViewModels/MainWindowViewModel.cs": {
-    "mtime": 1791235875.1838658,
-    "seen": 1791294702.6460683,
-    "ast_hash": "eba5fe07167a29cd0132755982d4d665",
-    "semantic_hash": "eba5fe07167a29cd0132755982d4d665"
+    "mtime": 1791323234.7296042,
+    "seen": 1793387812.8703008,
+    "ast_hash": "86b7ea324d57f1549e0530665f9187ce",
+    "semantic_hash": "86b7ea324d57f1549e0530665f9187ce"
   },
   "src/MouseLabAvaloniaApp/ViewModels/Settings/AppSettingsViewModel.cs": {
     "mtime": 1791235875.1840677,
@@ -598,12 +574,6 @@
     "seen": 1791294702.646096,
     "ast_hash": "4b3d1339abc299cc3501008b23c15dde",
     "semantic_hash": "4b3d1339abc299cc3501008b23c15dde"
-  },
-  "src/MouseLabSolution.slnx": {
-    "mtime": 1791235875.1844964,
-    "seen": 1791294702.6460986,
-    "ast_hash": "3070277d1f1ef78b06ca695ecc09e1ae",
-    "semantic_hash": "3070277d1f1ef78b06ca695ecc09e1ae"
   },
   ".opencode/skills/banner-design/SKILL.md": {
     "mtime": 1791293380.6825693,
@@ -1012,5 +982,311 @@
     "seen": 1791294702.6463108,
     "ast_hash": "1fce5342649eddc79f1e5a63e9d5d3d8",
     "semantic_hash": "1fce5342649eddc79f1e5a63e9d5d3d8"
+  },
+  ".vscode/launch.json": {
+    "mtime": 1792941443.9896467,
+    "seen": 1793387812.870133,
+    "ast_hash": "3d8a728f534b1458887e5b6124799bd1",
+    "semantic_hash": "3d8a728f534b1458887e5b6124799bd1"
+  },
+  ".vscode/settings.json": {
+    "mtime": 1792941758.0645041,
+    "seen": 1793387812.870136,
+    "ast_hash": "504319a0af7cf4e24d25d08cc47a554c",
+    "semantic_hash": "504319a0af7cf4e24d25d08cc47a554c"
+  },
+  ".vscode/tasks.json": {
+    "mtime": 1792948505.8444836,
+    "seen": 1793387812.8701384,
+    "ast_hash": "19266b4ac7e5cf8189cb384bfceb4aa9",
+    "semantic_hash": "19266b4ac7e5cf8189cb384bfceb4aa9"
+  },
+  "MouseLabSolution.slnx": {
+    "mtime": 1793373288.1651921,
+    "seen": 1793387812.8701408,
+    "ast_hash": "c72aa32d98bef51c8fd7e72a354a2daf",
+    "semantic_hash": "c72aa32d98bef51c8fd7e72a354a2daf"
+  },
+  "src/MouseLab.Common/Models/Matrix.cs": {
+    "mtime": 1793370726.9561365,
+    "seen": 1793387812.8701456,
+    "ast_hash": "58927b84839e84422b51a9f5b366af51",
+    "semantic_hash": "58927b84839e84422b51a9f5b366af51"
+  },
+  "src/MouseLab.Common/Models/PooledMatrix/MatrixPool.cs": {
+    "mtime": 1793370910.5387897,
+    "seen": 1793387812.870148,
+    "ast_hash": "66fec208792f20596cbe60b0c23d5033",
+    "semantic_hash": "66fec208792f20596cbe60b0c23d5033"
+  },
+  "src/MouseLab.Common/Models/PooledMatrix/PooledMatrix.cs": {
+    "mtime": 1793370866.6409254,
+    "seen": 1793387812.8701499,
+    "ast_hash": "5d7316867da1b982fc4d0053bc9e86a2",
+    "semantic_hash": "5d7316867da1b982fc4d0053bc9e86a2"
+  },
+  "src/MouseLab.Common/MouseLab.Common.csproj": {
+    "mtime": 1793370477.430483,
+    "seen": 1793387812.870156,
+    "ast_hash": "6e02f7a061f8cb658d31b96703043bc2",
+    "semantic_hash": "6e02f7a061f8cb658d31b96703043bc2"
+  },
+  "src/MouseLab.Common/Providers/ClassicMatrixProvider.cs": {
+    "mtime": 1793370971.5243902,
+    "seen": 1793387812.8701582,
+    "ast_hash": "3216dc4359de56e3554be0e8a4017348",
+    "semantic_hash": "3216dc4359de56e3554be0e8a4017348"
+  },
+  "src/MouseLab.Common/Providers/PooledMatrixProvider.cs": {
+    "mtime": 1793371060.631787,
+    "seen": 1793387812.87016,
+    "ast_hash": "6ef9b6a997fe28cc8f33d949f73022da",
+    "semantic_hash": "6ef9b6a997fe28cc8f33d949f73022da"
+  },
+  "src/MouseLab.Common/Services/MatrixCutter/MatrixCutter.cs": {
+    "mtime": 1793371656.0585606,
+    "seen": 1793387812.870162,
+    "ast_hash": "a540cbb1a5eeac58e8c57070d51a0b15",
+    "semantic_hash": "a540cbb1a5eeac58e8c57070d51a0b15"
+  },
+  "src/MouseLab.Common/Services/MatrixCutter/OldVersion/ImageCutter.cs": {
+    "mtime": 1793371867.239812,
+    "seen": 1793387812.870164,
+    "ast_hash": "99de248d26499014a2a212e0eca073e3",
+    "semantic_hash": "99de248d26499014a2a212e0eca073e3"
+  },
+  "src/MouseLab.Common/Services/MatrixRandomizer/MatrixRandomizer.cs": {
+    "mtime": 1793371519.730988,
+    "seen": 1793387812.8701658,
+    "ast_hash": "70d913ff47f8eeb6d5b7ef5bfb0b60fb",
+    "semantic_hash": "70d913ff47f8eeb6d5b7ef5bfb0b60fb"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/BaseMoveFinder.cs": {
+    "mtime": 1793372526.9178922,
+    "seen": 1793387812.8701677,
+    "ast_hash": "aee85e73b4eb86bca0bd2df72b1b2749",
+    "semantic_hash": "aee85e73b4eb86bca0bd2df72b1b2749"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/Parallel/MoveFinderSimdBoundaryParallel.cs": {
+    "mtime": 1793373269.2366443,
+    "seen": 1793387812.8701699,
+    "ast_hash": "904b3fec623c3339f0579dc562d21c75",
+    "semantic_hash": "904b3fec623c3339f0579dc562d21c75"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/Parallel/MoveFinderSimdParallel.cs": {
+    "mtime": 1793372973.9194155,
+    "seen": 1793387812.8701715,
+    "ast_hash": "a01060d6c5b13f5a1b9c8ae887885293",
+    "semantic_hash": "a01060d6c5b13f5a1b9c8ae887885293"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/Providers/ConstantProvider.cs": {
+    "mtime": 1793372534.900048,
+    "seen": 1793387812.8701735,
+    "ast_hash": "2ab802456e5250908e6df791134a9484",
+    "semantic_hash": "2ab802456e5250908e6df791134a9484"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/Providers/IVectorProvider.cs": {
+    "mtime": 1793372474.8589149,
+    "seen": 1793387812.8701756,
+    "ast_hash": "23c1bfe29f13f8b662387ef2efb35604",
+    "semantic_hash": "23c1bfe29f13f8b662387ef2efb35604"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/Providers/PointerProvider.cs": {
+    "mtime": 1793372538.1471117,
+    "seen": 1793387812.8701775,
+    "ast_hash": "da09b94bcb39dc672be08e3b137960d7",
+    "semantic_hash": "da09b94bcb39dc672be08e3b137960d7"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/Scalar/MoveFinderSimd.cs": {
+    "mtime": 1793373259.72837,
+    "seen": 1793387812.8701794,
+    "ast_hash": "faef1cf1f291a5f19f1b784dea5017b7",
+    "semantic_hash": "faef1cf1f291a5f19f1b784dea5017b7"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/Scalar/MoveFinderSimdBoundary.cs": {
+    "mtime": 1793373256.3482726,
+    "seen": 1793387812.8701813,
+    "ast_hash": "e30ae6d4a6a16730875e71f0391f8449",
+    "semantic_hash": "e30ae6d4a6a16730875e71f0391f8449"
+  },
+  "src/MouseLab.Common/Services/MoveFinder/SimdSadMatrixMatcher.cs": {
+    "mtime": 1793371952.627847,
+    "seen": 1793387812.8701832,
+    "ast_hash": "6d2001bb1cd62852a0195ca51e6f7f35",
+    "semantic_hash": "6d2001bb1cd62852a0195ca51e6f7f35"
+  },
+  "src/MouseLab.Common/Services/MoveFinderFactory.cs": {
+    "mtime": 1793374284.0049174,
+    "seen": 1793387812.8701851,
+    "ast_hash": "22facddde0073ec5cccef163751c6cb9",
+    "semantic_hash": "22facddde0073ec5cccef163751c6cb9"
+  },
+  "src/MouseLab.Common/Services/MoveFinderManager.cs": {
+    "mtime": 1793381526.8053977,
+    "seen": 1793387812.870187,
+    "ast_hash": "0fa385c9aa7bf3a851bb56a6293af65f",
+    "semantic_hash": "0fa385c9aa7bf3a851bb56a6293af65f"
+  },
+  "src/MouseLab.Core/Services/IMatrixCutter.cs": {
+    "mtime": 1793199057.8649583,
+    "seen": 1793387812.870223,
+    "ast_hash": "dc72b3d0b089d670083e973b251944a6",
+    "semantic_hash": "dc72b3d0b089d670083e973b251944a6"
+  },
+  "src/MouseLab.Core/Services/IMatrixMatcher.cs": {
+    "mtime": 1792945404.3163872,
+    "seen": 1793387812.8702266,
+    "ast_hash": "10c729d38a7bb4287c18af8214b5fa1b",
+    "semantic_hash": "10c729d38a7bb4287c18af8214b5fa1b"
+  },
+  "src/MouseLab.Core/Services/IMatrixRandomizer.cs": {
+    "mtime": 1793371234.568794,
+    "seen": 1793387812.8702285,
+    "ast_hash": "3868869e72a63372fcd3e0e7b6370313",
+    "semantic_hash": "3868869e72a63372fcd3e0e7b6370313"
+  },
+  "src/MouseLab.Core/Services/IMoveFinder.cs": {
+    "mtime": 1792946403.0163271,
+    "seen": 1793387812.8702304,
+    "ast_hash": "1f3153216a367cbbf3bd9f53503985e5",
+    "semantic_hash": "1f3153216a367cbbf3bd9f53503985e5"
+  },
+  "src/MouseLab.Core/Services/IMoveFinderFactory.cs": {
+    "mtime": 1793373972.4462254,
+    "seen": 1793387812.870232,
+    "ast_hash": "bffcb03b66a248584eee33b1271ffa20",
+    "semantic_hash": "bffcb03b66a248584eee33b1271ffa20"
+  },
+  "src/MouseLab.Core/Services/IMoveFinderManager.cs": {
+    "mtime": 1793374912.2871797,
+    "seen": 1793387812.870234,
+    "ast_hash": "948395320847fd177a739618c53fb39d",
+    "semantic_hash": "948395320847fd177a739618c53fb39d"
+  },
+  "src/MouseLabAvaloniaApp/Services/AppSettings/AppStore/AppSettingsSnapshot.cs": {
+    "mtime": 1791302177.5919163,
+    "seen": 1793387812.8702688,
+    "ast_hash": "03744e38a04b677c2dd0684308bbf16e",
+    "semantic_hash": "03744e38a04b677c2dd0684308bbf16e"
+  },
+  "src/MouseLabAvaloniaApp/Services/AppSettings/AppStore/AppSettingsStore.cs": {
+    "mtime": 1791302324.5956428,
+    "seen": 1793387812.8702712,
+    "ast_hash": "7a9614f435c05edc941b656b35fbb868",
+    "semantic_hash": "7a9614f435c05edc941b656b35fbb868"
+  },
+  "src/MouseLabAvaloniaApp/Services/Dock/DockFactory.cs": {
+    "mtime": 1793384238.7788353,
+    "seen": 1793387812.8702886,
+    "ast_hash": "3d0c9177215ddd37b5eef997ca4d2461",
+    "semantic_hash": "3d0c9177215ddd37b5eef997ca4d2461"
+  },
+  "src/MouseLabAvaloniaApp/ViewModels/Dock/BlankViewModel.cs": {
+    "mtime": 1791307845.1606395,
+    "seen": 1793387812.8702984,
+    "ast_hash": "25838b48ea4a3e40d36f5f440616919e",
+    "semantic_hash": "25838b48ea4a3e40d36f5f440616919e"
+  },
+  "src/MouseLabAvaloniaApp/Views/Dock/BlankView.axaml.cs": {
+    "mtime": 1791319912.6902437,
+    "seen": 1793387812.8703132,
+    "ast_hash": "f147cb6a7681fabac83e0f046cf01f16",
+    "semantic_hash": "f147cb6a7681fabac83e0f046cf01f16"
+  },
+  "src/MouseLabAvaloniaApp/Views/MainWindowDock.axaml.cs": {
+    "mtime": 1791304963.1679296,
+    "seen": 1793387812.8703182,
+    "ast_hash": "375c327ffe63bbd68ee868cc461fef3f",
+    "semantic_hash": "375c327ffe63bbd68ee868cc461fef3f"
+  },
+  "src/benchmark/Benchmark.MoveFinder/Benchmark.MoveFinder.csproj": {
+    "mtime": 1793373288.2751954,
+    "seen": 1793387812.8703287,
+    "ast_hash": "88e2af7161b9d1741f9d7364e20a9051",
+    "semantic_hash": "88e2af7161b9d1741f9d7364e20a9051"
+  },
+  "src/benchmark/Benchmark.MoveFinder/CutterBenchmark.cs": {
+    "mtime": 1793373314.8671389,
+    "seen": 1793387812.8703306,
+    "ast_hash": "43e2392d11a6ffa8b955c3a644bb663d",
+    "semantic_hash": "43e2392d11a6ffa8b955c3a644bb663d"
+  },
+  "src/benchmark/Benchmark.MoveFinder/MoveFinderBenchmark.cs": {
+    "mtime": 1793373377.2777963,
+    "seen": 1793387812.8703327,
+    "ast_hash": "7e9bfbccd8b8bfd75b9681685efdcc2e",
+    "semantic_hash": "7e9bfbccd8b8bfd75b9681685efdcc2e"
+  },
+  "src/benchmark/Benchmark.MoveFinder/Program.cs": {
+    "mtime": 1792951881.2938511,
+    "seen": 1793387812.8703346,
+    "ast_hash": "19da9f10e3f09c31523b3c7b4aa54353",
+    "semantic_hash": "19da9f10e3f09c31523b3c7b4aa54353"
+  },
+  "src/benchmark/Benchmark.MoveFinder/RandomizeBenchmark.cs": {
+    "mtime": 1793373375.400741,
+    "seen": 1793387812.8703365,
+    "ast_hash": "1b11a376a71c0b84e7c25e53fcebac00",
+    "semantic_hash": "1b11a376a71c0b84e7c25e53fcebac00"
+  },
+  "src/tests/MouseLab.Core.Tests/MouseLab.Core.Tests.csproj": {
+    "mtime": 1793373400.4644802,
+    "seen": 1793387812.8703382,
+    "ast_hash": "71f9a8e0ce95d4b496324eb6b146172f",
+    "semantic_hash": "71f9a8e0ce95d4b496324eb6b146172f"
+  },
+  "src/tests/MouseLab.Core.Tests/MoveFinderManagerTests.cs": {
+    "mtime": 1793381539.5986106,
+    "seen": 1793387812.87034,
+    "ast_hash": "4ed22a653021db206376658e16816fb4",
+    "semantic_hash": "4ed22a653021db206376658e16816fb4"
+  },
+  "src/tests/MouseLab.Core.Tests/PooledMatrixTests.cs": {
+    "mtime": 1793373460.8601706,
+    "seen": 1793387812.8703418,
+    "ast_hash": "2cc3d420dc1319d728566157291961d5",
+    "semantic_hash": "2cc3d420dc1319d728566157291961d5"
+  },
+  "src/tests/MouseLab.Matcher.Tests/MatchTests.cs": {
+    "mtime": 1793373491.1031747,
+    "seen": 1793387812.8703437,
+    "ast_hash": "fd1d7d9156c2590f338f6fe40bf7d3b0",
+    "semantic_hash": "fd1d7d9156c2590f338f6fe40bf7d3b0"
+  },
+  "src/tests/MouseLab.Matcher.Tests/MouseLab.Matcher.Tests.csproj": {
+    "mtime": 1793373479.8618388,
+    "seen": 1793387812.8703454,
+    "ast_hash": "49039211a751ddb5d2b174c5717f754f",
+    "semantic_hash": "49039211a751ddb5d2b174c5717f754f"
+  },
+  "src/tests/MouseLab.Matcher.Tests/TestImageFactory.cs": {
+    "mtime": 1792876897.2684817,
+    "seen": 1793387812.8703473,
+    "ast_hash": "518d61b5b43732c5835760467d6b5d66",
+    "semantic_hash": "518d61b5b43732c5835760467d6b5d66"
+  },
+  "src/tests/MouseLab.Matcher.Tests/TestMatrix.cs": {
+    "mtime": 1792877163.5215545,
+    "seen": 1793387812.8703492,
+    "ast_hash": "08ab08f6d2ef532ea54d4255644f962a",
+    "semantic_hash": "08ab08f6d2ef532ea54d4255644f962a"
+  },
+  "src/tests/MouseLab.Services.Tests/MatrixCutterTests.cs": {
+    "mtime": 1793373544.3796525,
+    "seen": 1793387812.8703508,
+    "ast_hash": "76a0acd63297271b3fcc39753704a772",
+    "semantic_hash": "76a0acd63297271b3fcc39753704a772"
+  },
+  "src/tests/MouseLab.Services.Tests/MatrixRandomizerTests.cs": {
+    "mtime": 1793373654.3431008,
+    "seen": 1793387812.870353,
+    "ast_hash": "fc11d9ef7bd033feb9e9e4d19b20ee46",
+    "semantic_hash": "fc11d9ef7bd033feb9e9e4d19b20ee46"
+  },
+  "src/tests/MouseLab.Services.Tests/MouseLab.Services.Tests.csproj": {
+    "mtime": 1793373506.9166481,
+    "seen": 1793387812.870355,
+    "ast_hash": "71f9a8e0ce95d4b496324eb6b146172f",
+    "semantic_hash": "71f9a8e0ce95d4b496324eb6b146172f"
   }
 }
