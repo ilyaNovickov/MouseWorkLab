@@ -8,7 +8,7 @@
             "name": "Mouse Lab Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/src/MouseLabAvaloniaApp/MouseLabAvaloniaApp.csproj"
+            "projectPath": "${workspaceFolder}/src/MouseLabAvaloniaDesktop/MouseLabAvaloniaDesktop.csproj"
         }
 
     ]
