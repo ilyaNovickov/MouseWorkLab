@@ -1,4 +1,5 @@
 using System;
+using MouseLab.Common.Models;
 using MouseLab.Core;
 using MouseLab.Core.Models;
 using MouseLab.Core.Services;
@@ -30,20 +31,7 @@ public class ModelingEnv : IModelingEnv
         get => ModelingSettings.WorktopResolution;
     }
 
-    public int WorktopWidth
-    {
-        get => ModelingSettings.WorktopResolution;
-    }
 
-    public Size WorktopSize
-    {
-        get => new Size(WorktopWidth, WorktopHeight);
-    }
-
-    public ReadOnlySpan<byte> Worktop
-    {
-        get => _worktop.ReadOnlySpanBytes;
-    }
 
     private int? _seed = null;
 
@@ -63,8 +51,29 @@ public class ModelingEnv : IModelingEnv
         get; private set;
     }
 
+    public int WorktopResolution
+    {
+        get => ModelingSettings.WorktopResolution;
+    }
+
+    public int WorktopAvaibleResolution
+    {
+        get
+        {
+            int res = WorktopResolution + (int)(0.20d * WorktopResolution);
+            return res;
+        }
+    }
+
+    public IReadOnlyMatrix Worktop
+    {
+        get => new ReadOnlyMatrix(_worktop.Bytes, WorktopResolution, WorktopResolution);
+    }
+
     public void GenerateWorktop()
     {
+        if (_worktop.Width != WorktopResolution || _worktop.Height != WorktopResolution)
+            _worktop = new Matrix(WorktopResolution, WorktopResolution);
         _matrixRandomizer.Randomize(_worktop, Seed);
     }
 }

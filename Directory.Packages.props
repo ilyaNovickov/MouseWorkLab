@@ -37,5 +37,7 @@
     <PackageVersion Include="StaticViewLocator" Version="0.7.0" />
 
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+
+    <PackageVersion Include="PanAndZoom" Version="12.1.1" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 using System;
+using MouseLab.Core.Models;
 
 namespace MouseLab.Core.Services;
 
@@ -6,13 +7,11 @@ public interface IModelingEnv
 {
     IMoveFinderManager FinderManager { get; }
 
-    int WorktopHeight { get; }
+    int WorktopResolution { get; }
 
-    int WorktopWidth { get; }
+    int WorktopAvaibleResolution { get; }
 
-    Size WorktopSize { get; }
-
-    ReadOnlySpan<byte> Worktop { get; }
+    IReadOnlyMatrix Worktop { get; }
 
     int? Seed { get; set; }
 
