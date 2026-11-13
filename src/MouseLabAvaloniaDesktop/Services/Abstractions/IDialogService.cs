@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using MouseLabAvaloniaDesktop.ViewModels;
 
-namespace MouseLabAvaloniaDesktop.Services;
+namespace MouseLabAvaloniaDesktop.Services.Abstractions;
 
 public interface IDialogService
 {

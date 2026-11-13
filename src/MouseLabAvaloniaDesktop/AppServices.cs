@@ -1,7 +1,7 @@
 using Dock.Model.Core;
 using Microsoft.Extensions.DependencyInjection;
-using MouseLabAvaloniaDesktop.Services;
-using MouseLabAvaloniaDesktop.Services.WindowsAndDialogs;
+using MouseLabAvaloniaDesktop.Services.Abstractions;
+using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels;
 using MouseLabAvaloniaDesktop.Views;
 using ProTranslate;

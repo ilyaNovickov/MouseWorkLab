@@ -17,6 +17,8 @@ public partial class ModelingSettingsView : UserControl
             var vm = AppServices.Instance.GetRequiredService<ModelingSettingsViewModel>();
             if (vm is not null)
                 Design.SetDataContext(this, vm);
+
+            //Design.SetDesignStyle(this, App.Current!.Styles[3]);
         }
 #endif
     }

@@ -6,10 +6,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Extensions.DependencyInjection;
+using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.ViewModels;
 
 
-namespace MouseLabAvaloniaDesktop.Services.WindowsAndDialogs;
+namespace MouseLabAvaloniaDesktop.Services.Implementations;
 
 public class DialogService : IDialogService
 {
