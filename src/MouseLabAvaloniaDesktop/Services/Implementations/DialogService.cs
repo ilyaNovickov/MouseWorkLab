@@ -81,7 +81,7 @@ public class DialogService : IDialogService
         window.Closed += (_, _) =>
         {
             openedWindows.Remove(vm);
-            vm.Dispose();
+            if (vm is IDisposable disposalbe) disposalbe.Dispose();
         };
         window.DataContext = vm;
 

@@ -1,6 +1,7 @@
 using System;
 using MouseLab.Core.Models;
 
+
 namespace MouseLab.Core.Services;
 
 public interface IModelingEnv
@@ -15,7 +16,7 @@ public interface IModelingEnv
 
     int? Seed { get; set; }
 
-    IModelingSettings ModelingSettings { get; }
+    ModelingSettings ModelingSettings { get; }
 
     void GenerateWorktop();
 }

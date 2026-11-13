@@ -7,7 +7,7 @@ using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
-public partial class WorktopSizeViewModel : ObservableObject
+public partial class WorktopSizeViewModel : ViewModelBase
 {
     public WorktopSizeViewModel(int size)
     {
@@ -31,7 +31,7 @@ public partial class WorktopSizeViewModel : ObservableObject
     }
 }
 
-public partial class ModelingSettingsViewModel : ViewModelBase
+public partial class ModelingSettingsViewModel : TranslatedViewModelBase
 {
     private ObservableCollection<WorktopSizeViewModel> avaibleSizes;
 

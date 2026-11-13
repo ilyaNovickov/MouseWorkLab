@@ -1,5 +1,7 @@
 using Dock.Model.Core;
 using Microsoft.Extensions.DependencyInjection;
+using MouseLab.Common.Services;
+using MouseLab.Core.Services;
 using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels;
@@ -85,12 +87,21 @@ public class AppServices : IDisposable, IServiceProvider
         #endregion
 
         services.AddSingleton<IDialogService>(sp => new DialogService(sp));
+
+        services.AddSingleton<IMatrixCutter, MatrixCutter>();
+        services.AddSingleton<IMatrixRandomizer, MatrixRandomizer>();
+        services.AddSingleton<IMoveFinderFactory, MoveFinderFactory>();
+        services.AddSingleton<IMoveFinderManager, MoveFinderManager>();
+        services.AddSingleton<IModelingEnv, ModelingEnv>();
         #endregion
 
         #region ViewModels
+        services.AddTransient<WorktopCanvasViewModel>();
+        services.AddTransient<WorktopViewModel>();
 
         services.AddTransient<ModelingSettingsViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
+
         services.AddTransient<MainViewModel>();
         #endregion
 

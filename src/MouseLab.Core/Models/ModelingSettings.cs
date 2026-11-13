@@ -2,10 +2,23 @@ using System;
 using System.Runtime.Intrinsics.X86;
 using MouseLab.Core.Services;
 
-namespace MouseLab.Common.Services;
+namespace MouseLab.Core.Models;
 
-public class ModelingSettings : IModelingSettings
+public class ModelingSettings
 {
+    public int WorktopResolution
+    {
+        get;
+        set;
+    } = 1024;
+
+    /*
+    public static int MinWorktopResolution => 1024;
+
+    public static int MaxWorktopResolution => 8_192;
+
+    public static int ExpMaxWorktopResolution => 16_384;
+
     private int _worktopResolution = 8192;
 
     public int WorktopResolution
@@ -16,8 +29,8 @@ public class ModelingSettings : IModelingSettings
             if (_worktopResolution == value)
                 return;
 
-            if (value < 0)
-                throw new ArgumentException("Value can't be negative");
+            if (value < MinWorktopResolution)
+                throw new ArgumentException("Value can't be negative or less than min value");
 
             if (!ExperimentalSettings && value > MaxWorktopResolution)
                 throw new ArgumentException($"Value must be less than {MaxWorktopResolution} in standart settings");
@@ -29,20 +42,24 @@ public class ModelingSettings : IModelingSettings
         }
     }
 
-    public int MaxWorktopResolution => 8192;
-
-    public int ExpMaxWorktopResolution => 16_384;
-
     public bool ExperimentalSettings
     {
         get;
         set
         {
-            if (!value && WorktopResolution > MaxWorktopResolution)
+            if (value)
             {
-                WorktopResolution = MaxWorktopResolution;
+                field = value;
             }
-            field = value;
+            else
+            {
+                field = value;
+                if (WorktopResolution > MaxWorktopResolution)
+                {
+                    WorktopResolution = MaxWorktopResolution;
+                }
+            }
         }
     }
+    */
 }

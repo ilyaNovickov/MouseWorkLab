@@ -5,7 +5,7 @@ using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
-public partial class SettingsWindowViewModel : ViewModelBase, IDialogResult
+public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogResult
 {
     public SettingsWindowViewModel(ITranslationService translation,
         ModelingSettingsViewModel modelingSettingsViewModel) : base(translation)

@@ -12,7 +12,12 @@ public class ModelingEnv : IModelingEnv
 
     private IMatrixRandomizer _matrixRandomizer;
 
-    public ModelingEnv(IMoveFinderManager moveFinderManager, IModelingSettings modelingSettings, IMatrixRandomizer matrixRandomizer)
+    public ModelingEnv(IMoveFinderManager moveFinderManager, IMatrixRandomizer matrixRandomizer) : this(moveFinderManager, new ModelingSettings(), matrixRandomizer)
+    {
+
+    }
+
+    public ModelingEnv(IMoveFinderManager moveFinderManager, ModelingSettings modelingSettings, IMatrixRandomizer matrixRandomizer)
     {
         FinderManager = moveFinderManager;
         ModelingSettings = modelingSettings;
@@ -46,7 +51,7 @@ public class ModelingEnv : IModelingEnv
         }
     }
 
-    public IModelingSettings ModelingSettings
+    public ModelingSettings ModelingSettings
     {
         get; private set;
     }
@@ -67,7 +72,7 @@ public class ModelingEnv : IModelingEnv
 
     public IReadOnlyMatrix Worktop
     {
-        get => new ReadOnlyMatrix(_worktop.Bytes, WorktopResolution, WorktopResolution);
+        get => _worktop;
     }
 
     public void GenerateWorktop()

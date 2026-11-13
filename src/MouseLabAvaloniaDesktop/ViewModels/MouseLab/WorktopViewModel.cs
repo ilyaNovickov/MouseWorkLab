@@ -3,7 +3,7 @@ using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
-public class WorktopViewModel : ViewModelBase
+public class WorktopViewModel : TranslatedViewModelBase
 {
     private int? _seed = null;
 
