@@ -30,9 +30,15 @@ public partial class App : Application
         {
             desktop.Exit += (_, _) => OnShutdown();
 
-            desktop.MainWindow = new MainWindow
+            /*
+                        desktop.MainWindow = new MainWindow
+                        {
+                            DataContext = _appServices.GetRequiredService<MainViewModel>(),
+                        };
+                        */
+            desktop.MainWindow = new SettingsWindow
             {
-                DataContext = _appServices.GetRequiredService<MainViewModel>(),
+                DataContext = _appServices.GetRequiredService<SettingsWindowViewModel>(),
             };
         }
 

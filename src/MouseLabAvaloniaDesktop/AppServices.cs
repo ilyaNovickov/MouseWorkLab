@@ -89,6 +89,8 @@ public class AppServices : IDisposable, IServiceProvider
 
         #region ViewModels
 
+        services.AddTransient<ModelingSettingsViewModel>();
+        services.AddTransient<SettingsWindowViewModel>();
         services.AddTransient<MainViewModel>();
         #endregion
 
