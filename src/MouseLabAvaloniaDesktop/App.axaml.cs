@@ -1,10 +1,16 @@
 using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Styling;
+using Microsoft.Extensions.DependencyInjection;
+using MouseLab.Core.Models;
+using MouseLab.Core.Services;
+using MouseLabAvaloniaDesktop.Models;
+using MouseLabAvaloniaDesktop.Services.AppSettings;
 using MouseLabAvaloniaDesktop.ViewModels;
 using MouseLabAvaloniaDesktop.Views;
-using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Markup.Xaml;
+using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop;
 
@@ -30,6 +36,20 @@ public partial class App : Application
         {
             desktop.Exit += (_, _) => OnShutdown();
 
+            // События настроек — единственный канал, по которому Save в окне
+            // настроек доезжает до UI (тема) и сервисов (язык, моделирование).
+            IApplicationSettingsService settings = _appServices.GetRequiredService<IApplicationSettingsService>();
+            IModelingEnv env = _appServices.GetRequiredService<IModelingEnv>();
+            ICultureService cultures = _appServices.GetRequiredService<ICultureService>();
+
+            settings.ThemeChanged += (_, e) => ApplyTheme(e.NewTheme);
+            settings.CultureChanged += (_, e) => cultures.SetCulture(e.NewCulture);
+            settings.ModelingChanged += (_, e) =>
+                // Экспериментальный флаг вернётся в Core, когда там раскомментируют
+                // ModelingSettings.ExperimentalSettings.
+                env.ApplySettings(new ModelingSettings { WorktopResolution = e.WorktopResolution });
+
+            ApplyTheme(settings.CurrentAppTheme);
 
             desktop.MainWindow = new MainWindow
             {
@@ -46,4 +66,12 @@ desktop.MainWindow = new SettingsWindow
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    private void ApplyTheme(Themes theme) =>
+        RequestedThemeVariant = theme switch
+        {
+            Themes.Dark => ThemeVariant.Dark,
+            Themes.Light => ThemeVariant.Light,
+            _ => ThemeVariant.Default
+        };
 }
