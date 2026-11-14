@@ -39,6 +39,12 @@
     "Title": "Application"
   },
 
+  "Settings": {
+    "Modeling": "Modeling",
+    "Experimental": "Experimental settings",
+    "WorktopSize": "Worktop size"
+  },
+
   "Common": {
     "Save": "Save",
     "Cancel": "Cancel",
