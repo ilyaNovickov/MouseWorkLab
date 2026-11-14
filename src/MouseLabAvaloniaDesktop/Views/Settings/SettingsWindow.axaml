@@ -5,6 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="MouseLabAvaloniaDesktop.Views.SettingsWindow"
         xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels"
+        xmlns:views="using:MouseLabAvaloniaDesktop.Views"
         x:DataType="vm:SettingsWindowViewModel"
         Title="SettingsWindow">
         <DockPanel LastChildFill="True">
@@ -15,27 +16,25 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Button Classes="settingsManage" Grid.Column="1" 
-                        Content="{Binding Strings.CommonSave}" 
+                <Button Classes="settingsManage" Grid.Column="1"
+                        Content="{Binding Strings.CommonSave}"
                         Command="{Binding SaveCommand}" />
-                <Button Classes="settingsManage" Grid.Column="2" 
-                        Content="{Binding Strings.CommonCancel}" 
+                <Button Classes="settingsManage" Grid.Column="2"
+                        Content="{Binding Strings.CommonCancel}"
                         Command="{Binding CancelCommand}" />
             </Grid>
           </Border>
           <ScrollViewer>
             <ItemsControl ItemsSource="{Binding SettingsVM}">
-
+                <ItemsControl.DataTemplates>
+                    <DataTemplate DataType="{x:Type vm:ModelingSettingsViewModel}">
+                        <views:ModelingSettingsView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type vm:AppearanceSettingsViewModel}">
+                        <views:AppearanceSettingsView />
+                    </DataTemplate>
+                </ItemsControl.DataTemplates>
             </ItemsControl>
-            <!--
-            <StackPanel Orientation="Vertical" >
-              
-              <Rectangle Fill="Aqua" Width="100" Height="100"/>
-              <Rectangle Fill="Red" Width="100" Height="100"/>
-              <Rectangle Fill="Brown" Width="100" Height="100"/>
-              
-              </StackPanel>
-              -->
           </ScrollViewer>
         </DockPanel>
 </Window>

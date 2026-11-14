@@ -8,6 +8,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Extensions.DependencyInjection;
 using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.ViewModels;
+using MouseLabAvaloniaDesktop.Views;
 
 
 namespace MouseLabAvaloniaDesktop.Services.Implementations;
@@ -16,10 +17,7 @@ public class DialogService : IDialogService
 {
     private static readonly Dictionary<Type, Func<Window>> WindowRegistry = new()
     {
-        /*
-        [typeof(SettingsViewModel)] = () => new SettingsWindow(),
-        [typeof(AboutViewModel)] = () => new AboutWindow(),
-        */
+        [typeof(SettingsWindowViewModel)] = () => new SettingsWindow(),
     };
 
 

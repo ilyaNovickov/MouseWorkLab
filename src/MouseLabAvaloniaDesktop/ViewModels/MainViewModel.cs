@@ -1,14 +1,21 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MouseLabAvaloniaDesktop.Services.Abstractions;
 using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
 public partial class MainViewModel : TranslatedViewModelBase
 {
-    public MainViewModel(ITranslationService translation) : base(translation)
-    {
+    private readonly IDialogService _dialogService;
 
+    public MainViewModel(ITranslationService translation, IDialogService dialogService) : base(translation)
+    {
+        _dialogService = dialogService;
     }
+
+    [RelayCommand]
+    private void ShowSettings() => _dialogService.Show<SettingsWindowViewModel>();
 
     [ObservableProperty]
     public partial string Greeting { get; set; } = "Welcome to Avalonia!";

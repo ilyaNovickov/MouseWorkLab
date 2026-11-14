@@ -9,6 +9,12 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="MouseLabAvaloniaDesktop">
 
-
-
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="{Binding Strings.MainWindowView}">
+                <MenuItem Header="{Binding Strings.MainWindowSettings}"
+                          Command="{Binding ShowSettingsCommand}" />
+            </MenuItem>
+        </Menu>
+    </DockPanel>
 </Window>
