@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels"
+             x:DataType="vm:AppearanceSettingsViewModel"
+             x:Class="MouseLabAvaloniaDesktop.Views.AppearanceSettingsView">
+             <GroupBox Classes="settings"
+                       Header="{Binding Strings.CommonAppSettings}"
+                       VerticalContentAlignment="Center"
+                       HorizontalContentAlignment="Center">
+                <ScrollViewer MinWidth="100"
+                              MinHeight="100"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Auto">
+                    <Grid VerticalAlignment="Center"
+                          HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Classes="settings"
+                                Text="{Binding Strings.CommonTheme}"
+                                Grid.Column="0"
+                                Grid.Row="0" />
+                        <ComboBox Classes="settings"
+                                  Grid.Column="1"
+                                  Grid.Row="0"
+                                  ItemsSource="{Binding AvailableThemes}"
+                                  SelectedItem="{Binding SelectedTheme}"
+                                  MinWidth="160"
+                                  MaxWidth="160">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName.Value}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Classes="settings"
+                                   Text="{Binding Strings.CommonLanguage}"
+                                   Grid.Column="0"
+                                   Grid.Row="1" />
+                        <ComboBox Classes="settings"
+                                  Grid.Column="1"
+                                  Grid.Row="1"
+                                  ItemsSource="{Binding AvailableCultures}"
+                                  SelectedItem="{Binding SelectedCulture}"
+                                  MinWidth="160"
+                                  MaxWidth="160">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </ScrollViewer>
+             </GroupBox>
+</UserControl>

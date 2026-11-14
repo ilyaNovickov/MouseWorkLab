@@ -112,6 +112,7 @@ public class AppServices : IDisposable, IServiceProvider
         services.AddTransient<WorktopViewModel>();
 
         services.AddTransient<ModelingSettingsViewModel>();
+        services.AddTransient<AppearanceSettingsViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
 
         services.AddTransient<MainViewModel>();
