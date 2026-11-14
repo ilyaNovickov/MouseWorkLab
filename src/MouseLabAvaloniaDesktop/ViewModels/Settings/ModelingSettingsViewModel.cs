@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using MouseLabAvaloniaDesktop.Services.AppSettings;
 using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
@@ -35,8 +36,12 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase
 {
     private ObservableCollection<WorktopSizeViewModel> avaibleSizes;
 
-    public ModelingSettingsViewModel(ITranslationService translation) : base(translation)
+    private readonly IApplicationSettingsService _settings;
+
+    public ModelingSettingsViewModel(ITranslationService translation, IApplicationSettingsService settings) : base(translation)
     {
+        _settings = settings;
+
         avaibleSizes = [
             new WorktopSizeViewModel(8192),
             new WorktopSizeViewModel(2 * 8192)

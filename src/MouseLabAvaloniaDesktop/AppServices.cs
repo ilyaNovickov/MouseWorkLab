@@ -2,7 +2,9 @@ using Dock.Model.Core;
 using Microsoft.Extensions.DependencyInjection;
 using MouseLab.Common.Services;
 using MouseLab.Core.Services;
+using MouseLabAvaloniaDesktop.Models;
 using MouseLabAvaloniaDesktop.Services.Abstractions;
+using MouseLabAvaloniaDesktop.Services.AppSettings;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels;
 using MouseLabAvaloniaDesktop.Views;
@@ -87,6 +89,16 @@ public class AppServices : IDisposable, IServiceProvider
         #endregion
 
         services.AddSingleton<IDialogService>(sp => new DialogService(sp));
+
+        // Путь к файлу не привязан: настройки — будущий артефакт «проекта»
+        // пользователя, имя и каталог выберет проектный слой. До того — только
+        // память, дефолтный снимок.
+        services.AddSingleton<IApplicationSettingsService>(_ =>
+            new ApplicationSettingsService(new AppSettingsSnapshot
+            {
+                Theme = Themes.Light,
+                WorktopResolution = 8192
+            }));
 
         services.AddSingleton<IMatrixCutter, MatrixCutter>();
         services.AddSingleton<IMatrixRandomizer, MatrixRandomizer>();
