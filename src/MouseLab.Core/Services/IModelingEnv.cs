@@ -19,4 +19,6 @@ public interface IModelingEnv
     ModelingSettings ModelingSettings { get; }
 
     void GenerateWorktop();
+
+    void ApplySettings(ModelingSettings settings);
 }

@@ -81,4 +81,9 @@ public class ModelingEnv : IModelingEnv
             _worktop = new Matrix(WorktopResolution, WorktopResolution);
         _matrixRandomizer.Randomize(_worktop, Seed);
     }
+
+    public void ApplySettings(ModelingSettings settings)
+    {
+        ModelingSettings = settings;
+    }
 }
