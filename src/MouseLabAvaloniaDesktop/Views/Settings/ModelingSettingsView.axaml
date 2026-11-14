@@ -6,8 +6,8 @@
              xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels"
              x:DataType="vm:ModelingSettingsViewModel"
              x:Class="MouseLabAvaloniaDesktop.Views.ModelingSettingsView">
-             <GroupBox Classes="settings" 
-                       Header="Настройки моделирования"
+             <GroupBox Classes="settings"
+                       Header="{Binding Strings.SettingsModeling}"
                        VerticalContentAlignment="Center"
                        HorizontalContentAlignment="Center">
                 <ScrollViewer MinWidth="100" 
@@ -25,7 +25,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <TextBlock Classes="settings"
-                                Text="Экспериментальные настройки"
+                                Text="{Binding Strings.SettingsExperimental}"
                                 Grid.Column="0"
                                 Grid.Row="0" />
                         <CheckBox Classes="settings"
@@ -33,7 +33,7 @@
                                   Grid.Column="1"
                                   Grid.Row="0" />
                         <TextBlock Classes="settings"
-                                   Text="Размеры полотна"
+                                   Text="{Binding Strings.SettingsWorktopSize}"
                                    Grid.Column="0"
                                    Grid.Row="1" />
                         <ComboBox Classes="settings"

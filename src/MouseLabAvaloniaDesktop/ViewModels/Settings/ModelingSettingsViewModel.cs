@@ -32,7 +32,7 @@ public partial class WorktopSizeViewModel : ViewModelBase
     }
 }
 
-public partial class ModelingSettingsViewModel : TranslatedViewModelBase
+public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISettingsSectionViewModel
 {
     private ObservableCollection<WorktopSizeViewModel> avaibleSizes;
 
@@ -49,6 +49,11 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase
 
         //OnPropertyChanged(nameof(AvaibleSizes));
         selectedSize = AvaibleSizes.First();
+
+        // Рабочая копия стартует с значений, применённых сервисом, — иначе
+        // Reset после Save вернул бы не то, что реально сохранено.
+        IsExperimentalOptions = _settings.ExperimentalOptions;
+        selectedSize = AvaibleSizes.First(s => s.SizeResolution == _settings.WorktopResolution);
     }
 
     public bool IsExperimentalOptions
@@ -86,5 +91,30 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase
                 throw new ArgumentException("Аргумент должен быть из списка и не равень null");
             SetProperty(ref selectedSize, value);
         }
+    }
+
+    /// <summary>
+    /// Публикует рабочую копию в сервис настроек (кнопка Save).
+    /// </summary>
+    public void Save()
+    {
+        _settings.ExperimentalOptions = IsExperimentalOptions;
+        _settings.WorktopResolution = SelectedSize.SizeResolution;
+    }
+
+    /// <summary>
+    /// Откатывает рабочую копию к применённым значениям (кнопка Cancel).
+    /// </summary>
+    /// <remarks>
+    /// Порядок важен: при IsExp == false сеттер SelectedSize молча игнорируется,
+    /// поэтому сначала выставляется флаг, потом размер — иначе после открата
+    /// с отключёнными экспериментами размер навсегда остался бы первым.
+    /// </remarks>
+    public void Reset()
+    {
+        IsExperimentalOptions = _settings.ExperimentalOptions;
+        selectedSize = AvaibleSizes.FirstOrDefault(s => s.SizeResolution == _settings.WorktopResolution)
+            ?? AvaibleSizes.First();
+        OnPropertyChanged(nameof(SelectedSize));
     }
 }
