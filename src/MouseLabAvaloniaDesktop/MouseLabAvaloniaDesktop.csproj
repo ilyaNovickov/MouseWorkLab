@@ -5,6 +5,18 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Компилируемые привязки по умолчанию: пути в Binding проверяются на этапе
+         сборки, а не в рантайме. Обязательно для NativeAOT - рефлексивные привязки
+         не выживают после тримминга. -->
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- Предупреждения о несовместимости с тримером/AOT -->
+	  <IsTrimmable>true</IsTrimmable>
+	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+
+	  <!-- Покажет все проблемные места при сборке -->
+	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
+	  <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+	  <EnableAotAnalyzer>true</EnableAotAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,5 +34,38 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" />
+
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+
+    <PackageReference Include="Dock.Avalonia" />
+    <PackageReference Include="Dock.Avalonia.Themes.Fluent" />
+    <PackageReference Include="Dock.Model.Avalonia" />
+    <PackageReference Include="Dock.Model.Mvvm" />
+
+    <!-- Ядро ProTranslate: культуры, переводы, fallback, форматирование, кэш. -->
+    <PackageReference Include="ProTranslate.Avalonia" />
+    <!-- Регистрация сервисов в IServiceCollection. -->
+    <PackageReference Include="ProTranslate.MicrosoftExtensions" />
+
+    <!-- Генератор ключей, типизированных строк и провайдера из JSON-каталогов.
+         Подключается как анализатор, а не как обычная ссылка. -->
+    <PackageReference Include="ProTranslate.SourceGenerator">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </PackageReference>
+
+    <!-- Проверки на этапе сборки: PTA001 неизвестный ключ, PTA002 несовпадение
+         числа плейсхолдеров, PTA003 пробел в переводе для какой-то культуры. -->
+    <PackageReference Include="ProTranslate.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </PackageReference>
+    <PackageReference Include="StaticViewLocator">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+
+    <PackageReference Include="PanAndZoom" />
   </ItemGroup>
 </Project>
