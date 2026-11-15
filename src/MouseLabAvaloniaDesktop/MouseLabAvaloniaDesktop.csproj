@@ -21,7 +21,12 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\Translations\**" />
+    <!-- SourceGenerator читает эти файлы на этапе сборки и генерирует по ним
+         ProTranslateKeys, ProTranslateStrings и ProTranslateGeneratedTranslationProvider.
+         Добавление языка = добавление файла Strings.<код-культуры>.json,
+         пересборка проекта не требует правок в C#. -->
+    <AdditionalFiles Include="Assets\Translations\Strings.*.json" />
   </ItemGroup>
 
   <ItemGroup>

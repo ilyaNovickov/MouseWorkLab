@@ -1,7 +1,12 @@
 using System;
+using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.Services.Implementations;
+using ProTranslate;
+using ProTranslate.Generated;
+using ProTranslate.Avalonia;
+using MouseLabAvaloniaDesktop.ViewModels;
 
 namespace MouseLabAvaloniaDesktop;
 
@@ -25,7 +30,7 @@ public class AppServices : IDisposable, IServiceProvider
         // статический binding source остался бы с пустым InMemory-провайдером
         // по умолчанию. Держим в одном методе с BuildServiceProvider, чтобы
         // порядок "сначала собрать, потом подключить адаптер" нельзя было нарушить.
-        //provider.UseProTranslateAvalonia();
+        provider.UseProTranslateAvalonia();
 
         return provider;
     }
@@ -37,7 +42,7 @@ public class AppServices : IDisposable, IServiceProvider
         #region Services
 
         #region ProTranslate
-        /*
+
         // Ядро ProTranslate: культура, поиск переводов, fallback, форматирование, кэш.
         //
         // provider - сгенерированный провайдер. ProTranslate.SourceGenerator на этапе сборки
@@ -72,10 +77,10 @@ public class AppServices : IDisposable, IServiceProvider
             {
                 MaximumEntries = 2048
             });
-*/
+
         // Адаптер Avalonia: подключает TranslationBindingSource, через который работают
         // разметочные расширения и статический ProTranslate.Avalonia.TranslationService.
-        //services.AddProTranslateAvalonia();
+        services.AddProTranslateAvalonia();
         #endregion
 
         /*
@@ -102,17 +107,19 @@ public class AppServices : IDisposable, IServiceProvider
         services.AddSingleton<IMoveFinderFactory, MoveFinderFactory>();
         services.AddSingleton<IMoveFinderManager, MoveFinderManager>();
         //services.AddSingleton<ModelingEnv, ModelingEnv>();
+
+        services.AddSingleton<IDialogService, DialogService>();
         #endregion
 
         #region ViewModels
         //services.AddTransient<WorktopCanvasViewModel>();
         //services.AddTransient<WorktopViewModel>();
 
-        //services.AddTransient<ModelingSettingsViewModel>();
-        //services.AddTransient<AppearanceSettingsViewModel>();
-        //services.AddTransient<SettingsWindowViewModel>();
+        services.AddSingleton<ModelingSettingsViewModel>();
+        services.AddSingleton<AppearanceSettingsViewModel>();
+        services.AddSingleton<SettingsWindowViewModel>();
 
-        //services.AddTransient<MainViewModel>();
+        services.AddSingleton<MainViewModel>();
         #endregion
 
 

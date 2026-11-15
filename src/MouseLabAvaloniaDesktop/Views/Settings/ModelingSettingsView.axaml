@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels"
+             x:DataType="vm:ModelingSettingsViewModel"
+             x:Class="MouseLabAvaloniaDesktop.Views.ModelingSettingsView">
+             <GroupBox Classes="settings"
+                       Header="{Binding Strings.SettingsModeling}"
+                       VerticalContentAlignment="Center"
+                       HorizontalContentAlignment="Center">
+                <ScrollViewer MinWidth="100" 
+                              MinHeight="100" 
+                              VerticalScrollBarVisibility="Auto" 
+                              HorizontalScrollBarVisibility="Auto">
+                    <Grid VerticalAlignment="Center"
+                          HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Classes="settings"
+                                Text="{Binding Strings.SettingsExperimental}"
+                                Grid.Column="0"
+                                Grid.Row="0" />
+                        <CheckBox Classes="settings"
+                                  IsChecked="{Binding IsExperimentalOptions}"
+                                  Grid.Column="1"
+                                  Grid.Row="0" />
+                        <TextBlock Classes="settings"
+                                   Text="{Binding Strings.SettingsWorktopSize}"
+                                   Grid.Column="0"
+                                   Grid.Row="1" />
+                        <ComboBox Classes="settings"
+                                  Grid.Column="1"
+                                  Grid.Row="1"
+                                  ItemsSource="{Binding AvaibleSizes}"
+                                  SelectedItem="{Binding SelectedSize}"
+                                  IsEnabled="{Binding IsExperimentalOptions}"
+                                  MinWidth="160"
+                                  MaxWidth="160" />
+                    </Grid>
+                </ScrollViewer>
+             </GroupBox>
+</UserControl>
