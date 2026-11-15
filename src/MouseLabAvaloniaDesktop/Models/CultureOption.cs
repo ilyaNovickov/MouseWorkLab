@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace MouseLabAvaloniaDesktop.Models;
 
 /// <summary>
@@ -18,9 +16,6 @@ public sealed class CultureOption
 
     /// <summary>Название языка для интерфейса, например "русский (Россия)".</summary>
     public string DisplayName { get; }
-
-    /// <summary>Готовый CultureInfo, который передаётся в ICultureService.SetCulture.</summary>
-    public CultureInfo Culture => CultureInfo.GetCultureInfo(CultureName);
 
     public override string ToString() => DisplayName;
 }

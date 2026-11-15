@@ -97,6 +97,11 @@ public class AppServices : IDisposable, IServiceProvider
             new ApplicationSettingsService(new AppSettingsSnapshot
             {
                 Theme = Themes.Light,
+
+                // Совпадает с культурой, которой ProTranslate стартует ниже, иначе
+                // ComboBox языка показывает не то, что применено, а первый же Save
+                // молча переключил бы UI на культуру по умолчанию.
+                Culture = CultureInfo.CurrentCulture.Name,
                 WorktopResolution = 8192
             }));
 

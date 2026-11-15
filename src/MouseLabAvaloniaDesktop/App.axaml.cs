@@ -51,6 +51,11 @@ public partial class App : Application
 
             ApplyTheme(settings.CurrentAppTheme);
 
+            // ModelingChanged поднимается только при реальном изменении, а
+            // ModelingEnv по умолчанию строит полотно 1024 — без однократного
+            // применения стартовые настройки так и не доехали бы до полотна.
+            env.ApplySettings(new ModelingSettings { WorktopResolution = settings.WorktopResolution });
+
             desktop.MainWindow = new MainWindow
             {
                 DataContext = _appServices.GetRequiredService<MainViewModel>(),
