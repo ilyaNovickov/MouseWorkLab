@@ -109,7 +109,7 @@ public class AppServices : IDisposable, IServiceProvider
         services.AddSingleton<IMatrixRandomizer, MatrixRandomizer>();
         services.AddSingleton<IMoveFinderFactory, MoveFinderFactory>();
         services.AddSingleton<IMoveFinderManager, MoveFinderManager>();
-        services.AddSingleton<IModelingEnv, ModelingEnv>();
+        services.AddSingleton<ModelingEnv, ModelingEnv>();
         #endregion
 
         #region ViewModels

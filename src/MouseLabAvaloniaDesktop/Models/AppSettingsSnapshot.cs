@@ -11,19 +11,15 @@ namespace MouseLabAvaloniaDesktop.Models;
 /// </remarks>
 public sealed class AppSettingsSnapshot
 {
-    [JsonPropertyName("theme")]
     public Themes Theme { get; init; } = Themes.Light;
 
     /// <summary>
     /// Код культуры. <c>null</c> означает «культура ещё не сохранялась» —
     /// инициализатора нет специально, чтобы дефолт не зависел от культуры процесса.
     /// </summary>
-    [JsonPropertyName("culture")]
     public string? Culture { get; init; }
 
-    [JsonPropertyName("worktopResolution")]
     public int WorktopResolution { get; init; } = 8192;
 
-    [JsonPropertyName("experimental")]
     public bool Experimental { get; init; }
 }

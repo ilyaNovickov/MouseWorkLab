@@ -6,7 +6,7 @@ using MouseLab.Core.Services;
 
 namespace MouseLab.Common.Services;
 
-public class ModelingEnv : IModelingEnv
+public class ModelingEnv
 {
     private IMatrix _worktop;
 
@@ -85,5 +85,8 @@ public class ModelingEnv : IModelingEnv
     public void ApplySettings(ModelingSettings settings)
     {
         ModelingSettings = settings;
+        ModelingSettingsChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    public event EventHandler? ModelingSettingsChanged;
 }

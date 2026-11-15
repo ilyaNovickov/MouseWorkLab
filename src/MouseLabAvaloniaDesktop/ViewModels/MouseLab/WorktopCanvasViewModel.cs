@@ -1,4 +1,5 @@
 using System;
+using CommunityToolkit.Mvvm.Input;
 using MouseLab.Common.Models;
 using MouseLab.Common.Services;
 using MouseLab.Core.Models;
@@ -6,13 +7,14 @@ using MouseLab.Core.Services;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
-public class WorktopCanvasViewModel : ViewModelBase
+public partial class WorktopCanvasViewModel : ViewModelBase
 {
-    private readonly IModelingEnv modelingEnv;
+    private readonly ModelingEnv modelingEnv;
 
-    public WorktopCanvasViewModel(IModelingEnv env)
+    public WorktopCanvasViewModel(ModelingEnv env)
     {
         this.modelingEnv = env;
+        modelingEnv.ModelingSettingsChanged += OnModelingSettingsChanged;
     }
 
     public IReadOnlyMatrix Worktop
@@ -26,4 +28,15 @@ public class WorktopCanvasViewModel : ViewModelBase
     public int WorktopAvaibleResolution => modelingEnv.WorktopAvaibleResolution;
 
     public int WorktopResolution => modelingEnv.WorktopResolution;
+
+    private void OnModelingSettingsChanged(object? sender, EventArgs e)
+    {
+
+    }
+
+    [RelayCommand]
+    private void Generate()
+    {
+        modelingEnv.GenerateWorktop();
+    }
 }

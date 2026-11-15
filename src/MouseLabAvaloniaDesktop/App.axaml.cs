@@ -11,6 +11,7 @@ using MouseLabAvaloniaDesktop.ViewModels;
 using MouseLabAvaloniaDesktop.Views;
 using Avalonia.Markup.Xaml;
 using ProTranslate;
+using MouseLab.Common.Services;
 
 namespace MouseLabAvaloniaDesktop;
 
@@ -39,7 +40,7 @@ public partial class App : Application
             // События настроек — единственный канал, по которому Save в окне
             // настроек доезжает до UI (тема) и сервисов (язык, моделирование).
             IApplicationSettingsService settings = _appServices.GetRequiredService<IApplicationSettingsService>();
-            IModelingEnv env = _appServices.GetRequiredService<IModelingEnv>();
+            ModelingEnv env = _appServices.GetRequiredService<ModelingEnv>();
             ICultureService cultures = _appServices.GetRequiredService<ICultureService>();
 
             settings.ThemeChanged += (_, e) => ApplyTheme(e.NewTheme);
