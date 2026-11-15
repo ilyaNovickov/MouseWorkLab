@@ -22,4 +22,8 @@ public class WorktopCanvasViewModel : ViewModelBase
             return modelingEnv.Worktop;
         }
     }
+
+    public int WorktopAvaibleResolution => modelingEnv.WorktopAvaibleResolution;
+
+    public int WorktopResolution => modelingEnv.WorktopResolution;
 }

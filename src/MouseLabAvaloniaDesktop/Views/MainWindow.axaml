@@ -5,16 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="MouseLabAvaloniaDesktop.Views.MainWindow"
+        xmlns:v="using:MouseLabAvaloniaDesktop.Views"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="MouseLabAvaloniaDesktop">
 
-    <DockPanel>
+    <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="{Binding Strings.MainWindowView}">
                 <MenuItem Header="{Binding Strings.MainWindowSettings}"
                           Command="{Binding ShowSettingsCommand}" />
             </MenuItem>
         </Menu>
+        <v:WorktopView/>
     </DockPanel>
 </Window>

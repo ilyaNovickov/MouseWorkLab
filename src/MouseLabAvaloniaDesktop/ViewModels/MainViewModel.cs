@@ -9,10 +9,13 @@ public partial class MainViewModel : TranslatedViewModelBase
 {
     private readonly IDialogService _dialogService;
 
-    public MainViewModel(ITranslationService translation, IDialogService dialogService) : base(translation)
+    public MainViewModel(ITranslationService translation, IDialogService dialogService, WorktopViewModel worktopViewModel) : base(translation)
     {
         _dialogService = dialogService;
+        WorktopViewModel = worktopViewModel;
     }
+
+    public WorktopViewModel WorktopViewModel { get; }
 
     [RelayCommand]
     private void ShowSettings() => _dialogService.Show<SettingsWindowViewModel>();

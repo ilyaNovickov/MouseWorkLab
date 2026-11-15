@@ -7,10 +7,12 @@ public class WorktopViewModel : TranslatedViewModelBase
 {
     private int? _seed = null;
 
-    public WorktopViewModel(ITranslationService translation) : base(translation)
+    public WorktopViewModel(ITranslationService translation, WorktopCanvasViewModel worktopCanvasViewModel) : base(translation)
     {
-
+        this.WorktopCanvasViewModel = worktopCanvasViewModel;
     }
+
+    public WorktopCanvasViewModel WorktopCanvasViewModel { get; }
 
     public int? Seed
     {
