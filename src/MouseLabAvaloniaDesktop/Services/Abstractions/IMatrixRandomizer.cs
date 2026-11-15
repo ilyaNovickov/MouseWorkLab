@@ -1,6 +1,8 @@
-﻿using MouseLab.Core;
-using MouseLab.Core.Models;
-using MouseLab.Core.Providers;
+﻿
+
+using System;
+using MouseLabAvaloniaDesktop.Models;
+using MouseLabAvaloniaDesktop.Providers;
 
 namespace MouseLabAvaloniaDesktop.Services.Abstractions
 {

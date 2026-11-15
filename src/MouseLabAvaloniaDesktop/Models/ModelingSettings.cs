@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.Intrinsics.X86;
-using MouseLab.Core.Services;
 
 namespace MouseLabAvaloniaDesktop.Models;
 

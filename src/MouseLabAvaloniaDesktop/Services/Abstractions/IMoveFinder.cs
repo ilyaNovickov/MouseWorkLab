@@ -1,5 +1,6 @@
 using System;
-using MouseLab.Core.Models;
+using MouseLabAvaloniaDesktop.Models;
+
 
 namespace MouseLabAvaloniaDesktop.Services.Abstractions;
 

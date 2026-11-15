@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MouseLab.Core.Models;
+using MouseLabAvaloniaDesktop.Models;
+
 
 namespace MouseLabAvaloniaDesktop.Providers
 {
