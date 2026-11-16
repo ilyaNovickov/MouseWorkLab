@@ -31,24 +31,24 @@ namespace MouseLabAvaloniaDesktop.Generators
             /// Копия ссылки безопасна (immutable-тип).
             /// </summary>
             [System.AttributeUsage(
-            System.AttributeTargets.Property | System.AttributeTargets.Field,
-            Inherited = false)]
+                System.AttributeTargets.Property | System.AttributeTargets.Field,
+                Inherited = false)]
             internal sealed class CopyFromReferenceAttribute : System.Attribute { }
 
             /// <summary>
             /// Глубокая копия через ICloneable.Clone().
             /// </summary>
             [System.AttributeUsage(
-            System.AttributeTargets.Property | System.AttributeTargets.Field,
-            Inherited = false)]
+                System.AttributeTargets.Property | System.AttributeTargets.Field,
+                Inherited = false)]
             internal sealed class CopyFromCloneAttribute : System.Attribute { }
 
             /// <summary>
             /// Пропустить свойство при генерации CopyFrom().
             /// </summary>
             [System.AttributeUsage(
-            System.AttributeTargets.Property | System.AttributeTargets.Field,
-            Inherited = false)]
+                System.AttributeTargets.Property | System.AttributeTargets.Field,
+                Inherited = false)]
             internal sealed class CopyFromIgnoreAttribute : System.Attribute { }
         }
         """;

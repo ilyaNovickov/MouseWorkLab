@@ -1,25 +1,23 @@
 ﻿using MouseLabAvaloniaDesktop.Models.Settings;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace MouseLabAvaloniaDesktop.Services.Implementations;
 
-    [JsonSerializable(typeof(AppSnapshot))]
-    [JsonSourceGenerationOptions(
-    WriteIndented = true,                    // красивый вывод
-    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
-    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    )]
-    internal partial class AppSettingsJsonContext : JsonSerializerContext
-    {
-    }
+[JsonSerializable(typeof(AppSnapshot))]
+[JsonSourceGenerationOptions(
+WriteIndented = true,                    // красивый вывод
+PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+)]
+internal partial class AppSettingsJsonContext : JsonSerializerContext
+{
+}
 
-    public class SettingsService
-    {
+public class SettingsService
+{
     private readonly string _filePath;
 
     public AppSnapshot Current { get; private set; }
@@ -74,20 +72,3 @@ namespace MouseLabAvaloniaDesktop.Services.Implementations;
         File.WriteAllText(_filePath, json);
     }
 }
-
-/*
-// ── Применение и сохранение ───────────────────────
-
-    public void ApplyAndSave(AppSettings draft)
-    {
-        // Копируем поштучно, чтобы PropertyChanged сработал
-        // на живом Current (и все привязки в приложении обновились).
-        Current.Ui.Theme = draft.Ui.Theme;
-        Current.Ui.FontSize = draft.Ui.FontSize;
-
-        Current.Business.MatrixWidth = draft.Business.MatrixWidth;
-        Current.Business.Sensitivity = draft.Business.Sensitivity;
-
-        SaveToDisk();
-    }
-}*/
