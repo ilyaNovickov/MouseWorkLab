@@ -5,11 +5,11 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <!-- Компилируемые привязки по умолчанию: пути в Binding проверяются на этапе
+      <!-- Компилируемые привязки по умолчанию: пути в Binding проверяются на этапе
          сборки, а не в рантайме. Обязательно для NativeAOT - рефлексивные привязки
          не выживают после тримминга. -->
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <!-- Предупреждения о несовместимости с тримером/AOT -->
+      <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+      <!-- Предупреждения о несовместимости с тримером/AOT -->
 	  <IsTrimmable>true</IsTrimmable>
 	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 
@@ -17,10 +17,16 @@
 	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
 	  <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
 	  <EnableAotAnalyzer>true</EnableAotAnalyzer>
+
+	  <!-- Отключаем рефлексию в System.Text.Json,
+         чтобы случайно не использовать несгенерированный путь -->
+	  <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+
+	  <!-- Avalonia + AOT требуют этого -->
+	  <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" Exclude="Assets\Translations\**" />
     <!-- SourceGenerator читает эти файлы на этапе сборки и генерирует по ним
          ProTranslateKeys, ProTranslateStrings и ProTranslateGeneratedTranslationProvider.
@@ -72,5 +78,13 @@
     </PackageReference>
 
     <PackageReference Include="PanAndZoom" />
+
+    <PackageReference Include="System.Text.Json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MouseLabAvaloniaDesktop.Generators\MouseLabAvaloniaDesktop.Generators.csproj" 
+					  OutputItemType="Analyzer" 
+					  ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>
