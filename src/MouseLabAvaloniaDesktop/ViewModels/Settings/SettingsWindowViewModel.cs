@@ -30,6 +30,8 @@ public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogR
         // Save НЕ закрывает окно: пользователь правит и сохраняет дальше.
         foreach (ISettingsSectionViewModel section in Sections)
             section.Save();
+
+        _settingsService.SaveToDisk();
     }
 
     [RelayCommand]

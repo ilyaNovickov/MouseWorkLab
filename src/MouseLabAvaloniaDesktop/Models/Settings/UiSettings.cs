@@ -3,17 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace MouseLabAvaloniaDesktop.Models.Settings
 {
     [GenerateCopyFrom]
     public partial class UiSettings : ObservableObject
     {
-        [ObservableProperty]
-        private Themes theme = Themes.Default;
+        //[ObservableProperty]
+        //[property: JsonInclude]
+        public Themes Theme { get; set => SetProperty(ref field, value); } = Themes.Default;
 
-        [ObservableProperty]
-        private CultureInfo culture = CultureInfo.CurrentCulture;
+        //[ObservableProperty]
+        //[property: JsonInclude]
+        public CultureInfo Culture { get; set => SetProperty(ref field, value); } = CultureInfo.CurrentCulture;
 
         /// <summary>
         /// Превращает строку из настроек в CultureInfo, подставляя культуру по умолчанию

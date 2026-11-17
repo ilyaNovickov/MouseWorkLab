@@ -2,20 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MouseLabAvaloniaDesktop.Models.Settings
 {
     [GenerateCopyFrom]
     public partial class ModelingSettings : ObservableObject
     {
-        private const int defaultWorktopResolution = 8_192;
+        public const int DefaultWorktopResolution = 8_192;
 
-        [ObservableProperty]
-        private bool isExperimentalSettings = false;
+        //[ObservableProperty]
+        //[property: JsonInclude]
+        public bool IsExperimentalSettings { get; set => SetProperty(ref field, value); } = false;
 
 
-        [ObservableProperty]
-        private int worktopResolution = defaultWorktopResolution;
+        //[ObservableProperty]
+        //[property: JsonInclude]
+        public int WorktopResolution { get; set => SetProperty(ref field, value); } = DefaultWorktopResolution;
 
         public void ValidateProperties()
         {
@@ -25,7 +29,7 @@ namespace MouseLabAvaloniaDesktop.Models.Settings
             }
             else
             {
-                WorktopResolution = defaultWorktopResolution;
+                WorktopResolution = DefaultWorktopResolution;
             }
         }
     }

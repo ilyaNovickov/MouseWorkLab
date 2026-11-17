@@ -1,9 +1,12 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using MouseLabAvaloniaDesktop.Models;
+using MouseLabAvaloniaDesktop.Models.Settings;
+using MouseLabAvaloniaDesktop.Services.Implementations;
+using ProTranslate;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
@@ -35,34 +38,42 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
 {
     private ObservableCollection<WorktopSizeViewModel> avaibleSizes;
 
-    //private readonly IApplicationSettingsService _settings;
+    private readonly SettingsService _settings;
 
     //public ModelingSettingsViewModel(ITranslationService translation, IApplicationSettingsService settings) : base(translation)
-    public ModelingSettingsViewModel(ITranslationService translation) : base(translation)
+    public ModelingSettingsViewModel(ITranslationService translation, SettingsService settings) : base(translation)
     {
-        //_settings = settings;
+        _settings = settings;
+
+        int defaultResolution = ModelingSettings.DefaultWorktopResolution;
 
         avaibleSizes = [
-            new WorktopSizeViewModel(8192),
-            new WorktopSizeViewModel(2 * 8192)
+            new WorktopSizeViewModel(defaultResolution),
+            new WorktopSizeViewModel(2 * defaultResolution)
         ];
 
         //OnPropertyChanged(nameof(AvaibleSizes));
-        selectedSize = AvaibleSizes.First();
+        //selectedSize = AvaibleSizes.First();
+        isExperimentalOptions = _settings.Current.ModelingSettings.IsExperimentalSettings;
+        selectedSize = AvaibleSizes.FirstOrDefault(
+            s => s.SizeResolution == _settings.Current.ModelingSettings.WorktopResolution,
+            AvaibleSizes[0]
+            );
 
         // Рабочая копия стартует с значений, применённых сервисом, — иначе
         // Reset после Save вернул бы не то, что реально сохранено.
-        //IsExperimentalOptions = _settings.ExperimentalOptions;
-        //selectedSize = AvaibleSizes.First(s => s.SizeResolution == _settings.WorktopResolution);
-        selectedSize = AvaibleSizes.First();
+        
+        //selectedSize = AvaibleSizes.First(s => s.SizeResolution == _settings.Current.ModelingSettings.WorktopResolution);
+        //selectedSize = AvaibleSizes.First();
     }
 
+    private bool isExperimentalOptions;
     public bool IsExperimentalOptions
     {
-        get;
+        get => isExperimentalOptions;
         set
         {
-            SetProperty(ref field, value);
+            SetProperty(ref isExperimentalOptions, value);
             OnIsExperimentalOptionsChanged();
         }
     }
@@ -99,10 +110,10 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
     /// </summary>
     public void Save()
     {
-        /*
-        _settings.ExperimentalOptions = IsExperimentalOptions;
-        _settings.WorktopResolution = SelectedSize.SizeResolution;
-        */
+        
+        _settings.Current.ModelingSettings.IsExperimentalSettings = IsExperimentalOptions;
+        _settings.Current.ModelingSettings.WorktopResolution = SelectedSize.SizeResolution;
+        
     }
 
     /// <summary>
@@ -120,6 +131,6 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
         selectedSize = AvaibleSizes.FirstOrDefault(s => s.SizeResolution == _settings.WorktopResolution)
             ?? AvaibleSizes.First();
             */
-        OnPropertyChanged(nameof(SelectedSize));
+        //OnPropertyChanged(nameof(SelectedSize));
     }
 }

@@ -7,6 +7,8 @@ using System.Text.Json.Serialization;
 namespace MouseLabAvaloniaDesktop.Services.Implementations;
 
 [JsonSerializable(typeof(AppSnapshot))]
+[JsonSerializable(typeof(UiSettings))]
+[JsonSerializable(typeof(ModelingSettings))]
 [JsonSourceGenerationOptions(
 WriteIndented = true,                    // красивый вывод
 PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
@@ -81,7 +83,7 @@ public class SettingsService
         Current.CopyFrom(clone);
         SaveToDisk();
     }
-    private void SaveToDisk()
+    public void SaveToDisk()
     {
         string json = JsonSerializer.Serialize(Current, AppSettingsJsonContext.Default.AppSnapshot);
         File.WriteAllText(_filePath, json);
