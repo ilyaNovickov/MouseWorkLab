@@ -84,8 +84,6 @@ public class AppServices : IDisposable, IServiceProvider
         #endregion
 
         /*
-                services.AddSingleton<IDialogService>(sp => new DialogService(sp));
-
                 // Путь к файлу не привязан: настройки — будущий артефакт «проекта»
                 // пользователя, имя и каталог выберет проектный слой. До того — только
                 // память, дефолтный снимок.
@@ -102,6 +100,8 @@ public class AppServices : IDisposable, IServiceProvider
                     }));
                     */
 
+        services.AddSingleton<SettingsService, SettingsService>();
+
         services.AddSingleton<IMatrixCutter, MatrixCutter>();
         services.AddSingleton<IMatrixRandomizer, MatrixRandomizer>();
         services.AddSingleton<IMoveFinderFactory, MoveFinderFactory>();
@@ -115,11 +115,11 @@ public class AppServices : IDisposable, IServiceProvider
         //services.AddTransient<WorktopCanvasViewModel>();
         //services.AddTransient<WorktopViewModel>();
 
-        services.AddSingleton<ModelingSettingsViewModel>();
-        services.AddSingleton<AppearanceSettingsViewModel>();
-        services.AddSingleton<SettingsWindowViewModel>();
+        services.AddTransient<ModelingSettingsViewModel>();
+        services.AddTransient<AppearanceSettingsViewModel>();
+        services.AddTransient<SettingsWindowViewModel>();
 
-        services.AddSingleton<MainViewModel>();
+        services.AddTransient<MainViewModel>();
         #endregion
 
 

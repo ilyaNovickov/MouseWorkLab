@@ -2,16 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.Input;
+using MouseLabAvaloniaDesktop.Services.Implementations;
 using ProTranslate;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
 public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogResult
 {
-    public SettingsWindowViewModel(ITranslationService translation,
+    private readonly SettingsService _settingsService;
+
+    public SettingsWindowViewModel(
+        ITranslationService translation,
+        SettingsService settingsService,
         ModelingSettingsViewModel modelingSettingsViewModel,
         AppearanceSettingsViewModel appearanceSettingsViewModel) : base(translation)
     {
+        _settingsService = settingsService;
+
         SettingsVM = [modelingSettingsViewModel, appearanceSettingsViewModel];
     }
 

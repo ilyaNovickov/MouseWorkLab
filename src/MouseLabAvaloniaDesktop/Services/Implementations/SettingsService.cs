@@ -22,8 +22,23 @@ public class SettingsService
 
     public AppSnapshot Current { get; private set; }
 
+    public SettingsService(AppSnapshot snapshot)
+    {
+        //System.AppContext.BaseDirectory - папка приложения
+        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        string dir = Path.Combine(appData, "MouseLab");
+
+        Directory.CreateDirectory(dir);
+
+        _filePath = Path.Combine(dir, "settings.json");
+
+        Current = snapshot;
+    }
+
     public SettingsService()
     {
+        //System.AppContext.BaseDirectory - папка приложения
         string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
         string dir = Path.Combine(appData, "MouseLab");

@@ -1,17 +1,19 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using MouseLabAvaloniaDesktop.Models;
+using MouseLabAvaloniaDesktop.Models.Settings;
+using MouseLabAvaloniaDesktop.Services.Implementations;
+using ProTranslate;
+using ProTranslate.Generated;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using MouseLabAvaloniaDesktop.Models;
-using ProTranslate;
-using ProTranslate.Generated;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
 public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISettingsSectionViewModel
 {
-    //private readonly IApplicationSettingsService _settings;
+    private readonly SettingsService _settings;
 
     private List<ThemeOption> availableThemes;
 
@@ -22,24 +24,24 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
     private CultureOption? selectedCulture;
 
     //public AppearanceSettingsViewModel(ITranslationService translation, IApplicationSettingsService settings) : base(translation)
-    public AppearanceSettingsViewModel(ITranslationService translation) : base(translation)
+    public AppearanceSettingsViewModel(ITranslationService translation, SettingsService settings) : base(translation)
     {
-        //_settings = settings;
+        _settings = settings;
 
         // Список языков задан вручную; при росте приложения его можно получать
         // из ProTranslateProviderManifest.Cultures, который SourceGenerator
         // собирает из имён файлов Strings.*.json.
         availableCultures =
         [
-            new CultureOption("en-US", Describe("en-US")),
             new CultureOption("ru-RU", Describe("ru-RU")),
+            new CultureOption("en-US", Describe("en-US"))
         ];
 
         availableThemes =
         [
+            new ThemeOption(Strings.Observe_CommonDefaultTheme(), Themes.Default),
             new ThemeOption(Strings.Observe_CommonDarkTheme(), Themes.Dark),
-            new ThemeOption(Strings.Observe_CommonLightTheme(), Themes.Light),
-            new ThemeOption(Strings.Observe_CommonDefaultTheme(), Themes.Default)
+            new ThemeOption(Strings.Observe_CommonLightTheme(), Themes.Light)
         ];
 
         // Выставляем в ComboBox значения, реально применённые в настройках,
@@ -77,6 +79,15 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
         if (SelectedCulture is not null)
             _settings.CurrentCultureName = SelectedCulture.CultureName;
             */
+        if (SelectedTheme is not null)
+        {
+            _settings.Current.UiSettings.Theme = SelectedTheme.Theme;
+        }
+
+        if (SelectedCulture is not null)
+        {
+            _settings.Current.UiSettings.Culture = UiSettings.ResolveCulture(SelectedCulture.CultureName);
+        }
     }
 
     /// <summary>
@@ -84,8 +95,8 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
     /// </summary>
     public void Reset()
     {
-        SyncSelectedTheme();
-        SyncSelectedCulture();
+        //SyncSelectedTheme();
+        //SyncSelectedCulture();
     }
 
     // Название языка на самом языке («русский (Россия)»), чтобы список был
@@ -102,6 +113,7 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
         /*
         selectedTheme = AvailableThemes.FirstOrDefault(t => t.Theme == _settings.CurrentAppTheme);
         */
+        selectedTheme = AvailableThemes.FirstOrDefault(t => t.Theme == _settings.Current.UiSettings.Theme);
         OnPropertyChanged(nameof(SelectedTheme));
     }
 
@@ -111,6 +123,11 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
         selectedCulture = AvailableCultures.FirstOrDefault(
             c => string.Equals(c.CultureName, _settings.CurrentCultureName, StringComparison.OrdinalIgnoreCase));
             */
+        selectedCulture = AvailableCultures.FirstOrDefault(c => string.Equals(
+            c.CultureName, 
+            _settings.Current.UiSettings.Culture.Name, 
+            StringComparison.OrdinalIgnoreCase
+            ));
         OnPropertyChanged(nameof(SelectedCulture));
     }
 
