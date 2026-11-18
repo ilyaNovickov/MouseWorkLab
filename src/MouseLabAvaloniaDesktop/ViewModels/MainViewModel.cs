@@ -7,15 +7,13 @@ namespace MouseLabAvaloniaDesktop.ViewModels;
 
 public partial class MainViewModel : TranslatedViewModelBase
 {
-    private readonly IDialogService _dialogService;
 
-    public MainViewModel(ITranslationService translation, IDialogService dialogService) : base(translation)
+
+    public MainViewModel(ITranslationService translation, MenuViewModel menuViewModel) : base(translation)
     {
-        _dialogService = dialogService;
+        MenuViewModel = menuViewModel;
     }
 
-
-    [RelayCommand]
-    private void ShowSettings() => _dialogService.Show<SettingsWindowViewModel>();
+    public MenuViewModel MenuViewModel { get; }
 }
 

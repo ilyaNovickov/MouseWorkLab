@@ -105,8 +105,9 @@ public class AppServices : IDisposable, IServiceProvider
                     */
 
         // пересмотреть
-        services.AddSingleton<FileDialogService>(sp => new FileDialogService(
-            (Application.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow!));
+        //services.AddSingleton<FileDialogService>(sp => new FileDialogService(
+        //    (Application.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow!));
+        services.AddSingleton<FileDialogService>();
 
         services.AddSingleton<ModelingSettings>();
         services.AddSingleton<UiSettings>();
@@ -135,6 +136,7 @@ public class AppServices : IDisposable, IServiceProvider
         services.AddTransient<AppearanceSettingsViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
 
+        services.AddTransient<MenuViewModel>();
         services.AddTransient<MainViewModel>();
         #endregion
 
