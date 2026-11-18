@@ -47,7 +47,11 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
 
     protected override void Dispose(bool disposing)
     {
-        _projectService.ProjectLoaded -= _projectService_ProjectLoaded;
+        if (disposing)
+        {
+            _projectService.ProjectLoaded -= _projectService_ProjectLoaded;
+        }
+        
         base.Dispose(disposing);
     }
 

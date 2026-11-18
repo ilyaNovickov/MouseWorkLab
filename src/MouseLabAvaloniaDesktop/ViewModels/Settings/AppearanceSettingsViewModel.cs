@@ -48,6 +48,14 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
         // а не первые в списке.
         SyncSelectedTheme();
         SyncSelectedCulture();
+
+        _projectService.ProjectLoaded += _projectService_ProjectLoaded;
+    }
+
+    private void _projectService_ProjectLoaded(object? sender, EventArgs e)
+    {
+        SyncSelectedTheme();
+        SyncSelectedCulture();
     }
 
     public IReadOnlyList<ThemeOption> AvailableThemes => availableThemes;
@@ -120,10 +128,9 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
 
     protected override void Dispose(bool disposing)
     {
-        base.Dispose(disposing);
-
         if (disposing)
         {
+            this._projectService.ProjectLoaded -= _projectService_ProjectLoaded;
             // ProTranslateStrings.Dispose() не освобождает наблюдаемые строки,
             // выданные Strings.Observe_*(); ими владеет тот, кто их создал.
             foreach (ThemeOption option in availableThemes)
@@ -132,5 +139,7 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
             availableThemes = [];
             availableCultures = [];
         }
+
+        base.Dispose(disposing);
     }
 }
