@@ -7,6 +7,7 @@
         xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels"
         xmlns:views="using:MouseLabAvaloniaDesktop.Views"
         x:DataType="vm:SettingsWindowViewModel"
+        IsEnabled="{Binding IsEnable}"
         Title="SettingsWindow">
         <DockPanel LastChildFill="True">
           <Border DockPanel.Dock="Bottom">

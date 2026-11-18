@@ -23,8 +23,8 @@ public partial class App : Application
 
     public void OnShutdown()
     {
-        var settingsService = _appServices.GetRequiredService<SettingsService>();
-        settingsService.Current.UiSettings.PropertyChanged -= _uiChangedHandler;
+        var settingsService = _appServices.GetRequiredService<ProjectService>();
+        settingsService.UiSettings.PropertyChanged -= _uiChangedHandler;
 
         _appServices.Dispose();
     }
@@ -37,18 +37,18 @@ public partial class App : Application
         {
             desktop.Exit += (_, _) => OnShutdown();
 
-            var settingsService = _appServices.GetRequiredService<SettingsService>();
+            var projectService = _appServices.GetRequiredService<ProjectService>();
             _uiChangedHandler = (object? s, PropertyChangedEventArgs e) =>
             {
                 switch (e.PropertyName)
                 {
-                    case nameof(settingsService.Current.UiSettings.Culture):
+                    case nameof(projectService.UiSettings.Culture):
                         // ??
                         var cultureService = _appServices.GetRequiredService<ICultureService>();
-                        cultureService.SetCulture(UiSettings.ResolveCulture(settingsService.Current.UiSettings.Culture.Name));
+                        cultureService.SetCulture(UiSettings.ResolveCulture(projectService.UiSettings.Culture));
                         break;
-                    case nameof(settingsService.Current.UiSettings.Theme):
-                        RequestedThemeVariant = settingsService.Current.UiSettings.Theme switch
+                    case nameof(projectService.UiSettings.Theme):
+                        RequestedThemeVariant = projectService.UiSettings.Theme switch
                         {
                             Models.Themes.Light => Avalonia.Styling.ThemeVariant.Light,
                             Models.Themes.Dark => Avalonia.Styling.ThemeVariant.Dark,
@@ -59,7 +59,7 @@ public partial class App : Application
                         break;
                 }
             };
-            settingsService.Current.UiSettings.PropertyChanged += _uiChangedHandler;
+            projectService.UiSettings.PropertyChanged += _uiChangedHandler;
 
             desktop.MainWindow = new MainWindow
             {

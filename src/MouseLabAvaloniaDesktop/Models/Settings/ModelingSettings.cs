@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MouseLabAvaloniaDesktop.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,19 +8,29 @@ using System.Text.Json.Serialization;
 
 namespace MouseLabAvaloniaDesktop.Models.Settings
 {
-    [GenerateCopyFrom]
-    public partial class ModelingSettings : ObservableObject
+    public partial class ModelingSettings : ObservableObject, IDataTransferObject<ModelingSettingsDto>
     {
         public const int DefaultWorktopResolution = 8_192;
 
-        //[ObservableProperty]
-        //[property: JsonInclude]
-        public bool IsExperimentalSettings { get; set => SetProperty(ref field, value); } = false;
+        public bool IsExperimentalSettings 
+        { 
+            get;
+            set
+            {
+                if (SetProperty(ref field, value))
+                {
+                    if (field) 
+                        OnPropertyChanged(nameof(WorktopResolution));
+                }
+            }
+        } = false;
 
 
-        //[ObservableProperty]
-        //[property: JsonInclude]
-        public int WorktopResolution { get; set => SetProperty(ref field, value); } = DefaultWorktopResolution;
+        public int WorktopResolution 
+        { 
+            get => IsExperimentalSettings ? field : DefaultWorktopResolution; 
+            set => SetProperty(ref field, value); 
+        } = DefaultWorktopResolution;
 
         public void ValidateProperties()
         {
@@ -31,6 +42,22 @@ namespace MouseLabAvaloniaDesktop.Models.Settings
             {
                 WorktopResolution = DefaultWorktopResolution;
             }
+        }
+
+        public void LoadDto(ModelingSettingsDto value)
+        {
+            this.IsExperimentalSettings = value.IsExperimentalSettings;
+            this.WorktopResolution = value.WorktopResolution;
+            this.ValidateProperties();
+        }
+
+        public ModelingSettingsDto ToDto()
+        {
+            return new ModelingSettingsDto()
+            {
+                IsExperimentalSettings = this.IsExperimentalSettings,
+                WorktopResolution = this.WorktopResolution
+            };
         }
     }
 }

@@ -13,7 +13,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels;
 
 public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISettingsSectionViewModel
 {
-    private readonly SettingsService _settings;
+    private readonly ProjectService _projectService;
 
     private List<ThemeOption> availableThemes;
 
@@ -24,9 +24,9 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
     private CultureOption? selectedCulture;
 
     //public AppearanceSettingsViewModel(ITranslationService translation, IApplicationSettingsService settings) : base(translation)
-    public AppearanceSettingsViewModel(ITranslationService translation, SettingsService settings) : base(translation)
+    public AppearanceSettingsViewModel(ITranslationService translation, ProjectService projectService) : base(translation)
     {
-        _settings = settings;
+        _projectService = projectService;
 
         // Список языков задан вручную; при росте приложения его можно получать
         // из ProTranslateProviderManifest.Cultures, который SourceGenerator
@@ -72,21 +72,14 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
     /// </summary>
     public void Save()
     {
-        /*
-        if (SelectedTheme is not null)
-            _settings.CurrentAppTheme = SelectedTheme.Theme;
-
-        if (SelectedCulture is not null)
-            _settings.CurrentCultureName = SelectedCulture.CultureName;
-            */
         if (SelectedTheme is not null)
         {
-            _settings.Current.UiSettings.Theme = SelectedTheme.Theme;
+            _projectService.UiSettings.Theme = SelectedTheme.Theme;
         }
 
         if (SelectedCulture is not null)
         {
-            _settings.Current.UiSettings.Culture = UiSettings.ResolveCulture(SelectedCulture.CultureName);
+           _projectService.UiSettings.Culture = SelectedCulture.CultureName;
         }
     }
 
@@ -95,8 +88,7 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
     /// </summary>
     public void Reset()
     {
-        //SyncSelectedTheme();
-        //SyncSelectedCulture();
+
     }
 
     // Название языка на самом языке («русский (Россия)»), чтобы список был
@@ -110,22 +102,17 @@ public partial class AppearanceSettingsViewModel : TranslatedViewModelBase, ISet
 
     private void SyncSelectedTheme()
     {
-        /*
-        selectedTheme = AvailableThemes.FirstOrDefault(t => t.Theme == _settings.CurrentAppTheme);
-        */
-        selectedTheme = AvailableThemes.FirstOrDefault(t => t.Theme == _settings.Current.UiSettings.Theme);
+
+        selectedTheme = AvailableThemes.FirstOrDefault(t => t.Theme == _projectService.UiSettings.Theme);
         OnPropertyChanged(nameof(SelectedTheme));
     }
 
     private void SyncSelectedCulture()
     {
-        /*
-        selectedCulture = AvailableCultures.FirstOrDefault(
-            c => string.Equals(c.CultureName, _settings.CurrentCultureName, StringComparison.OrdinalIgnoreCase));
-            */
+
         selectedCulture = AvailableCultures.FirstOrDefault(c => string.Equals(
             c.CultureName, 
-            _settings.Current.UiSettings.Culture.Name, 
+            _projectService.UiSettings.Culture, 
             StringComparison.OrdinalIgnoreCase
             ));
         OnPropertyChanged(nameof(SelectedCulture));

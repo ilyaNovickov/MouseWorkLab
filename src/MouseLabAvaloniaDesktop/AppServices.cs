@@ -1,12 +1,16 @@
-using System;
-using System.Globalization;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Extensions.DependencyInjection;
+using MouseLabAvaloniaDesktop.Models.Settings;
 using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.Services.Implementations;
-using ProTranslate;
-using ProTranslate.Generated;
-using ProTranslate.Avalonia;
 using MouseLabAvaloniaDesktop.ViewModels;
+using ProTranslate;
+using ProTranslate.Avalonia;
+using ProTranslate.Generated;
+using System;
+using System.Globalization;
 
 namespace MouseLabAvaloniaDesktop;
 
@@ -100,7 +104,19 @@ public class AppServices : IDisposable, IServiceProvider
                     }));
                     */
 
-        services.AddSingleton<SettingsService, SettingsService>();
+        // пересмотреть
+        services.AddSingleton<FileDialogService>(sp => new FileDialogService(
+            (Application.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow!));
+
+        services.AddSingleton<ModelingSettings>();
+        services.AddSingleton<UiSettings>();
+        services.AddSingleton<ProjectService, ProjectService>(sp =>
+        {
+            var modelingSettings = sp.GetRequiredService<ModelingSettings>();
+            var uiSettings = sp.GetRequiredService<UiSettings>();
+
+            return new ProjectService(uiSettings, modelingSettings);
+        });
 
         services.AddSingleton<IMatrixCutter, MatrixCutter>();
         services.AddSingleton<IMatrixRandomizer, MatrixRandomizer>();

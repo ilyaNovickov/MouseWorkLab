@@ -10,40 +10,17 @@ using System.Linq;
 
 namespace MouseLabAvaloniaDesktop.ViewModels;
 
-public partial class WorktopSizeViewModel : ViewModelBase
-{
-    public WorktopSizeViewModel(int size)
-    {
-        SizeResolution = size;
-    }
-
-    public int SizeResolution
-    {
-        get;
-        set
-        {
-            if (value < 0)
-                throw new ArgumentException("Размер не может быть отрицательным");
-            SetProperty(ref field, value);
-        }
-    }
-
-    public override string ToString()
-    {
-        return $"{SizeResolution}x{SizeResolution}";
-    }
-}
-
 public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISettingsSectionViewModel
 {
     private ObservableCollection<WorktopSizeViewModel> avaibleSizes;
 
-    private readonly SettingsService _settings;
+    private readonly ProjectService _projectService;
 
-    //public ModelingSettingsViewModel(ITranslationService translation, IApplicationSettingsService settings) : base(translation)
-    public ModelingSettingsViewModel(ITranslationService translation, SettingsService settings) : base(translation)
+#pragma warning disable CS8618 // Поле, не допускающее значения NULL, должно содержать значение, отличное от NULL, при выходе из конструктора. Рассмотрите возможность добавления модификатора "required" или объявления значения, допускающего значение NULL.
+    public ModelingSettingsViewModel(ITranslationService translation, ProjectService projectService) : base(translation)
+#pragma warning restore CS8618 // Поле, не допускающее значения NULL, должно содержать значение, отличное от NULL, при выходе из конструктора. Рассмотрите возможность добавления модификатора "required" или объявления значения, допускающего значение NULL.
     {
-        _settings = settings;
+        _projectService = projectService;
 
         int defaultResolution = ModelingSettings.DefaultWorktopResolution;
 
@@ -52,19 +29,26 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
             new WorktopSizeViewModel(2 * defaultResolution)
         ];
 
-        //OnPropertyChanged(nameof(AvaibleSizes));
-        //selectedSize = AvaibleSizes.First();
-        isExperimentalOptions = _settings.Current.ModelingSettings.IsExperimentalSettings;
+        _projectService.ProjectLoaded += _projectService_ProjectLoaded;
+
+        _projectService_ProjectLoaded(null, EventArgs.Empty);
+    }
+
+    private void _projectService_ProjectLoaded(object? sender, EventArgs e)
+    {
+        isExperimentalOptions = _projectService.ModelingSettings.IsExperimentalSettings;
         selectedSize = AvaibleSizes.FirstOrDefault(
-            s => s.SizeResolution == _settings.Current.ModelingSettings.WorktopResolution,
+            s => s.SizeResolution == _projectService.ModelingSettings.WorktopResolution,
             AvaibleSizes[0]
             );
+        OnPropertyChanged(nameof(IsExperimentalOptions));
+        OnPropertyChanged(nameof(SelectedSize));
+    }
 
-        // Рабочая копия стартует с значений, применённых сервисом, — иначе
-        // Reset после Save вернул бы не то, что реально сохранено.
-        
-        //selectedSize = AvaibleSizes.First(s => s.SizeResolution == _settings.Current.ModelingSettings.WorktopResolution);
-        //selectedSize = AvaibleSizes.First();
+    protected override void Dispose(bool disposing)
+    {
+        _projectService.ProjectLoaded -= _projectService_ProjectLoaded;
+        base.Dispose(disposing);
     }
 
     private bool isExperimentalOptions;
@@ -111,8 +95,8 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
     public void Save()
     {
         
-        _settings.Current.ModelingSettings.IsExperimentalSettings = IsExperimentalOptions;
-        _settings.Current.ModelingSettings.WorktopResolution = SelectedSize.SizeResolution;
+        _projectService.ModelingSettings.IsExperimentalSettings = IsExperimentalOptions;
+        _projectService.ModelingSettings.WorktopResolution = SelectedSize.SizeResolution;
         
     }
 
@@ -126,11 +110,30 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
     /// </remarks>
     public void Reset()
     {
-        /*
-        IsExperimentalOptions = _settings.ExperimentalOptions;
-        selectedSize = AvaibleSizes.FirstOrDefault(s => s.SizeResolution == _settings.WorktopResolution)
-            ?? AvaibleSizes.First();
-            */
-        //OnPropertyChanged(nameof(SelectedSize));
+
+    }
+}
+
+public partial class WorktopSizeViewModel : ViewModelBase
+{
+    public WorktopSizeViewModel(int size)
+    {
+        SizeResolution = size;
+    }
+
+    public int SizeResolution
+    {
+        get;
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException("Размер не может быть отрицательным");
+            SetProperty(ref field, value);
+        }
+    }
+
+    public override string ToString()
+    {
+        return $"{SizeResolution}x{SizeResolution}";
     }
 }

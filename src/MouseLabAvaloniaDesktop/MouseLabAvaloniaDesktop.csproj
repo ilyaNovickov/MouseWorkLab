@@ -83,8 +83,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MouseLabAvaloniaDesktop.Generators\MouseLabAvaloniaDesktop.Generators.csproj" 
-					  OutputItemType="Analyzer" 
-					  ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\MouseLabAvaloniaDesktop.Generators\MouseLabAvaloniaDesktop.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>
