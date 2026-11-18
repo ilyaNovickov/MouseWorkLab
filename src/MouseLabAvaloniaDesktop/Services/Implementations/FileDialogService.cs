@@ -9,6 +9,21 @@ using System.Threading.Tasks;
 
 namespace MouseLabAvaloniaDesktop.Services.Implementations
 {
+    /*
+    public abstract class FileDialogInfo
+    {
+        public string? Title { get; set; }
+    }
+
+    public class OpenFileDialogInfo : FileDialogInfo
+    {
+
+        public bool AllowMultiple { get; set; }
+
+        public string? SuggestedFileName { get; set; }
+    }
+    */
+
     public class FileDialogService
     {
         //private readonly Window _target;
