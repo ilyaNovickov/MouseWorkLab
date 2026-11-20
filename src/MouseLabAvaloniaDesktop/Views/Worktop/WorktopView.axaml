@@ -4,11 +4,86 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels.Worktop"
+             xmlns:paz="using:Avalonia.Controls.PanAndZoom"
              xmlns:v="using:MouseLabAvaloniaDesktop.Views"
              x:Class="MouseLabAvaloniaDesktop.Views.WorktopView"
              x:DataType="vm:WorktopViewModel">
-    <v:WorktopCanvasView DataContext="{Binding WorktopCanvasViewModel}"/>
+    <UserControl.Styles>
+        <Style Selector="TextBlock.center">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="1,0,1,0"/>
+        </Style>
+    </UserControl.Styles>
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <Button Content="foo"/>
+        </Menu>
+        <Border DockPanel.Dock="Bottom"
+                Margin="5,5,5,5"
+                BorderBrush="Red"
+                BorderThickness="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Classes="center" Grid.Column="0" Text="Сид"/>
+                <TextBox Grid.Column="1"
+                         Name="seedTextBox"
+                         Margin="3,5,0,5"
+                         Width="120"
+                         MinWidth="120"
+                         MaxWidth="120"
+                         TextInputOptions.ContentType="Number">
+                    <TextBox.InnerRightContent>
+                        <Button Content="✕"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="4" />
+                    </TextBox.InnerRightContent>
+                </TextBox>
+                <Button Grid.Column="2"
+                        Margin="3,3,3,3"
+                        Content="Генерация" />
+                <TextBlock Classes="center" 
+                            Grid.Column="4" 
+                            Text="Масштаб"/>
+                <TextBlock Classes="center" 
+                           Grid.Column="5" 
+                           Text="{Binding #zoomBorder.ZoomX, StringFormat={}{0:0.00}}"/>
+                <Button Grid.Column="6"
+                        Margin="3,3,3,3"
+                        Content="Сброс"
+                        Command="{Binding #zoomBorder.FitCommand}" />
+            </Grid>
+        </Border>
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto">
+            <paz:ZoomBorder Name="zoomBorder"
+                            DoubleClickZoomMode="ZoomToFit"
+                            MinZoomX="0.2"
+                            MinZoomY="0.2"
+                            Background="DimGray"
+                            MinimumVisibleContentPercentage="0.01"
+                            AutoCalculateMaxZoom="True"
+                            MaxZoomPixelSize="200">
+                
+                    <Rectangle Width="100"
+                            Height="900"
+                            Fill="red" />
+                
+            </paz:ZoomBorder>
+        </ScrollViewer>
+    </DockPanel>
     <!--
+<v:WorktopCanvasView DataContext="{Binding WorktopCanvasViewModel}"/>
+    -->
+<!--
     <Grid>
     <Canvas Background="red">
         

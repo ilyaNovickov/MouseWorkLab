@@ -13,7 +13,7 @@
     <DockPanel LastChildFill="True">
         <v:MenuView DockPanel.Dock="Top"
                     DataContext="{Binding MenuViewModel}"/>
-
+        <v:WorktopView DataContext="{Binding WorktopViewModel}" />
     </DockPanel>
 
 </Window>
