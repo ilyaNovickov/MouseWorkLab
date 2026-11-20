@@ -26,7 +26,9 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
 
         avaibleSizes = [
             new WorktopSizeViewModel(defaultResolution),
-            new WorktopSizeViewModel(2 * defaultResolution)
+            new WorktopSizeViewModel(4 * defaultResolution),
+            new WorktopSizeViewModel(8 * defaultResolution),
+            new WorktopSizeViewModel(16 * defaultResolution)
         ];
 
         _projectService.ProjectLoaded += _projectService_ProjectLoaded;
@@ -51,7 +53,7 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
         {
             _projectService.ProjectLoaded -= _projectService_ProjectLoaded;
         }
-        
+
         base.Dispose(disposing);
     }
 
@@ -98,10 +100,10 @@ public partial class ModelingSettingsViewModel : TranslatedViewModelBase, ISetti
     /// </summary>
     public void Save()
     {
-        
+
         _projectService.ModelingSettings.IsExperimentalSettings = IsExperimentalOptions;
         _projectService.ModelingSettings.WorktopResolution = SelectedSize.SizeResolution;
-        
+
     }
 
     /// <summary>

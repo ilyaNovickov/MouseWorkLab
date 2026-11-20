@@ -95,22 +95,4 @@
             </paz:ZoomBorder>
         </ScrollViewer>
     </DockPanel>
-    <!--
-<v:WorktopCanvasView DataContext="{Binding WorktopCanvasViewModel}"/>
-    -->
-<!--
-    <Grid>
-    <Canvas Background="red">
-        
-    </Canvas>
-    <Canvas Background="blue" 
-                Width="100" 
-                Height="100">
-            <Rectangle Fill="Gray" 
-                       Width="10" 
-                       Height="10"
-                       Canvas.Left="-10"/>
-    </Canvas>
-    </Grid>
-    -->
 </UserControl>

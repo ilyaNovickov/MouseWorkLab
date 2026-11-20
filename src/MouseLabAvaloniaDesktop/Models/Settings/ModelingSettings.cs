@@ -10,26 +10,26 @@ namespace MouseLabAvaloniaDesktop.Models.Settings
 {
     public partial class ModelingSettings : ObservableObject, IDataTransferObject<ModelingSettingsDto>
     {
-        public const int DefaultWorktopResolution = 8_192;
+        public const int DefaultWorktopResolution = 1024;
 
-        public bool IsExperimentalSettings 
-        { 
+        public bool IsExperimentalSettings
+        {
             get;
             set
             {
                 if (SetProperty(ref field, value))
                 {
-                    if (field) 
+                    if (field)
                         OnPropertyChanged(nameof(WorktopResolution));
                 }
             }
         } = false;
 
 
-        public int WorktopResolution 
-        { 
-            get => IsExperimentalSettings ? field : DefaultWorktopResolution; 
-            set => SetProperty(ref field, value); 
+        public int WorktopResolution
+        {
+            get => IsExperimentalSettings ? field : DefaultWorktopResolution;
+            set => SetProperty(ref field, value);
         } = DefaultWorktopResolution;
 
         public void ValidateProperties()

@@ -71,9 +71,6 @@ namespace MouseLabAvaloniaDesktop.ViewModels
             return file.Path.AbsolutePath;
         }
 
-        /*
-               < MenuItem Header="Загрузить проект"/>*/
-
         [RelayCommand]
         private async Task LoadProject()
         {

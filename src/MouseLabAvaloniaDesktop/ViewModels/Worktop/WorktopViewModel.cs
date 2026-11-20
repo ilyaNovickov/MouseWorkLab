@@ -99,7 +99,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         public int AvaibleResolution
         {
             get;
-            set
+            private set
             {
                 if (SetProperty(ref field, value))
                 {
@@ -113,7 +113,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         public partial int WorktopPosition
         {
             get;
-            set;
+            private set;
         }
 
         //private Matrix matrix = new(500, 500);
