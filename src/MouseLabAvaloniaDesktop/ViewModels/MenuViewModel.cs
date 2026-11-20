@@ -31,7 +31,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels
         [RelayCommand]
         private async Task CreateProject()
         {
-            var file = await GetProjectFilePathAsync();
+            var file = await GetProjectFilePathAsync(T("FileDialog.SaveProjectTitle"));
 
             if (file is null)
                 return;
@@ -44,7 +44,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels
         {
             if (!File.Exists(_projectService.CurrentFilePath))
             {
-                var file = await GetProjectFilePathAsync();
+                var file = await GetProjectFilePathAsync(T("FileDialog.SaveProjectTitle"));
                 if (file is null)
                     return;
                 _projectService.SaveTo(file);
@@ -55,9 +55,9 @@ namespace MouseLabAvaloniaDesktop.ViewModels
             }
         }
 
-        private async Task<string?> GetProjectFilePathAsync()
+        private async Task<string?> GetProjectFilePathAsync(string title)
         {
-            var file = await _fileDialogService.SaveFileAsync([FilePickerFileTypes.Json]);
+            var file = await _fileDialogService.SaveFileAsync(title, [CreateJsonFilter()]);
 
             if (file is null)
                 return null;
@@ -71,10 +71,14 @@ namespace MouseLabAvaloniaDesktop.ViewModels
             return file.Path.AbsolutePath;
         }
 
+        private FilePickerFileType CreateJsonFilter() =>
+            new(T("FileDialog.JsonFilter")) { Patterns = ["*.json"] };
+
         [RelayCommand]
         private async Task LoadProject()
         {
-            var file = await _fileDialogService.OpenFileAsync([FilePickerFileTypes.Json]);
+            var file = await _fileDialogService.OpenFileAsync(
+                T("FileDialog.OpenProjectTitle"), [CreateJsonFilter()]);
 
             if (file is null)
                 return;

@@ -33,23 +33,25 @@ namespace MouseLabAvaloniaDesktop.Services.Implementations
         //    _target = target;
         //}
 
-        public async Task<IStorageFile?> OpenFileAsync(IReadOnlyList<FilePickerFileType>? filePickerFiles = null)
+        public async Task<IStorageFile?> OpenFileAsync(string title,
+            IReadOnlyList<FilePickerFileType>? filePickerFiles = null)
         {
             var files = await GetWindow().StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
             {
-                Title = "Open Text File",
-                AllowMultiple = false, 
+                Title = title,
+                AllowMultiple = false,
                 FileTypeFilter = filePickerFiles
             });
-            
+
             return files.Count >= 1 ? files[0] : null;
         }
 
-        public async Task<IStorageFile?> SaveFileAsync(IReadOnlyList<FilePickerFileType>? filePickerFiles = null)
+        public async Task<IStorageFile?> SaveFileAsync(string title,
+            IReadOnlyList<FilePickerFileType>? filePickerFiles = null)
         {
             return await GetWindow().StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
             {
-                Title = "Save Text File", 
+                Title = title,
                 ShowOverwritePrompt = true,
                 FileTypeChoices = filePickerFiles
             });

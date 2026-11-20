@@ -42,6 +42,12 @@
     "WorktopSize": "Размеры полотна"
   },
 
+  "FileDialog": {
+    "OpenProjectTitle": "Открыть проект",
+    "SaveProjectTitle": "Сохранить проект",
+    "JsonFilter": "Файлы JSON (*.json)"
+  },
+
   "Common": {
     "Save": "Сохранить",
     "Cancel": "Отмена",

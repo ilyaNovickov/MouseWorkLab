@@ -45,6 +45,12 @@
     "WorktopSize": "Worktop size"
   },
 
+  "FileDialog": {
+    "OpenProjectTitle": "Open project",
+    "SaveProjectTitle": "Save project",
+    "JsonFilter": "JSON files (*.json)"
+  },
+
   "Common": {
     "Save": "Save",
     "Cancel": "Cancel",
