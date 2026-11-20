@@ -65,10 +65,10 @@ namespace MouseLabAvaloniaDesktop.ViewModels
             if (Path.GetExtension(file.Path.LocalPath) != ".json")
                 return null;
 
-            // gnu/linux не поддерживает кириллические пути ?
-            File.Create(file.Path.AbsolutePath).Close();
+            // AbsolutePath — экранированный URI-путь (%D0%A8...), LocalPath декодирует его.
+            File.Create(file.Path.LocalPath).Close();
 
-            return file.Path.AbsolutePath;
+            return file.Path.LocalPath;
         }
 
         private FilePickerFileType CreateJsonFilter() =>
@@ -86,10 +86,10 @@ namespace MouseLabAvaloniaDesktop.ViewModels
             if (Path.GetExtension(file.Path.LocalPath) != ".json")
                 return;
 
-            if (!File.Exists(file.Path.AbsolutePath))
+            if (!File.Exists(file.Path.LocalPath))
                 return;
 
-            _projectService.Load(file.Path.AbsolutePath);
+            _projectService.Load(file.Path.LocalPath);
         }
 
         [RelayCommand]
