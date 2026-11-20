@@ -6,6 +6,7 @@ using MouseLabAvaloniaDesktop.Models.Settings;
 using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels;
+using MouseLabAvaloniaDesktop.ViewModels.Worktop;
 using ProTranslate;
 using ProTranslate.Avalonia;
 using ProTranslate.Generated;
@@ -123,7 +124,7 @@ public class AppServices : IDisposable, IServiceProvider
         services.AddSingleton<IMatrixRandomizer, MatrixRandomizer>();
         services.AddSingleton<IMoveFinderFactory, MoveFinderFactory>();
         services.AddSingleton<IMoveFinderManager, MoveFinderManager>();
-        //services.AddSingleton<ModelingEnv, ModelingEnv>();
+        services.AddSingleton<ModelingEnv, ModelingEnv>();
 
         services.AddSingleton<IDialogService, DialogService>();
         #endregion
@@ -135,6 +136,9 @@ public class AppServices : IDisposable, IServiceProvider
         services.AddTransient<ModelingSettingsViewModel>();
         services.AddTransient<AppearanceSettingsViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
+
+        services.AddTransient<WorktopCanvasViewModel>();
+        services.AddTransient<WorktopViewModel>();
 
         services.AddTransient<MenuViewModel>();
         services.AddTransient<MainViewModel>();

@@ -2,12 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="MouseLabAvaloniaDesktop.App"
              xmlns:local="using:MouseLabAvaloniaDesktop"
+             xmlns:conv="using:MouseLabAvaloniaDesktop.Converters"
              RequestedThemeVariant="Light">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <local:ViewLocator />
     </Application.DataTemplates>
+
+    <Application.Resources>
+        <conv:ReadOnlyMatrixConverter x:Key="MatrixToImage" />
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
