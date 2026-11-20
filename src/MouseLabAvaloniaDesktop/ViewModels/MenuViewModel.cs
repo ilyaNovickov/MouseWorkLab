@@ -18,8 +18,8 @@ namespace MouseLabAvaloniaDesktop.ViewModels
         private readonly FileDialogService _fileDialogService;
         private readonly ProjectService _projectService;
 
-        public MenuViewModel(ITranslationService translation, 
-            IDialogService dialogService, 
+        public MenuViewModel(ITranslationService translation,
+            IDialogService dialogService,
             FileDialogService fileDialogService,
             ProjectService projectService) : base(translation)
         {
@@ -38,14 +38,14 @@ namespace MouseLabAvaloniaDesktop.ViewModels
 
             _projectService.SaveTo(file);
         }
-        
+
         [RelayCommand]
         private async Task SaveProject()
         {
             if (!File.Exists(_projectService.CurrentFilePath))
             {
                 var file = await GetProjectFilePathAsync();
-                if (file is null) 
+                if (file is null)
                     return;
                 _projectService.SaveTo(file);
             }
@@ -65,6 +65,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels
             if (Path.GetExtension(file.Path.LocalPath) != ".json")
                 return null;
 
+            // gnu/linux не поддерживает кириллические пути ?
             File.Create(file.Path.AbsolutePath).Close();
 
             return file.Path.AbsolutePath;

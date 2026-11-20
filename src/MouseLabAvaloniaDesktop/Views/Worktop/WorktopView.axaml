@@ -39,17 +39,20 @@
                          Width="120"
                          MinWidth="120"
                          MaxWidth="120"
-                         TextInputOptions.ContentType="Number">
+                         TextInputOptions.ContentType="Number"
+                         Text="{Binding Seed}">
                     <TextBox.InnerRightContent>
                         <Button Content="✕"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Padding="4" />
+                                Padding="4"
+                                Command="{Binding #seedTextBox.Clear}" />
                     </TextBox.InnerRightContent>
                 </TextBox>
                 <Button Grid.Column="2"
                         Margin="3,3,3,3"
-                        Content="Генерация" />
+                        Content="Генерация"
+                        Command="{Binding GenerateWorktopCommand}" />
                 <TextBlock Classes="center" 
                             Grid.Column="4" 
                             Text="Масштаб"/>
@@ -63,7 +66,7 @@
             </Grid>
         </Border>
         <ScrollViewer VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Auto">
+                      HorizontalScrollBarVisibility="Auto">
             <paz:ZoomBorder Name="zoomBorder"
                             DoubleClickZoomMode="ZoomToFit"
                             MinZoomX="0.2"
@@ -73,10 +76,22 @@
                             AutoCalculateMaxZoom="True"
                             MaxZoomPixelSize="200">
                 
-                    <Rectangle Width="100"
-                            Height="900"
-                            Fill="red" />
-                
+                    <Canvas Name="mainCanvas"
+                            Width="{Binding AvaibleResolution}"
+                            Height="{Binding AvaibleResolution}"
+                            Background="Transparent" >
+                        <Image Name="worktop"
+                               RenderOptions.BitmapInterpolationMode="None"
+                               Source="{Binding Worktop, Converter={StaticResource MatrixToImage}, Mode=OneWay}"
+                               Canvas.Left="{Binding WorktopPosition}"
+                               Canvas.Top="{Binding WorktopPosition}" />
+                        <Canvas Name="upperCanvas"
+                                Background="#2AA52A2A"
+                                Canvas.Left="0"
+                                Canvas.Top="0"
+                                Width="{Binding AvaibleResolution}"
+                                Height="{Binding AvaibleResolution}" />
+                    </Canvas>
             </paz:ZoomBorder>
         </ScrollViewer>
     </DockPanel>

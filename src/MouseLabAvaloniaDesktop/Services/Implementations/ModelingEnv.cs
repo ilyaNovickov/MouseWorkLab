@@ -14,8 +14,8 @@ namespace MouseLabAvaloniaDesktop.Services.Implementations
 
         public ModelingEnv(IMatrixRandomizer matrixRandomizer)
         {
-            //_worktop = new Matrix(ModelingSettings.DefaultWorktopResolution, ModelingSettings.DefaultWorktopResolution);
-            _worktop = new Matrix(512, 512);
+            _worktop = new Matrix(ModelingSettings.DefaultWorktopResolution, ModelingSettings.DefaultWorktopResolution);
+            //_worktop = new Matrix(512, 512);
             _matrixRandomizer = matrixRandomizer;
         }
 
@@ -30,6 +30,14 @@ namespace MouseLabAvaloniaDesktop.Services.Implementations
                 seed = Random.Shared.Next();
             }
             Seed = seed;
+
+            if (_worktop.Width != resolution)
+            {
+                var old = _worktop;
+                _worktop = new Matrix(resolution, resolution);
+                old.Dispose();
+            }
+
             _matrixRandomizer.Randomize(_worktop.SpanBytes, Seed);
         }
 

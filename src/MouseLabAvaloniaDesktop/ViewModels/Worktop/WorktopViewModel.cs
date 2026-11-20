@@ -1,11 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MouseLabAvaloniaDesktop.Models;
 using MouseLabAvaloniaDesktop.Models.Settings;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using ProTranslate;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 {
@@ -15,17 +18,19 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         private readonly ModelingSettings _modelingSettings;
 
         public WorktopViewModel(
-            ITranslationService translation, 
-            WorktopCanvasViewModel worktopCanvasViewModel,
+            ITranslationService translation,
+            //WorktopCanvasViewModel worktopCanvasViewModel,
             ModelingEnv modelingEnv,
             ModelingSettings modelingSettings
             ) : base(translation)
         {
-            WorktopCanvasViewModel = worktopCanvasViewModel;
+            //WorktopCanvasViewModel = worktopCanvasViewModel;
             _modelingEnv = modelingEnv;
             _modelingSettings = modelingSettings;
 
             _modelingSettings.PropertyChanged += _modelingSettings_PropertyChanged;
+
+            OnWorktopChanged();
         }
 
         private void _modelingSettings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -34,7 +39,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
                 && _modelingEnv.Worktop.Width == _modelingSettings.WorktopResolution;
         }
 
-        public WorktopCanvasViewModel WorktopCanvasViewModel { get; }
+        //public WorktopCanvasViewModel WorktopCanvasViewModel { get; }
 
         public string? Seed
         {
@@ -76,12 +81,17 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         private bool isNeedGeneration;
 
         [RelayCommand]
-        private void GenerateWorktop()
+        private async Task GenerateWorktop()
         {
-            _modelingEnv.GenerateNewWorktop(_modelingSettings.WorktopResolution, GetSeedFromString(Seed));
-            IsNeedGeneration = false;
-            AvaibleResolution = (int)(_modelingEnv.Worktop.Size.Width * (1.00d + 2d * Marging));
-            OnPropertyChanged(nameof(Worktop));
+            await Task.Run(() =>
+            {
+                _modelingEnv.GenerateNewWorktop(_modelingSettings.WorktopResolution, GetSeedFromString(Seed));
+                //Thread.Sleep(2000);
+            });
+
+
+            //OnPropertyChanged(nameof(Worktop));
+            OnWorktopChanged();
         }
 
         private const double Marging = 0.10d;
@@ -93,9 +103,36 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             {
                 if (SetProperty(ref field, value))
                 {
-                    WorktopCanvasViewModel.SetCanvasDiff(field, _modelingEnv.Worktop.Size.Width);
+                    //WorktopCanvasViewModel.SetCanvasDiff(field, _modelingEnv.Worktop.Size.Width);
                 }
             }
+        }
+
+        // использовать double ?
+        [ObservableProperty]
+        public partial int WorktopPosition
+        {
+            get;
+            set;
+        }
+
+        //private Matrix matrix = new(500, 500);
+        public IReadOnlyMatrix Worktop
+        {
+            //get => matrix;
+            get => _modelingEnv.Worktop;
+        }
+
+        private void OnWorktopChanged()
+        {
+            IsNeedGeneration = false;
+            //AvaibleResolution = (int)(matrix.Size.Width * (1.00d + 2d * Marging));
+            //Diff = (AvaibleResolution - matrix.Width) / 2;
+
+            AvaibleResolution = (int)(_modelingEnv.Worktop.Size.Width * (1.00d + 2d * Marging));
+            WorktopPosition = (AvaibleResolution - _modelingEnv.Worktop.Width) / 2;
+
+            OnPropertyChanged(nameof(Worktop));
         }
     }
 }

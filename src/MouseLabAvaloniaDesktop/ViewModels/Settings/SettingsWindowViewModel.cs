@@ -16,13 +16,19 @@ public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogR
 
     private readonly FileDialogService _fileDialogService;
 
+    // only for command usage
+    private readonly MenuViewModel _menuViewModel;
+
     public SettingsWindowViewModel(
         ITranslationService translation,
         FileDialogService fileDialogService,
         ProjectService projectService,
+        MenuViewModel menuViewModel,
         ModelingSettingsViewModel modelingSettingsViewModel,
         AppearanceSettingsViewModel appearanceSettingsViewModel) : base(translation)
     {
+        _menuViewModel = menuViewModel;
+
         _fileDialogService = fileDialogService;
         _projectService = projectService;
 
@@ -42,6 +48,7 @@ public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogR
             section.Save();
 
         IsEnable = false;
+        /*
         // Пересмотреть
         if (!File.Exists(_projectService.CurrentFilePath))
         {
@@ -57,6 +64,9 @@ public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogR
         {
             _projectService.Save();
         }
+        */
+        await _menuViewModel.SaveProjectCommand.ExecuteAsync(null);
+
         IsEnable = true;
     }
 
