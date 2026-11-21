@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,25 +11,15 @@ namespace MouseLabAvaloniaDesktop.ViewModels;
 
 public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogResult
 {
-    private readonly ProjectService _projectService;
-
-    private readonly FileDialogService _fileDialogService;
-
-    // only for command usage
-    private readonly MenuViewModel _menuViewModel;
+    private readonly ProjectFileService _projectFileService;
 
     public SettingsWindowViewModel(
         ITranslationService translation,
-        FileDialogService fileDialogService,
-        ProjectService projectService,
-        MenuViewModel menuViewModel,
+        ProjectFileService projectFileService,
         ModelingSettingsViewModel modelingSettingsViewModel,
         AppearanceSettingsViewModel appearanceSettingsViewModel) : base(translation)
     {
-        _menuViewModel = menuViewModel;
-
-        _fileDialogService = fileDialogService;
-        _projectService = projectService;
+        _projectFileService = projectFileService;
 
         SettingsVM = [modelingSettingsViewModel, appearanceSettingsViewModel];
     }
@@ -48,25 +37,8 @@ public partial class SettingsWindowViewModel : TranslatedViewModelBase, IDialogR
             section.Save();
 
         IsEnable = false;
-        /*
-        // Пересмотреть
-        if (!File.Exists(_projectService.CurrentFilePath))
-        {
-            var savedFile = await _fileDialogService.SaveFileAsync();
-            if (savedFile is null)
-                return;
-            if (Path.GetExtension(savedFile.Path.LocalPath) != ".json")
-                throw new Exception("File has to be json");
-            File.Create(savedFile.Path.AbsolutePath).Close();
-            _projectService.SaveTo(savedFile.Path.AbsolutePath);
-        }
-        else
-        {
-            _projectService.Save();
-        }
-        */
-        await _menuViewModel.SaveProjectCommand.ExecuteAsync(null);
-
+        await _projectFileService.SaveAsync(
+            T("FileDialog.SaveProjectTitle"), T("FileDialog.JsonFilter"));
         IsEnable = true;
     }
 

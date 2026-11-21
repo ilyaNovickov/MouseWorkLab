@@ -120,6 +120,7 @@ public class AppServices : IDisposable, IServiceProvider
             return new ProjectService(uiSettings, modelingSettings);
         });
 
+        services.AddSingleton<ProjectFileService>();
         services.AddSingleton<IMatrixCutter, MatrixCutter>();
         services.AddSingleton<IMatrixRandomizer, MatrixRandomizer>();
         services.AddSingleton<IMoveFinderFactory, MoveFinderFactory>();

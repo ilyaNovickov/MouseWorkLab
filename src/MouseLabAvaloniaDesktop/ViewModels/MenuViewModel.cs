@@ -2,95 +2,37 @@
 using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using ProTranslate;
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Platform.Storage;
 
 namespace MouseLabAvaloniaDesktop.ViewModels
 {
     public partial class MenuViewModel : TranslatedViewModelBase
     {
         private readonly IDialogService _dialogService;
-        private readonly FileDialogService _fileDialogService;
-        private readonly ProjectService _projectService;
+        private readonly ProjectFileService _projectFileService;
 
         public MenuViewModel(ITranslationService translation,
             IDialogService dialogService,
-            FileDialogService fileDialogService,
-            ProjectService projectService) : base(translation)
+            ProjectFileService projectFileService) : base(translation)
         {
             _dialogService = dialogService;
-            _fileDialogService = fileDialogService;
-            _projectService = projectService;
+            _projectFileService = projectFileService;
         }
 
         [RelayCommand]
-        private async Task CreateProject()
-        {
-            var file = await GetProjectFilePathAsync(T("FileDialog.SaveProjectTitle"));
-
-            if (file is null)
-                return;
-
-            _projectService.SaveTo(file);
-        }
+        private Task CreateProject() =>
+            _projectFileService.CreateAsync(
+                T("FileDialog.SaveProjectTitle"), T("FileDialog.JsonFilter"));
 
         [RelayCommand]
-        private async Task SaveProject()
-        {
-            if (!File.Exists(_projectService.CurrentFilePath))
-            {
-                var file = await GetProjectFilePathAsync(T("FileDialog.SaveProjectTitle"));
-                if (file is null)
-                    return;
-                _projectService.SaveTo(file);
-            }
-            else
-            {
-                _projectService.Save();
-            }
-        }
-
-        private async Task<string?> GetProjectFilePathAsync(string title)
-        {
-            var file = await _fileDialogService.SaveFileAsync(title, [CreateJsonFilter()]);
-
-            if (file is null)
-                return null;
-
-            if (Path.GetExtension(file.Path.LocalPath) != ".json")
-                return null;
-
-            // AbsolutePath — экранированный URI-путь (%D0%A8...), LocalPath декодирует его.
-            File.Create(file.Path.LocalPath).Close();
-
-            return file.Path.LocalPath;
-        }
-
-        private FilePickerFileType CreateJsonFilter() =>
-            new(T("FileDialog.JsonFilter")) { Patterns = ["*.json"] };
+        private Task SaveProject() =>
+            _projectFileService.SaveAsync(
+                T("FileDialog.SaveProjectTitle"), T("FileDialog.JsonFilter"));
 
         [RelayCommand]
-        private async Task LoadProject()
-        {
-            var file = await _fileDialogService.OpenFileAsync(
-                T("FileDialog.OpenProjectTitle"), [CreateJsonFilter()]);
-
-            if (file is null)
-                return;
-
-            if (Path.GetExtension(file.Path.LocalPath) != ".json")
-                return;
-
-            if (!File.Exists(file.Path.LocalPath))
-                return;
-
-            _projectService.Load(file.Path.LocalPath);
-        }
+        private Task LoadProject() =>
+            _projectFileService.LoadAsync(
+                T("FileDialog.OpenProjectTitle"), T("FileDialog.JsonFilter"));
 
         [RelayCommand]
         private void ShowSettings() => _dialogService.Show<SettingsWindowViewModel>();
