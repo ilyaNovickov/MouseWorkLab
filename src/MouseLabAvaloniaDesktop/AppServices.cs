@@ -7,6 +7,7 @@ using MouseLabAvaloniaDesktop.Services.Abstractions;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels;
 using MouseLabAvaloniaDesktop.ViewModels.Worktop;
+using MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 using ProTranslate;
 using ProTranslate.Avalonia;
 using ProTranslate.Generated;
@@ -138,6 +139,7 @@ public class AppServices : IDisposable, IServiceProvider
         services.AddTransient<AppearanceSettingsViewModel>();
         services.AddTransient<SettingsWindowViewModel>();
 
+        services.AddTransient<NodeViewModel>();
         services.AddTransient<WorktopViewModel>();
 
         services.AddTransient<MenuViewModel>();

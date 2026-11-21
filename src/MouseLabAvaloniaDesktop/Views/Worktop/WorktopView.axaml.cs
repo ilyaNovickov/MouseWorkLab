@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -13,6 +14,7 @@ namespace MouseLabAvaloniaDesktop.Views
         public WorktopView()
         {
             InitializeComponent();
+            this.DataContextChanged += this_DataContexChanged;
 #if DEBUG
             if (Design.IsDesignMode)
             {
@@ -39,6 +41,34 @@ namespace MouseLabAvaloniaDesktop.Views
 
             // Не сбрасывает масштаб
             //zoomBorder.FitCommand.Execute(null);
+        }
+
+        private WorktopViewModel? _worktopVM;
+
+        private void this_DataContexChanged(object? sender, EventArgs e)
+        {
+            if (this.DataContext != _worktopVM)
+            {
+                _worktopVM?.Dispose();
+
+                if (this.DataContext is not WorktopViewModel worktopViewModel)
+                {
+                    _worktopVM = null;
+                    return;
+                }
+                _worktopVM = worktopViewModel;
+            }
+        }
+
+        private void upperCanvas_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+        {
+            if (!e.Properties.IsLeftButtonPressed)
+                return;
+
+            var point = e.GetCurrentPoint(this.upperCanvas);
+
+            _worktopVM?.AddNodeCommand.Execute(
+                new MouseLabAvaloniaDesktop.Models.Point((int)point.Position.X, (int)point.Position.Y));
         }
     }
 }

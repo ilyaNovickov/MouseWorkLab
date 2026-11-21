@@ -2,8 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore"
              mc:Ignorable="d"
              x:Class="MouseLabAvaloniaDesktop.Views.NodeView"
+             x:DataType="vm:NodeViewModel"
              ClipToBounds="False">
   <UserControl.Styles>
     <Style Selector="Border.node">
@@ -29,12 +31,12 @@
     </Style>
   </UserControl.Styles>
   <Border Classes="node"
-          Classes.selected="True"
+          Classes.selected="{Binding IsSelected}"
           Width="64"
           Height="64"
           CornerRadius="64">
     <TextBlock Classes="nodeId"
-               Classes.selected="True"
-               Text="1024"/>
+               Classes.selected="{Binding IsSelected}"
+               Text="{Binding Label}"/>
   </Border>
 </UserControl>

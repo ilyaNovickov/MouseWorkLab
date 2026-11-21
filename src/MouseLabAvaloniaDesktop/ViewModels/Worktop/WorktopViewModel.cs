@@ -6,9 +6,13 @@ using MouseLabAvaloniaDesktop.Services.Implementations;
 using ProTranslate;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
+using System.ComponentModel;
+using System.Collections.Specialized;
 
 namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 {
@@ -27,6 +31,10 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             //WorktopCanvasViewModel = worktopCanvasViewModel;
             _modelingEnv = modelingEnv;
             _modelingSettings = modelingSettings;
+
+            //RelayCommand<int, int> relayCommand = new RelayCommand<int, int>(AddNode);
+
+            Nodes.CollectionChanged += Nodes_CollectionChanged;
 
             _modelingSettings.PropertyChanged += _modelingSettings_PropertyChanged;
 
@@ -133,6 +141,38 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             WorktopPosition = (AvaibleResolution - _modelingEnv.Worktop.Width) / 2;
 
             OnPropertyChanged(nameof(Worktop));
+        }
+
+        public const int MaxNodes = 1024;
+
+        public ObservableCollection<NodeViewModel> Nodes { get; } = new();
+
+        private void Nodes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    break;
+            }
+        }
+
+        [RelayCommand]
+        private void AddNode(Point point)
+        {
+            if (Nodes.Count >= MaxNodes)
+                return;
+
+            NodeViewModel nodeViewModel = new(point.X, point.Y, Nodes.Count.ToString());
+
+            Nodes.Add(nodeViewModel);
         }
     }
 }
