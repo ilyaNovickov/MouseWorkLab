@@ -78,8 +78,8 @@
                             MaxZoomPixelSize="200">
                 
                     <Canvas Name="mainCanvas"
-                            Width="{Binding AvaibleResolution}"
-                            Height="{Binding AvaibleResolution}"
+                            Width="{Binding AvailableResolution}"
+                            Height="{Binding AvailableResolution}"
                             Background="Transparent" >
                         <Image Name="worktop"
                                RenderOptions.BitmapInterpolationMode="None"
@@ -90,17 +90,22 @@
                                 Background="#2AA52A2A"
                                 Canvas.Left="0"
                                 Canvas.Top="0"
-                                Width="{Binding AvaibleResolution}"
-                                Height="{Binding AvaibleResolution}"
+                                Width="{Binding AvailableResolution}"
+                                Height="{Binding AvailableResolution}"
                                 PointerPressed="upperCanvas_PointerPressed">
                             <ItemsControl ItemsSource="{Binding Nodes}">
-                                <!--
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-                                -->
+                                <ItemsControl.ItemContainerTheme>
+                                    <ControlTheme TargetType="ContentPresenter"
+                                                  x:DataType="vmN:NodeViewModel">
+                                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                    </ControlTheme>
+                                </ItemsControl.ItemContainerTheme>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="vmN:NodeViewModel">
                                         <v:NodeView/>

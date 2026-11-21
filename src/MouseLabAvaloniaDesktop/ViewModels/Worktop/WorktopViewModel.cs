@@ -104,7 +104,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 
         private const double Marging = 0.10d;
 
-        public int AvaibleResolution
+        public int AvailableResolution
         {
             get;
             private set
@@ -134,11 +134,11 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         private void OnWorktopChanged()
         {
             IsNeedGeneration = false;
-            //AvaibleResolution = (int)(matrix.Size.Width * (1.00d + 2d * Marging));
-            //Diff = (AvaibleResolution - matrix.Width) / 2;
+            //AvailableResolution = (int)(matrix.Size.Width * (1.00d + 2d * Marging));
+            //Diff = (AvailableResolution - matrix.Width) / 2;
 
-            AvaibleResolution = (int)(_modelingEnv.Worktop.Size.Width * (1.00d + 2d * Marging));
-            WorktopPosition = (AvaibleResolution - _modelingEnv.Worktop.Width) / 2;
+            AvailableResolution = (int)(_modelingEnv.Worktop.Size.Width * (1.00d + 2d * Marging));
+            WorktopPosition = (AvailableResolution - _modelingEnv.Worktop.Width) / 2;
 
             OnPropertyChanged(nameof(Worktop));
         }

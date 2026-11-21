@@ -6,9 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="10" d:DesignHeight="10"
              x:Class="MouseLabAvaloniaDesktop.Views.NodeView"
              x:DataType="vm:NodeViewModel"
-             ClipToBounds="False" 
-             Canvas.Top="{Binding X}"
-             Canvas.Left="{Binding Y}">
+              ClipToBounds="False">
   <UserControl.Styles>
     <Style Selector="Border.node">
       <Setter Property="Background" Value="White"/>
