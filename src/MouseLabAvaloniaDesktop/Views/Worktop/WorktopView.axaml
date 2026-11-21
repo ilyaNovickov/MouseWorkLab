@@ -94,6 +94,13 @@
                                 Height="{Binding AvaibleResolution}"
                                 PointerPressed="upperCanvas_PointerPressed">
                             <ItemsControl ItemsSource="{Binding Nodes}">
+                                <!--
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                -->
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="vmN:NodeViewModel">
                                         <v:NodeView/>

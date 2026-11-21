@@ -41,7 +41,15 @@ public partial class NodeViewModel : ViewModelBase
     private string _label;
 
     [ObservableProperty]
+    private int _width;
+
+    [ObservableProperty]
+    private int _height;
+
+    [ObservableProperty]
     private bool _isSelected;
+
+
 
     public object ToModel()
     {

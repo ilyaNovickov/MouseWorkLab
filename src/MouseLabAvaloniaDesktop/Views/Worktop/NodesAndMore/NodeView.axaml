@@ -3,38 +3,40 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore"
-             mc:Ignorable="d"
+             mc:Ignorable="d" d:DesignWidth="10" d:DesignHeight="10"
              x:Class="MouseLabAvaloniaDesktop.Views.NodeView"
              x:DataType="vm:NodeViewModel"
-             ClipToBounds="False">
+             ClipToBounds="False" 
+             Canvas.Top="{Binding X}"
+             Canvas.Left="{Binding Y}">
   <UserControl.Styles>
     <Style Selector="Border.node">
       <Setter Property="Background" Value="White"/>
       <Setter Property="BorderBrush" Value="Black"/>
-      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="BorderThickness" Value="0.8"/>
     </Style>
     <Style Selector="Border.node.selected">
       <Setter Property="Background" Value="White"/>
       <Setter Property="BorderBrush" Value="#FF3D7EFF"/>
-      <Setter Property="BorderThickness" Value="4"/>
-      <Setter Property="BoxShadow" Value="0 2 25 10 #fff00000"/>
+      <Setter Property="BorderThickness" Value="1.2"/>
+      <Setter Property="BoxShadow" Value="0 1. 1.2 1.4 #fff00000"/>
     </Style>
     <Style Selector="TextBlock.nodeId">
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="HorizontalAlignment" Value="Center"/>
-      <Setter Property="FontSize" Value="24"/>
+      <Setter Property="FontSize" Value="2"/>
       
     </Style>
     <Style Selector="TextBlock.nodeId.selected">
-      <Setter Property="FontSize" Value="20"/>
-      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="FontSize" Value="2"/>
+      <Setter Property="FontWeight" Value="UltraBold"/>
     </Style>
   </UserControl.Styles>
   <Border Classes="node"
           Classes.selected="{Binding IsSelected}"
-          Width="64"
-          Height="64"
-          CornerRadius="64">
+          Width="8"
+          Height="8"
+          CornerRadius="8">
     <TextBlock Classes="nodeId"
                Classes.selected="{Binding IsSelected}"
                Text="{Binding Label}"/>
