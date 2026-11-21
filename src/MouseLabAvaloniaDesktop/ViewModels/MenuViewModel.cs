@@ -22,17 +22,17 @@ namespace MouseLabAvaloniaDesktop.ViewModels
         [RelayCommand]
         private Task CreateProject() =>
             _projectFileService.CreateAsync(
-                T("FileDialog.SaveProjectTitle"), T("FileDialog.JsonFilter"));
+                Strings.FileDialogSaveProjectTitle, Strings.FileDialogJsonFilter);
 
         [RelayCommand]
         private Task SaveProject() =>
             _projectFileService.SaveAsync(
-                T("FileDialog.SaveProjectTitle"), T("FileDialog.JsonFilter"));
+                Strings.FileDialogSaveProjectTitle, Strings.FileDialogJsonFilter);
 
         [RelayCommand]
         private Task LoadProject() =>
-            _projectFileService.LoadAsync(
-                T("FileDialog.OpenProjectTitle"), T("FileDialog.JsonFilter"));
+            _projectFileService.LoadAsync(Strings.FileDialogOpenProjectTitle,
+                Strings.FileDialogJsonFilter);
 
         [RelayCommand]
         private void ShowSettings() => _dialogService.Show<SettingsWindowViewModel>();
