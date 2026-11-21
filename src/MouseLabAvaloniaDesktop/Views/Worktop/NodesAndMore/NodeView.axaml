@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="MouseLabAvaloniaDesktop.Views.NodeView"
+             ClipToBounds="False">
+  <UserControl.Styles>
+    <Style Selector="Border.node">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="Black"/>
+      <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+    <Style Selector="Border.node.selected">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="#FF3D7EFF"/>
+      <Setter Property="BorderThickness" Value="4"/>
+      <Setter Property="BoxShadow" Value="0 2 25 10 #fff00000"/>
+    </Style>
+    <Style Selector="TextBlock.nodeId">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="FontSize" Value="24"/>
+      
+    </Style>
+    <Style Selector="TextBlock.nodeId.selected">
+      <Setter Property="FontSize" Value="20"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+  </UserControl.Styles>
+  <Border Classes="node"
+          Classes.selected="True"
+          Width="64"
+          Height="64"
+          CornerRadius="64">
+    <TextBlock Classes="nodeId"
+               Classes.selected="True"
+               Text="1024"/>
+  </Border>
+</UserControl>
