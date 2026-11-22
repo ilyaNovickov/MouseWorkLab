@@ -65,10 +65,12 @@ namespace MouseLabAvaloniaDesktop.Views
             if (!e.Properties.IsLeftButtonPressed)
                 return;
 
-            var point = e.GetCurrentPoint(this.upperCanvas);
+            var point = e.GetCurrentPoint(this.zoomBorder).Position;
+
+            Point contentPoint = zoomBorder.ViewportToContent(point);
 
             _worktopVM?.AddNodeCommand.Execute(
-                new MouseLabAvaloniaDesktop.Models.Point((int)point.Position.X, (int)point.Position.Y));
+                new MouseLabAvaloniaDesktop.Models.Point((int)contentPoint.X, (int)contentPoint.Y));
         }
     }
 }
