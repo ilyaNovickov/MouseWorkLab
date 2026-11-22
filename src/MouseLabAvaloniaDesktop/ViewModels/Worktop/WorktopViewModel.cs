@@ -134,11 +134,14 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         private void OnWorktopChanged()
         {
             IsNeedGeneration = false;
-            //AvailableResolution = (int)(matrix.Size.Width * (1.00d + 2d * Marging));
-            //Diff = (AvailableResolution - matrix.Width) / 2;
 
-            AvailableResolution = (int)(_modelingEnv.Worktop.Size.Width * (1.00d + 2d * Marging));
-            WorktopPosition = (AvailableResolution - _modelingEnv.Worktop.Width) / 2;
+            int diff = (int)(_modelingEnv.Worktop.Size.Width * Marging);
+
+            AvailableResolution = _modelingEnv.Worktop.Width + (2 * diff);
+            WorktopPosition = diff;
+
+            //AvailableResolution = (int)(_modelingEnv.Worktop.Size.Width * (1.00d + 2d * Marging));
+            //WorktopPosition = (AvailableResolution - _modelingEnv.Worktop.Width) / 2;
 
             OnPropertyChanged(nameof(Worktop));
         }

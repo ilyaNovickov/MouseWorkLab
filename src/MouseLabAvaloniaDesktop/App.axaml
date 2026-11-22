@@ -12,6 +12,8 @@
 
     <Application.Resources>
         <conv:ReadOnlyMatrixConverter x:Key="MatrixToImage" />
+        <conv:NumberToCornerRadiusConverter x:Key="NumberToCornerRadius" />
+
     </Application.Resources>
 
     <Application.Styles>

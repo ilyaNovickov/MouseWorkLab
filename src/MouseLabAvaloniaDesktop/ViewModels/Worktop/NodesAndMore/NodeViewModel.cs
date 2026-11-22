@@ -5,6 +5,8 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 
 public partial class NodeViewModel : ViewModelBase
 {
+    public const int DefaultSize = 8;
+
     public NodeViewModel() : this(0, 0, "-1")
     {
 
@@ -41,10 +43,10 @@ public partial class NodeViewModel : ViewModelBase
     private string _label;
 
     [ObservableProperty]
-    private int _width;
+    private int _width = DefaultSize;
 
     [ObservableProperty]
-    private int _height;
+    private int _height = DefaultSize;
 
     [ObservableProperty]
     private bool _isSelected;

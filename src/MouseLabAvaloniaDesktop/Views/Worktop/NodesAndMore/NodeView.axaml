@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="10" d:DesignHeight="10"
              x:Class="MouseLabAvaloniaDesktop.Views.NodeView"
              x:DataType="vm:NodeViewModel"
-              ClipToBounds="False">
+             ClipToBounds="False">
   <UserControl.Styles>
     <Style Selector="Border.node">
       <Setter Property="Background" Value="White"/>
@@ -32,9 +32,9 @@
   </UserControl.Styles>
   <Border Classes="node"
           Classes.selected="{Binding IsSelected}"
-          Width="8"
-          Height="8"
-          CornerRadius="8">
+          Width="{Binding Width}"
+          Height="{Binding Height}"
+          CornerRadius="{Binding Height, Converter={StaticResource NumberToCornerRadius}}">
     <TextBlock Classes="nodeId"
                Classes.selected="{Binding IsSelected}"
                Text="{Binding Label}"/>
