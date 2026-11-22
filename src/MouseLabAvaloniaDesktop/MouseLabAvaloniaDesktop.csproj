@@ -5,18 +5,18 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-      <!-- Компилируемые привязки по умолчанию: пути в Binding проверяются на этапе
+    <!-- Компилируемые привязки по умолчанию: пути в Binding проверяются на этапе
          сборки, а не в рантайме. Обязательно для NativeAOT - рефлексивные привязки
          не выживают после тримминга. -->
-      <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-      <!-- Предупреждения о несовместимости с тримером/AOT -->
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- Предупреждения о несовместимости с тримером/AOT -->
 	  <IsTrimmable>true</IsTrimmable>
 	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 
-	  <!-- Покажет все проблемные места при сборке -->
-	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
-	  <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-	  <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <!-- Покажет все проблемные места при сборке -->
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
 
 	  <!-- Отключаем рефлексию в System.Text.Json,
          чтобы случайно не использовать несгенерированный путь -->
@@ -24,6 +24,8 @@
 
 	  <!-- Avalonia + AOT требуют этого -->
 	  <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>

@@ -39,6 +39,20 @@
                 "Release"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "my aot release (linux)",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "publish",
+                "${workspaceFolder}/src/MouseLabAvaloniaDesktop/MouseLabAvaloniaDesktop.csproj",
+                "-c",
+                "Release",
+                "-r",
+                "linux-x64"
+            ],
+            "problemMatcher": []
         }
     ]
 }
