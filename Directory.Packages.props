@@ -10,16 +10,16 @@
     <PackageVersion Include="System.Text.Json" Version="11.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.1" />
-    <PackageVersion Include="Avalonia" Version="12.1.3" />
-    <PackageVersion Include="Avalonia.Desktop" Version="12.1.3" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.3" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.3" />
+    <PackageVersion Include="Avalonia" Version="12.1.6" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.6" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.6" />
     <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageVersion Include="Dock.Avalonia" Version="12.1.0.7" />
-    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.0.7" />
-    <PackageVersion Include="Dock.Model.Avalonia" Version="12.1.0.7" />
-    <PackageVersion Include="Dock.Model.Mvvm" Version="12.1.0.7" />
+    <PackageVersion Include="Dock.Avalonia" Version="12.1.5" />
+    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.5" />
+    <PackageVersion Include="Dock.Model.Avalonia" Version="12.1.5" />
+    <PackageVersion Include="Dock.Model.Mvvm" Version="12.1.5" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     <!-- Ядро ProTranslate: культуры, переводы, fallback, форматирование, кэш. -->
     <PackageVersion Include="ProTranslate.Avalonia" Version="0.1.0" />
@@ -31,8 +31,22 @@
     <!-- Проверки на этапе сборки: PTA001 неизвестный ключ, PTA002 несовпадение
          числа плейсхолдеров, PTA003 пробел в переводе для какой-то культуры. -->
     <PackageVersion Include="ProTranslate.Analyzers" Version="0.1.0" />
-    <PackageVersion Include="StaticViewLocator" Version="0.7.0" />
+    <PackageVersion Include="StaticViewLocator" Version="0.8.0" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="PanAndZoom" Version="12.1.1" />
+
+    <PackageVersion Include="Xaml.Behaviors" Version="12.1.5"  />
+    <PackageVersion Include="Xaml.Behaviors.Animations" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactivity" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions.Custom" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions.DragAndDrop" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions.DragAndDrop.DataGrid" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions.Draggable" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions.Events" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions.Responsive" Version="12.1.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions.Scripting" Version="12.1.5" />
+
   </ItemGroup>
 </Project>
