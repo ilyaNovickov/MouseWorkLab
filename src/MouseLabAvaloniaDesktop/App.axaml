@@ -20,5 +20,6 @@
         <FluentTheme />
         <DockFluentTheme />
         <StyleInclude Source="/Styles/SettingsStyles.axaml"/>
+        <StyleInclude Source="/Styles/NodeStyles.axaml"/>
     </Application.Styles>
 </Application>

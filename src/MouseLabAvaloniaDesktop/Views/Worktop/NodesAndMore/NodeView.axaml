@@ -12,29 +12,6 @@
   <i:Interaction.Behaviors>
     <b:NodeDragBehavior CanDrag="{Binding CanInteract}" />
   </i:Interaction.Behaviors>
-  <UserControl.Styles>
-    <Style Selector="Border.node">
-      <Setter Property="Background" Value="White"/>
-      <Setter Property="BorderBrush" Value="Black"/>
-      <Setter Property="BorderThickness" Value="0.8"/>
-    </Style>
-    <Style Selector="Border.node.selected">
-      <Setter Property="Background" Value="White"/>
-      <Setter Property="BorderBrush" Value="#FF3D7EFF"/>
-      <Setter Property="BorderThickness" Value="1.2"/>
-      <Setter Property="BoxShadow" Value="0 1. 1.2 1.4 #fff00000"/>
-    </Style>
-    <Style Selector="TextBlock.nodeId">
-      <Setter Property="VerticalAlignment" Value="Center"/>
-      <Setter Property="HorizontalAlignment" Value="Center"/>
-      <Setter Property="FontSize" Value="2"/>
-      
-    </Style>
-    <Style Selector="TextBlock.nodeId.selected">
-      <Setter Property="FontSize" Value="2"/>
-      <Setter Property="FontWeight" Value="UltraBold"/>
-    </Style>
-  </UserControl.Styles>
   <Border Classes="node"
           Classes.selected="{Binding IsSelected}"
           Width="{Binding Width}"
