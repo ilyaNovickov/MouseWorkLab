@@ -89,6 +89,7 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Auto">
             <paz:ZoomBorder Name="zoomBorder"
+                            PanButton="{Binding PanButton}"
                             DoubleClickZoomMode="None"
                             MinZoomX="0.2"
                             MinZoomY="0.2"

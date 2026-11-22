@@ -70,7 +70,9 @@ public class NodeDragBehavior : Behavior<Control>
     private NodeViewModel? _node;
     private WorktopViewModel? _worktop;
     private IPointer? _pointer;
-    private Point _last;
+    private Point _originPointer;
+    private int _originX;
+    private int _originY;
     private bool _captured;
 
     protected override void OnAttachedToVisualTree()
@@ -115,7 +117,9 @@ public class NodeDragBehavior : Behavior<Control>
         _worktop = worktop;
         _canvas = canvas;
         _pointer = e.Pointer;
-        _last = e.GetPosition(canvas);
+        _originPointer = e.GetPosition(canvas);
+        _originX = node.X;
+        _originY = node.Y;
         _captured = true;
         e.Pointer.Capture(AssociatedObject);
     }
@@ -131,11 +135,9 @@ public class NodeDragBehavior : Behavior<Control>
             return;
         }
 
-        Point current = e.GetPosition(_canvas);
-        Vector delta = current - _last;
-        _last = current;
+        Vector offset = e.GetPosition(_canvas) - _originPointer;
 
-        _worktop.MoveNode(_node, delta);
+        _worktop.MoveNodeFromOrigin(_node, _originX, _originY, offset);
     }
 
     private void OnReleased(object? sender, PointerReleasedEventArgs e) => Stop();

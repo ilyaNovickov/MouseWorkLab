@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 using System.ComponentModel;
 using System.Collections.Specialized;
+using Avalonia.Controls.PanAndZoom;
 using Vector = Avalonia.Vector;
 
 namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
@@ -174,10 +175,14 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         [ObservableProperty]
         private NodeViewModel? selectedNode;
 
+        [ObservableProperty]
+        private ButtonName panButton = ButtonName.Middle;
+
         [RelayCommand]
         public void SetMode(WorkspaceMode mode)
         {
             WorkspaceMode = mode;
+            PanButton = mode == WorkspaceMode.PanOnly ? ButtonName.Left : ButtonName.Middle;
 
             bool canInteract = mode == WorkspaceMode.SelectAndMove;
             foreach (NodeViewModel node in Nodes)
@@ -216,13 +221,13 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             SelectedNode = null;
         }
 
-        public void MoveNode(NodeViewModel node, Vector delta)
+        public void MoveNodeFromOrigin(NodeViewModel node, int originX, int originY, Vector offset)
         {
             if (WorkspaceMode != WorkspaceMode.SelectAndMove)
                 return;
 
-            node.X = (int)Math.Round(node.X + delta.X);
-            node.Y = (int)Math.Round(node.Y + delta.Y);
+            node.X = originX + (int)Math.Round(offset.X);
+            node.Y = originY + (int)Math.Round(offset.Y);
         }
 
         [RelayCommand]

@@ -1,3 +1,4 @@
+using Avalonia.Controls.PanAndZoom;
 using MouseLabAvaloniaDesktop.Models.Settings;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels.Worktop;
@@ -72,20 +73,55 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
-    public void MoveNodeAppliesDeltaOnlyInSelectMode()
+    public void MoveNodeFromOriginWorksOnlyInSelectMode()
     {
         using WorktopViewModel vm = CreateViewModel();
         vm.OnCanvasPressed(new ModelsPoint(10, 10));
         var node = Assert.Single(vm.Nodes);
+        int originX = node.X;
+        int originY = node.Y;
 
-        vm.MoveNode(node, new Vector(3, 4));
-        Assert.Equal(10, node.X);
-        Assert.Equal(10, node.Y);
+        vm.MoveNodeFromOrigin(node, originX, originY, new Vector(3, 4));
+        Assert.Equal(originX, node.X);
+        Assert.Equal(originY, node.Y);
 
         vm.SetMode(WorkspaceMode.SelectAndMove);
-        vm.MoveNode(node, new Vector(3, 4));
-        Assert.Equal(13, node.X);
-        Assert.Equal(14, node.Y);
+        vm.MoveNodeFromOrigin(node, originX, originY, new Vector(3, 4));
+        Assert.Equal(originX + 3, node.X);
+        Assert.Equal(originY + 4, node.Y);
+    }
+
+    [Fact]
+    public void MoveNodeFromOriginKeepsSubPixelOffset()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        vm.OnCanvasPressed(new ModelsPoint(10, 10));
+        var node = Assert.Single(vm.Nodes);
+        int originX = node.X;
+        int originY = node.Y;
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+
+        vm.MoveNodeFromOrigin(node, originX, originY, new Vector(0.4, 0.4));
+        Assert.Equal(originX, node.X);
+        Assert.Equal(originY, node.Y);
+
+        vm.MoveNodeFromOrigin(node, originX, originY, new Vector(0.6, 0.6));
+        Assert.Equal(originX + 1, node.X);
+        Assert.Equal(originY + 1, node.Y);
+    }
+
+    [Fact]
+    public void PanButtonFollowsMode()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+
+        Assert.Equal(ButtonName.Middle, vm.PanButton);
+
+        vm.SetMode(WorkspaceMode.PanOnly);
+        Assert.Equal(ButtonName.Left, vm.PanButton);
+
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        Assert.Equal(ButtonName.Middle, vm.PanButton);
     }
 
     [Fact]
