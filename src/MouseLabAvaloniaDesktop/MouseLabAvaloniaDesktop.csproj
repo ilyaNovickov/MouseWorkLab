@@ -81,7 +81,6 @@
 
     <PackageReference Include="PanAndZoom" />
 
-    <PackageReference Include="Xaml.Behaviors" />
     <PackageReference Include="Xaml.Behaviors.Animations" />
     <PackageReference Include="Xaml.Behaviors.Avalonia" />
     <PackageReference Include="Xaml.Behaviors.Interactivity" />

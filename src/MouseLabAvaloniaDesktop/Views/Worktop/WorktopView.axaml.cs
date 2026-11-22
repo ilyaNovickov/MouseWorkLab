@@ -60,18 +60,5 @@ namespace MouseLabAvaloniaDesktop.Views
                 _worktopVM = worktopViewModel;
             }
         }
-
-        private void upperCanvas_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
-        {
-            if (!e.Properties.IsLeftButtonPressed)
-                return;
-
-            var point = e.GetCurrentPoint(this.zoomBorder).Position;
-
-            Point contentPoint = zoomBorder.ViewportToContent(point);
-
-            _worktopVM?.AddNodeCommand.Execute(
-                new MouseLabAvaloniaDesktop.Models.Point((int)contentPoint.X, (int)contentPoint.Y));
-        }
     }
 }

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 using System.ComponentModel;
 using System.Collections.Specialized;
+using Vector = Avalonia.Vector;
 
 namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 {
@@ -167,13 +168,75 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             }
         }
 
+        [ObservableProperty]
+        private WorkspaceMode workspaceMode = WorkspaceMode.Add;
+
+        [ObservableProperty]
+        private NodeViewModel? selectedNode;
+
+        [RelayCommand]
+        public void SetMode(WorkspaceMode mode)
+        {
+            WorkspaceMode = mode;
+
+            bool canInteract = mode == WorkspaceMode.SelectAndMove;
+            foreach (NodeViewModel node in Nodes)
+                node.CanInteract = canInteract;
+
+            if (!canInteract)
+                ClearSelection();
+        }
+
+        public void OnCanvasPressed(Point point)
+        {
+            if (WorkspaceMode == WorkspaceMode.Add)
+                AddNode(point);
+            else
+                ClearSelection();
+        }
+
+        public void SelectNode(NodeViewModel node)
+        {
+            if (WorkspaceMode != WorkspaceMode.SelectAndMove || SelectedNode == node)
+                return;
+
+            if (SelectedNode is not null)
+                SelectedNode.IsSelected = false;
+
+            SelectedNode = node;
+            node.IsSelected = true;
+        }
+
+        public void ClearSelection()
+        {
+            if (SelectedNode is null)
+                return;
+
+            SelectedNode.IsSelected = false;
+            SelectedNode = null;
+        }
+
+        public void MoveNode(NodeViewModel node, Vector delta)
+        {
+            if (WorkspaceMode != WorkspaceMode.SelectAndMove)
+                return;
+
+            node.X = (int)Math.Round(node.X + delta.X);
+            node.Y = (int)Math.Round(node.Y + delta.Y);
+        }
+
         [RelayCommand]
         private void AddNode(Point point)
         {
             if (Nodes.Count >= MaxNodes)
                 return;
 
-            NodeViewModel nodeViewModel = new(point.X, point.Y, Nodes.Count.ToString());
+            NodeViewModel nodeViewModel = new(point.X - (NodeViewModel.DefaultSize / 2) + 1,
+                        point.Y - (NodeViewModel.DefaultSize / 2) + 1,
+                        Nodes.Count.ToString())
+            {
+                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove
+            };
 
             Nodes.Add(nodeViewModel);
         }

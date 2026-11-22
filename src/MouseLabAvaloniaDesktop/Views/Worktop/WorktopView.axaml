@@ -7,6 +7,8 @@
              xmlns:vmN="using:MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore"
              xmlns:paz="using:Avalonia.Controls.PanAndZoom"
              xmlns:v="using:MouseLabAvaloniaDesktop.Views"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:b="using:MouseLabAvaloniaDesktop.Behaviors"
              x:Class="MouseLabAvaloniaDesktop.Views.WorktopView"
              x:DataType="vm:WorktopViewModel">
     <UserControl.Styles>
@@ -17,7 +19,18 @@
     </UserControl.Styles>
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
-            <Button Content="foo"/>
+            <Button Content="Панорама"
+                    Command="{Binding SetModeCommand}"
+                    CommandParameter="{x:Static vm:WorkspaceMode.PanOnly}" />
+            <Button Content="Выбор"
+                    Command="{Binding SetModeCommand}"
+                    CommandParameter="{x:Static vm:WorkspaceMode.SelectAndMove}" />
+            <Button Content="Удаление"
+                    Command="{Binding SetModeCommand}"
+                    CommandParameter="{x:Static vm:WorkspaceMode.Delete}" />
+            <Button Content="Добавление"
+                    Command="{Binding SetModeCommand}"
+                    CommandParameter="{x:Static vm:WorkspaceMode.Add}" />
         </Menu>
         <Border DockPanel.Dock="Bottom"
                 Margin="5,5,5,5"
@@ -101,15 +114,17 @@
                         
 
                             <ItemsControl ItemsSource="{Binding Nodes}">
+                                <i:Interaction.Behaviors>
+                                    <b:CanvasPointerBehavior Viewport="{Binding #zoomBorder}" />
+                                </i:Interaction.Behaviors>
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas Name="upperCanvas"
                                                 Width="{Binding AvailableResolution}"
                                                 Height="{Binding AvailableResolution}"
                                                 Canvas.Left="0"
-                                                Canvas.Top="0"                                          
-                                                Background="Transparent"
-                                                PointerPressed="upperCanvas_PointerPressed" />
+                                                 Canvas.Top="0"
+                                                 Background="Transparent" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemContainerTheme>

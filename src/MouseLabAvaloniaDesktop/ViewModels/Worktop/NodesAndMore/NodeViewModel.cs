@@ -51,7 +51,8 @@ public partial class NodeViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isSelected;
 
-
+    [ObservableProperty]
+    private bool _canInteract;
 
     public object ToModel()
     {
