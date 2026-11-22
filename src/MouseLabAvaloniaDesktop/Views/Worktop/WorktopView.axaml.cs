@@ -22,8 +22,9 @@ namespace MouseLabAvaloniaDesktop.Views
                 if (vm is not null)
                     Design.SetDataContext(this, vm);
             }
+            else
 #endif
-            this.worktop.PropertyChanged += Image_PropertyChanged;
+                this.worktop.PropertyChanged += Image_PropertyChanged;
         }
 
         private void Image_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

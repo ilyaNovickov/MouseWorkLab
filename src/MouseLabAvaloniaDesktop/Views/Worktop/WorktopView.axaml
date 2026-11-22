@@ -60,10 +60,17 @@
                 <TextBlock Classes="center" 
                            Grid.Column="5" 
                            Text="{Binding #zoomBorder.ZoomX, StringFormat={}{0:0.00}}"/>
-                <Button Grid.Column="6"
-                        Margin="3,3,3,3"
-                        Content="Сброс"
-                        Command="{Binding #zoomBorder.FitCommand}" />
+                <StackPanel Grid.Column="6" 
+                            Orientation="Horizontal" 
+                            Margin="3,3,3,3">
+                    <Button Content="+" 
+                            Command="{Binding #zoomBorder.ZoomInCommand}" />
+                    <Button Content="-" 
+                            Command="{Binding #zoomBorder.ZoomOutCommand}" />
+                    <Button Content="Сброс"
+                            Command="{Binding #zoomBorder.FitCommand}" />
+                </StackPanel>
+                
             </Grid>
         </Border>
         <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -75,18 +82,24 @@
                             Background="DimGray"
                             MinimumVisibleContentPercentage="0.01"
                             AutoCalculateMaxZoom="True"
-                            MaxZoomPixelSize="200">
-                
+                            MaxZoomPixelSize="200" >
+
+                <Border BorderBrush="Black" 
+                        BorderThickness="1" 
+                        Width="{Binding AvailableResolution}"
+                        Height="{Binding AvailableResolution}">
+
                     <Canvas Name="mainCanvas"
                             Width="{Binding AvailableResolution}"
                             Height="{Binding AvailableResolution}"
-                            Background="Transparent" >
+                            Background="Gray" >
                         <Image Name="worktop"
                                RenderOptions.BitmapInterpolationMode="None"
                                Source="{Binding Worktop, Converter={StaticResource MatrixToImage}, Mode=OneWay}"
                                Canvas.Left="{Binding WorktopPosition}"
                                Canvas.Top="{Binding WorktopPosition}" />
                         
+
                             <ItemsControl ItemsSource="{Binding Nodes}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -94,8 +107,8 @@
                                                 Width="{Binding AvailableResolution}"
                                                 Height="{Binding AvailableResolution}"
                                                 Canvas.Left="0"
-                                                Canvas.Top="0"
-                                                Background="#91DEB887"
+                                                Canvas.Top="0"                                          
+                                                Background="Transparent"
                                                 PointerPressed="upperCanvas_PointerPressed" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
@@ -114,6 +127,8 @@
                             </ItemsControl>
 
                     </Canvas>
+
+                    </Border>
             </paz:ZoomBorder>
         </ScrollViewer>
     </DockPanel>
