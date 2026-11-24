@@ -61,7 +61,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
 
     private void Recompute()
     {
-        const double nodeRadius = 20;
+        const double nodeRadius = NodeViewModel.DefaultSize / 2d;
 
         var s = new Point(Source.X, Source.Y);
         var t = new Point(Target.X, Target.Y);
