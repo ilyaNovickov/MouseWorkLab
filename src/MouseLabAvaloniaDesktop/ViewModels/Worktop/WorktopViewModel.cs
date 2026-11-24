@@ -254,7 +254,8 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             Nodes.Add(nodeViewModel);
         }
 
-        public ObservableCollection<ConnectionViewModel> Connections = new();
+        [ObservableProperty]
+        private ObservableCollection<ConnectionViewModel> connections = new();
 
         private void AddConnection(NodeViewModel source, NodeViewModel target)
         {

@@ -107,12 +107,27 @@
                             Width="{Binding AvailableResolution}"
                             Height="{Binding AvailableResolution}"
                             Background="Gray" >
-                        <Image Name="worktop"
-                               RenderOptions.BitmapInterpolationMode="None"
-                               Source="{Binding Worktop, Converter={StaticResource MatrixToImage}, Mode=OneWay}"
-                               Canvas.Left="{Binding WorktopPosition}"
-                               Canvas.Top="{Binding WorktopPosition}" />
-                        
+                         <Image Name="worktop"
+                                RenderOptions.BitmapInterpolationMode="None"
+                                Source="{Binding Worktop, Converter={StaticResource MatrixToImage}, Mode=OneWay}"
+                                Canvas.Left="{Binding WorktopPosition}"
+                                Canvas.Top="{Binding WorktopPosition}" />
+
+                            <ItemsControl ItemsSource="{Binding Connections}"
+                                          IsHitTestVisible="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas Width="{Binding AvailableResolution}"
+                                                Height="{Binding AvailableResolution}"
+                                                Background="Transparent" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="vmN:ConnectionViewModel">
+                                        <v:ConnectionView/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
                             <ItemsControl ItemsSource="{Binding Nodes}">
                                 <i:Interaction.Behaviors>
