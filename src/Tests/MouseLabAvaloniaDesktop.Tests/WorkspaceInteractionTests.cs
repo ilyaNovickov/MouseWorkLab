@@ -282,4 +282,62 @@ public class WorkspaceInteractionTests
 
         Assert.Null(vm.SelectedConnectionKindOption);
     }
+
+    [Fact]
+    public void DraggedControlPointSurvivesNodeMoveAndKindToggle()
+    {
+        using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
+        {
+            Kind = ConnectionKinds.Curved
+        };
+
+        connection.SetControlPoint(0, new PointD(20, 30));
+        Assert.True(connection.HasManualControlPoints);
+        Assert.Equal(20, connection.Control1.X);
+        Assert.Equal(30, connection.Control1.Y);
+
+        connection.Target.Y = 50;
+        Assert.Equal(20, connection.Control1.X);
+        Assert.Equal(30, connection.Control1.Y);
+        Assert.NotEqual(4, connection.Start.Y);
+
+        connection.Kind = ConnectionKinds.Straight;
+        connection.Kind = ConnectionKinds.Curved;
+        Assert.Equal(20, connection.Control1.X);
+        Assert.Equal(30, connection.Control1.Y);
+    }
+
+    [Fact]
+    public void ControlPointEditRequiresCurvedKindAndValidIndex()
+    {
+        using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0));
+
+        connection.SetControlPoint(0, new PointD(20, 30));
+        Assert.False(connection.HasManualControlPoints);
+
+        connection.Kind = ConnectionKinds.Curved;
+        connection.SetControlPoint(5, new PointD(20, 30));
+        Assert.False(connection.HasManualControlPoints);
+    }
+
+    [Fact]
+    public void HandleMoveRequiresSelectedCurvedConnection()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        vm.OnCanvasPressed(new ModelsPoint(1, 1));
+        vm.OnCanvasPressed(new ModelsPoint(50, 50));
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        var connection = Assert.Single(vm.Connections);
+        connection.Kind = ConnectionKinds.Curved;
+        vm.SelectConnection(connection);
+
+        vm.SetConnectionControlPoint(connection, 0, new PointD(25, 35));
+        Assert.Equal(25, connection.Control1.X);
+        Assert.Equal(35, connection.Control1.Y);
+
+        vm.ClearSelection();
+        vm.SetConnectionControlPoint(connection, 0, new PointD(1, 1));
+        Assert.Equal(25, connection.Control1.X);
+        Assert.Equal(35, connection.Control1.Y);
+    }
 }

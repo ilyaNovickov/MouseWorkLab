@@ -68,7 +68,26 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private PointD _arrowTo;
 
+    private bool _manualControlPoints;
+
+    public bool HasManualControlPoints => _manualControlPoints;
+
     public bool ShowHandles => IsSelected && Kind == ConnectionKinds.Curved;
+
+    public void SetControlPoint(int index, PointD point)
+    {
+        if (Kind != ConnectionKinds.Curved)
+            return;
+
+        if (index == 0)
+            Control1 = point;
+        else if (index == 1)
+            Control2 = point;
+        else
+            return;
+
+        _manualControlPoints = true;
+    }
 
     private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -96,8 +115,11 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
         {
             Start = s;
             End = t;
-            Control1 = s;
-            Control2 = t;
+            if (!_manualControlPoints)
+            {
+                Control1 = s;
+                Control2 = t;
+            }
             ArrowFrom = new PointD(t.X - ux * arrowDirectionLength,
                                    t.Y - uy * arrowDirectionLength);
             ArrowTo = t;
@@ -119,12 +141,15 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
             double nx = -uy, ny = ux;
             double offset = len * Curvature;
 
-            Control1 = new PointD(
-                Start.X + dx * 0.4 + nx * offset * 0.25,
-                Start.Y + dy * 0.4 + ny * offset * 0.25);
-            Control2 = new PointD(
-                End.X + dx * (-0.4) + nx * offset * 0.25,
-                End.Y + dy * (-0.4) + ny * offset * 0.25);
+            if (!_manualControlPoints)
+            {
+                Control1 = new PointD(
+                    Start.X + dx * 0.4 + nx * offset * 0.25,
+                    Start.Y + dy * 0.4 + ny * offset * 0.25);
+                Control2 = new PointD(
+                    End.X + dx * (-0.4) + nx * offset * 0.25,
+                    End.Y + dy * (-0.4) + ny * offset * 0.25);
+            }
 
             ArrowFrom = new PointD(arrowTip.X - ux * arrowDirectionLength,
                                    arrowTip.Y - uy * arrowDirectionLength);
@@ -132,8 +157,11 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
         }
         else
         {
-            Control1 = Start;
-            Control2 = End;
+            if (!_manualControlPoints)
+            {
+                Control1 = Start;
+                Control2 = End;
+            }
             ArrowFrom = new PointD(arrowTip.X - ux * arrowDirectionLength,
                                    arrowTip.Y - uy * arrowDirectionLength);
             ArrowTo = arrowTip;

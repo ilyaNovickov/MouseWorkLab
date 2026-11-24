@@ -278,6 +278,16 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             connection.IsSelected = true;
         }
 
+        public void SetConnectionControlPoint(ConnectionViewModel connection, int index, PointD point)
+        {
+            if (WorkspaceMode != WorkspaceMode.SelectAndMove
+                || SelectedConnection != connection
+                || connection.Kind != ConnectionKinds.Curved)
+                return;
+
+            connection.SetControlPoint(index, point);
+        }
+
         private void ClearConnectionSelection()
         {
             if (SelectedConnection is null)

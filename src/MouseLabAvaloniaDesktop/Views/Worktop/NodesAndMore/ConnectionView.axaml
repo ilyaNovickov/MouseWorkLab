@@ -93,19 +93,25 @@
             EndPoint="{Binding Control2}" />
 
       <!-- Ручки Безье -->
-      <Ellipse Classes="handle"
-               IsVisible="{Binding ShowHandles}"
-               Canvas.Left="{Binding Control1.X}"
-               Canvas.Top="{Binding Control1.Y}">
-        <Ellipse.RenderTransform>
+       <Ellipse Classes="handle"
+                IsVisible="{Binding ShowHandles}"
+                Canvas.Left="{Binding Control1.X}"
+                Canvas.Top="{Binding Control1.Y}">
+         <i:Interaction.Behaviors>
+           <b:BezierHandleDragBehavior HandleIndex="0" CanDrag="{Binding ShowHandles}" />
+         </i:Interaction.Behaviors>
+         <Ellipse.RenderTransform>
           <TranslateTransform X="-6" Y="-6" />
         </Ellipse.RenderTransform>
       </Ellipse>
-      <Ellipse Classes="handle"
-               IsVisible="{Binding ShowHandles}"
-               Canvas.Left="{Binding Control2.X}"
-               Canvas.Top="{Binding Control2.Y}">
-        <Ellipse.RenderTransform>
+       <Ellipse Classes="handle"
+                IsVisible="{Binding ShowHandles}"
+                Canvas.Left="{Binding Control2.X}"
+                Canvas.Top="{Binding Control2.Y}">
+         <i:Interaction.Behaviors>
+           <b:BezierHandleDragBehavior HandleIndex="1" CanDrag="{Binding ShowHandles}" />
+         </i:Interaction.Behaviors>
+         <Ellipse.RenderTransform>
           <TranslateTransform X="-6" Y="-6" />
         </Ellipse.RenderTransform>
       </Ellipse>
