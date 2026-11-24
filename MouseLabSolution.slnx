@@ -2,7 +2,9 @@
   <Folder Name="/src/">
     <Project Path="./src/MouseLabAvaloniaDesktop.Generators/MouseLabAvaloniaDesktop.Generators.csproj" Id="fea93a68-4222-45f9-9947-ba6d352a671a" />
     <Project Path="./src/MouseLabAvaloniaDesktop/MouseLabAvaloniaDesktop.csproj" />
-    <Project Path="./src/Tests/MouseLab.Tests.csproj" />
+    <Folder Name="/Tests">
+      <Project Path="./src/Tests/MouseLabAvaloniaDesktop.Tests/MouseLabAvaloniaDesktop.Tests.csproj" />
+    </Folder>
   </Folder>
-
+  
 </Solution>

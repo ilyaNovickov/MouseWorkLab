@@ -6,7 +6,7 @@ using Xunit;
 using ModelsPoint = MouseLabAvaloniaDesktop.Models.Point;
 using Vector = Avalonia.Vector;
 
-namespace MouseLab.Tests;
+namespace MouseLabAvaloniaDesktop.Tests;
 
 public class WorkspaceInteractionTests
 {

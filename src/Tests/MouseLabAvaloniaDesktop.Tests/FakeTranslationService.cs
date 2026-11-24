@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using ProTranslate;
 
-namespace MouseLab.Tests;
+namespace MouseLabAvaloniaDesktop.Tests;
 
 internal sealed class FakeTranslationService : ITranslationService
 {
