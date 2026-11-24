@@ -79,6 +79,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     private void Recompute()
     {
         const double nodeRadius = NodeViewModel.DefaultSize / 2d;
+        const double arrowDirectionLength = 10d;
 
         var s = new PointD(Source.X + nodeRadius, Source.Y + nodeRadius);
         var t = new PointD(Target.X + nodeRadius, Target.Y + nodeRadius);
@@ -87,18 +88,20 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
         double dy = t.Y - s.Y;
         double len = Math.Sqrt(dx * dx + dy * dy);
 
+        double ux = len > 0d ? dx / len : 1d;
+        double uy = len > 0d ? dy / len : 0d;
+
         if (len < nodeRadius * 2)
         {
             Start = s;
             End = t;
             Control1 = s;
             Control2 = t;
-            ArrowFrom = s;
+            ArrowFrom = new PointD(t.X - ux * arrowDirectionLength,
+                                   t.Y - uy * arrowDirectionLength);
             ArrowTo = t;
             return;
         }
-
-        double ux = dx / len, uy = dy / len;
 
         Start = new PointD(s.X + ux * nodeRadius,
                           s.Y + uy * nodeRadius);
@@ -117,15 +120,17 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                 End.X + dx * (-0.4) + nx * offset * 0.25,
                 End.Y + dy * (-0.4) + ny * offset * 0.25);
 
-            ArrowFrom = Control2;
-            ArrowTo = t;
+            ArrowFrom = new PointD(End.X - ux * arrowDirectionLength,
+                                   End.Y - uy * arrowDirectionLength);
+            ArrowTo = End;
         }
         else
         {
             Control1 = Start;
             Control2 = End;
-            ArrowFrom = Start;
-            ArrowTo = t;
+            ArrowFrom = new PointD(End.X - ux * arrowDirectionLength,
+                                   End.Y - uy * arrowDirectionLength);
+            ArrowTo = End;
         }
     }
 

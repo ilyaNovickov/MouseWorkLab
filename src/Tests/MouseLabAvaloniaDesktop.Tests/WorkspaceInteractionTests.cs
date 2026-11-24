@@ -218,13 +218,27 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
-    public void ArrowTargetsCenterOfSecondNode()
+    public void ArrowSitsOnTargetBoundaryAndPointsToCenter()
     {
         using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0));
 
         Assert.Equal(8, connection.Start.X);
         Assert.Equal(100, connection.End.X);
-        Assert.Equal(104, connection.ArrowTo.X);
-        Assert.Equal(4, connection.ArrowTo.Y);
+        Assert.Equal(connection.End.X, connection.ArrowTo.X);
+        Assert.Equal(connection.End.Y, connection.ArrowTo.Y);
+        Assert.True(connection.ArrowFrom.X < connection.ArrowTo.X);
+    }
+
+    [Fact]
+    public void CurvedArrowAlsoPointsToTargetCenter()
+    {
+        using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
+        {
+            Kind = ConnectionKinds.Curved
+        };
+
+        Assert.Equal(connection.End.X, connection.ArrowTo.X);
+        Assert.Equal(connection.End.Y, connection.ArrowTo.Y);
+        Assert.True(connection.ArrowFrom.X < connection.ArrowTo.X);
     }
 }

@@ -107,6 +107,9 @@
                             Width="{Binding AvailableResolution}"
                             Height="{Binding AvailableResolution}"
                             Background="Gray" >
+                        <i:Interaction.Behaviors>
+                            <b:CanvasPointerBehavior Viewport="{Binding #zoomBorder}" />
+                        </i:Interaction.Behaviors>
                          <Image Name="worktop"
                                 RenderOptions.BitmapInterpolationMode="None"
                                 Source="{Binding Worktop, Converter={StaticResource MatrixToImage}, Mode=OneWay}"
@@ -129,9 +132,6 @@
                             </ItemsControl>
 
                             <ItemsControl ItemsSource="{Binding Nodes}">
-                                <i:Interaction.Behaviors>
-                                    <b:CanvasPointerBehavior Viewport="{Binding #zoomBorder}" />
-                                </i:Interaction.Behaviors>
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas Name="upperCanvas"
@@ -139,7 +139,7 @@
                                                 Height="{Binding AvailableResolution}"
                                                 Canvas.Left="0"
                                                 Canvas.Top="0"
-                                                Background="Transparent" />
+                                                Background="{x:Null}" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemContainerTheme>

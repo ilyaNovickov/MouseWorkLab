@@ -42,7 +42,7 @@ public class CanvasPointerBehavior : Behavior<Control>
         if (!e.GetCurrentPoint(AssociatedObject).Properties.IsLeftButtonPressed)
             return;
 
-        if (e.Source is not Canvas)
+        if (e.Source is not (Canvas or Image))
             return;
 
         if (AssociatedObject.DataContext is not WorktopViewModel worktop || Viewport is null)
