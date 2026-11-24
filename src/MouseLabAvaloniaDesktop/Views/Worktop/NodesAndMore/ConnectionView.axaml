@@ -11,7 +11,7 @@
   <UserControl.Styles>
         <Style Selector="Path.edge">
             <Setter Property="Stroke" Value="#5A6672" />
-            <Setter Property="StrokeThickness" Value="2" />
+            <Setter Property="StrokeThickness" Value="1" />
         </Style>
         <Style Selector="Path.edge.selected">
             <Setter Property="Stroke" Value="#FF3D7EFF" />

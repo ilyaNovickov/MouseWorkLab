@@ -5,6 +5,23 @@ using MouseLabAvaloniaDesktop.Models;
 
 namespace MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 
+public struct PointD
+{
+    public PointD()
+    {
+
+    }
+
+    public PointD(double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public double X { get; set; }
+    public double Y { get; set; }
+}
+
 public partial class ConnectionViewModel : ViewModelBase, IDisposable
 {
     public ConnectionViewModel(NodeViewModel source, NodeViewModel target)
@@ -33,23 +50,23 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
 
     // Чистые данные
     [ObservableProperty]
-    private Point _start;
+    private PointD _start;
 
     [ObservableProperty]
-    private Point _end;
+    private PointD _end;
 
     [ObservableProperty]
-    private Point _control1;
+    private PointD _control1;
 
     [ObservableProperty]
-    private Point _control2;
+    private PointD _control2;
 
     // Для стрелки: откуда идёт касательная к концу
     [ObservableProperty]
-    private Point _arrowFrom;
+    private PointD _arrowFrom;
 
     [ObservableProperty]
-    private Point _arrowTo;
+    private PointD _arrowTo;
 
     public bool ShowHandles => IsSelected && Kind == ConnectionKinds.Curved;
 
@@ -63,8 +80,8 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     {
         const double nodeRadius = NodeViewModel.DefaultSize / 2d;
 
-        var s = new Point(Source.X, Source.Y);
-        var t = new Point(Target.X, Target.Y);
+        var s = new PointD(Source.X + nodeRadius, Source.Y + nodeRadius);
+        var t = new PointD(Target.X + nodeRadius, Target.Y + nodeRadius);
 
         double dx = t.X - s.X;
         double dy = t.Y - s.Y;
@@ -83,22 +100,22 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
 
         double ux = dx / len, uy = dy / len;
 
-        Start = new Point((int)(s.X + ux * nodeRadius),
-                          (int)(s.Y + uy * nodeRadius));
-        End = new Point((int)(t.X - ux * nodeRadius),
-                        (int)(t.Y - uy * nodeRadius));
+        Start = new PointD(s.X + ux * nodeRadius,
+                          s.Y + uy * nodeRadius);
+        End = new PointD(t.X - ux * nodeRadius,
+                        t.Y - uy * nodeRadius);
 
         if (Kind == ConnectionKinds.Curved)
         {
             double nx = -uy, ny = ux;
             double offset = len * Curvature;
 
-            Control1 = new Point(
-                (int)(Start.X + dx * 0.4 + nx * offset * 0.25),
-                (int)(Start.Y + dy * 0.4 + ny * offset * 0.25));
-            Control2 = new Point(
-                (int)(End.X + dx * (-0.4) + nx * offset * 0.25),
-                (int)(End.Y + dy * (-0.4) + ny * offset * 0.25));
+            Control1 = new PointD(
+                Start.X + dx * 0.4 + nx * offset * 0.25,
+                Start.Y + dy * 0.4 + ny * offset * 0.25);
+            Control2 = new PointD(
+                End.X + dx * (-0.4) + nx * offset * 0.25,
+                End.Y + dy * (-0.4) + ny * offset * 0.25);
 
             ArrowFrom = Control2;
             ArrowTo = End;

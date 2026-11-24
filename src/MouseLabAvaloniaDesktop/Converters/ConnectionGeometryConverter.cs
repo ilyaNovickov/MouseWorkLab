@@ -23,10 +23,10 @@ public class ConnectionGeometryConverter : IMultiValueConverter
         if (values.Count < 5) return null;
         if (values.Any(v => v is UnsetValueType)) return null;
 
-        var start = ToAvaloniaPoint((MouseLabAvaloniaDesktop.Models.Point)values[0]!);
-        var end = ToAvaloniaPoint((MouseLabAvaloniaDesktop.Models.Point)values[1]!);
-        var cp1 = ToAvaloniaPoint((MouseLabAvaloniaDesktop.Models.Point)values[2]!);
-        var cp2 = ToAvaloniaPoint((MouseLabAvaloniaDesktop.Models.Point)values[3]!);
+        var start = ToAvaloniaPoint((PointD)values[0]!);
+        var end = ToAvaloniaPoint((PointD)values[1]!);
+        var cp1 = ToAvaloniaPoint((PointD)values[2]!);
+        var cp2 = ToAvaloniaPoint((PointD)values[3]!);
         var kind = (ConnectionKinds)values[4]!;
 
         var sg = new StreamGeometry();
@@ -42,7 +42,7 @@ public class ConnectionGeometryConverter : IMultiValueConverter
         return sg;
     }
 
-    private static Point ToAvaloniaPoint(MouseLabAvaloniaDesktop.Models.Point p)
+    private static Point ToAvaloniaPoint(PointD p)
     {
         return new Point(p.X, p.Y);
     }
@@ -57,8 +57,8 @@ public class ArrowGeometryConverter : IMultiValueConverter
     private static ArrowGeometryConverter? _instance;
     public static ArrowGeometryConverter Instance => _instance ??= new();
 
-    private const double ArrowLength = 14;
-    private const double ArrowWidth = 9;
+    private const double ArrowLength = 7d;
+    private const double ArrowWidth = 4.5d;
 
     public object? Convert(IList<object?> values, Type targetType,
                            object? parameter, CultureInfo culture)
@@ -66,8 +66,8 @@ public class ArrowGeometryConverter : IMultiValueConverter
         if (values.Count < 2) return null;
         if (values.Any(v => v is UnsetValueType)) return null;
 
-        var from = ToAvaloniaPoint((MouseLabAvaloniaDesktop.Models.Point)values[0]!);
-        var to = ToAvaloniaPoint((MouseLabAvaloniaDesktop.Models.Point)values[1]!);
+        var from = ToAvaloniaPoint((PointD)values[0]!);
+        var to = ToAvaloniaPoint((PointD)values[1]!);
 
         double dx = to.X - from.X;
         double dy = to.Y - from.Y;
@@ -95,7 +95,7 @@ public class ArrowGeometryConverter : IMultiValueConverter
         return sg;
     }
 
-    private static Point ToAvaloniaPoint(MouseLabAvaloniaDesktop.Models.Point p)
+    private static Point ToAvaloniaPoint(PointD p)
     {
         return new Point(p.X, p.Y);
     }
