@@ -2,6 +2,7 @@ using Avalonia.Controls.PanAndZoom;
 using MouseLabAvaloniaDesktop.Models.Settings;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels.Worktop;
+using MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 using Xunit;
 using ModelsPoint = MouseLabAvaloniaDesktop.Models.Point;
 using Vector = Avalonia.Vector;
@@ -152,5 +153,78 @@ public class WorkspaceInteractionTests
 
         Assert.Null(vm.SelectedNode);
         Assert.False(node.IsSelected);
+    }
+
+    [Fact]
+    public void SelectingConnectionClearsNodeSelection()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        vm.OnCanvasPressed(new ModelsPoint(1, 1));
+        vm.OnCanvasPressed(new ModelsPoint(50, 50));
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        var node = vm.Nodes[0];
+        var connection = Assert.Single(vm.Connections);
+
+        vm.SelectNode(node);
+        Assert.True(node.IsSelected);
+
+        vm.SelectConnection(connection);
+
+        Assert.Null(vm.SelectedNode);
+        Assert.False(node.IsSelected);
+        Assert.Same(connection, vm.SelectedConnection);
+        Assert.True(connection.IsSelected);
+    }
+
+    [Fact]
+    public void SelectingNodeClearsConnectionSelection()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        vm.OnCanvasPressed(new ModelsPoint(1, 1));
+        vm.OnCanvasPressed(new ModelsPoint(50, 50));
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        var node = vm.Nodes[0];
+        var connection = Assert.Single(vm.Connections);
+
+        vm.SelectConnection(connection);
+        Assert.True(connection.IsSelected);
+
+        vm.SelectNode(node);
+
+        Assert.Null(vm.SelectedConnection);
+        Assert.False(connection.IsSelected);
+        Assert.Same(node, vm.SelectedNode);
+        Assert.True(node.IsSelected);
+    }
+
+    [Fact]
+    public void ConnectionSelectionWorksOnlyInSelectMode()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        vm.OnCanvasPressed(new ModelsPoint(1, 1));
+        vm.OnCanvasPressed(new ModelsPoint(50, 50));
+        var connection = Assert.Single(vm.Connections);
+
+        vm.SelectConnection(connection);
+        Assert.Null(vm.SelectedConnection);
+
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        vm.SelectConnection(connection);
+        Assert.Same(connection, vm.SelectedConnection);
+
+        vm.SetMode(WorkspaceMode.Add);
+        Assert.Null(vm.SelectedConnection);
+        Assert.False(connection.IsSelected);
+    }
+
+    [Fact]
+    public void ArrowTargetsCenterOfSecondNode()
+    {
+        using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0));
+
+        Assert.Equal(8, connection.Start.X);
+        Assert.Equal(100, connection.End.X);
+        Assert.Equal(104, connection.ArrowTo.X);
+        Assert.Equal(4, connection.ArrowTo.Y);
     }
 }

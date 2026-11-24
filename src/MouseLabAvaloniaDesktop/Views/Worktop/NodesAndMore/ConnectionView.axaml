@@ -3,10 +3,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:b="using:MouseLabAvaloniaDesktop.Behaviors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="vm:ConnectionViewModel"
              x:Class="MouseLabAvaloniaDesktop.Views.ConnectionView"
-             ClipToBounds="False">
+              ClipToBounds="False">
+  <i:Interaction.Behaviors>
+    <b:ConnectionPointerBehavior />
+  </i:Interaction.Behaviors>
 
   <UserControl.Styles>
         <Style Selector="Path.edge">

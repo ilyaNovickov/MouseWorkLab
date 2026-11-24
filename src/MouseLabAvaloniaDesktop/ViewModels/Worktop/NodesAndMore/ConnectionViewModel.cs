@@ -118,14 +118,14 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                 End.Y + dy * (-0.4) + ny * offset * 0.25);
 
             ArrowFrom = Control2;
-            ArrowTo = End;
+            ArrowTo = t;
         }
         else
         {
             Control1 = Start;
             Control2 = End;
             ArrowFrom = Start;
-            ArrowTo = End;
+            ArrowTo = t;
         }
     }
 

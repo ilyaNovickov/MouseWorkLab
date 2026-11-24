@@ -113,13 +113,12 @@
                                 Canvas.Left="{Binding WorktopPosition}"
                                 Canvas.Top="{Binding WorktopPosition}" />
 
-                            <ItemsControl ItemsSource="{Binding Connections}"
-                                          IsHitTestVisible="False">
+                            <ItemsControl ItemsSource="{Binding Connections}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas Width="{Binding AvailableResolution}"
                                                 Height="{Binding AvailableResolution}"
-                                                Background="Transparent" />
+                                                Background="{x:Null}" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>

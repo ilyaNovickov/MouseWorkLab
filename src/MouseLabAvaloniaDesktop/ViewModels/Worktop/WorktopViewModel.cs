@@ -184,6 +184,9 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         private NodeViewModel? selectedNode;
 
         [ObservableProperty]
+        private ConnectionViewModel? selectedConnection;
+
+        [ObservableProperty]
         private ButtonName panButton = ButtonName.Middle;
 
         [RelayCommand]
@@ -213,6 +216,8 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             if (WorkspaceMode != WorkspaceMode.SelectAndMove || SelectedNode == node)
                 return;
 
+            ClearConnectionSelection();
+
             if (SelectedNode is not null)
                 SelectedNode.IsSelected = false;
 
@@ -220,8 +225,30 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             node.IsSelected = true;
         }
 
+        public void SelectConnection(ConnectionViewModel connection)
+        {
+            if (WorkspaceMode != WorkspaceMode.SelectAndMove || SelectedConnection == connection)
+                return;
+
+            ClearSelection();
+
+            SelectedConnection = connection;
+            connection.IsSelected = true;
+        }
+
+        private void ClearConnectionSelection()
+        {
+            if (SelectedConnection is null)
+                return;
+
+            SelectedConnection.IsSelected = false;
+            SelectedConnection = null;
+        }
+
         public void ClearSelection()
         {
+            ClearConnectionSelection();
+
             if (SelectedNode is null)
                 return;
 
