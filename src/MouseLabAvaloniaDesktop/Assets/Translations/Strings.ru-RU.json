@@ -1,7 +1,10 @@
 {
   "Worktop" : {
     "Seed": "Сид",
-    "Generate": "Сгенерировать"
+    "Generate": "Сгенерировать",
+    "ConnectionKind": "Тип",
+    "ConnectionKindStraight": "Прямая",
+    "ConnectionKindCurved": "Кривая"
   },
 
 

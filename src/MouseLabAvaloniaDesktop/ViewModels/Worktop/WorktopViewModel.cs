@@ -23,6 +23,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
     {
         private readonly ModelingEnv _modelingEnv;
         private readonly ModelingSettings _modelingSettings;
+        private readonly List<ConnectionKindOption> connectionKindOptions;
 
         public WorktopViewModel(
             ITranslationService translation,
@@ -34,6 +35,11 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             //WorktopCanvasViewModel = worktopCanvasViewModel;
             _modelingEnv = modelingEnv;
             _modelingSettings = modelingSettings;
+            connectionKindOptions =
+            [
+                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindStraight(), ConnectionKinds.Straight),
+                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindCurved(), ConnectionKinds.Curved)
+            ];
 
             //RelayCommand<int, int> relayCommand = new RelayCommand<int, int>(AddNode);
 
@@ -188,6 +194,42 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 
         [ObservableProperty]
         private ButtonName panButton = ButtonName.Middle;
+
+        public IReadOnlyList<ConnectionKindOption> ConnectionKindOptions => connectionKindOptions;
+
+        public bool HasSelectedConnection => SelectedConnection is not null;
+
+        public ConnectionKindOption? SelectedConnectionKindOption
+        {
+            get => SelectedConnection is null
+                ? null
+                : connectionKindOptions.FirstOrDefault(option => option.Kind == SelectedConnection.Kind);
+            set
+            {
+                if (value is null || SelectedConnection is null || SelectedConnection.Kind == value.Kind)
+                    return;
+
+                SelectedConnection.Kind = value.Kind;
+                OnPropertyChanged();
+            }
+        }
+
+        partial void OnSelectedConnectionChanged(ConnectionViewModel? value)
+        {
+            OnPropertyChanged(nameof(SelectedConnectionKindOption));
+            OnPropertyChanged(nameof(HasSelectedConnection));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (ConnectionKindOption option in connectionKindOptions)
+                    option.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
 
         [RelayCommand]
         public void SetMode(WorkspaceMode mode)

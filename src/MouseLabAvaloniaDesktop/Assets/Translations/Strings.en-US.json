@@ -1,7 +1,10 @@
 {
   "Worktop" : {
     "Seed": "Seed",
-    "Generate": "Generate"
+    "Generate": "Generate",
+    "ConnectionKind": "Type",
+    "ConnectionKindStraight": "Straight",
+    "ConnectionKindCurved": "Curved"
   },
 
 

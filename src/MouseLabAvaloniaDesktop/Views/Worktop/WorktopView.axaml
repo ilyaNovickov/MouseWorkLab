@@ -31,6 +31,18 @@
             <Button Content="Добавление"
                     Command="{Binding SetModeCommand}"
                     CommandParameter="{x:Static vm:WorkspaceMode.Add}" />
+            <TextBlock Classes="center"
+                       Text="{Binding Strings.WorktopConnectionKind}" />
+            <ComboBox ItemsSource="{Binding ConnectionKindOptions}"
+                      SelectedItem="{Binding SelectedConnectionKindOption}"
+                      IsEnabled="{Binding HasSelectedConnection}"
+                      MinWidth="110">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding DisplayName.Value}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </Menu>
         <Border DockPanel.Dock="Bottom"
                 Margin="5,5,5,5"

@@ -1,4 +1,5 @@
 using Avalonia.Controls.PanAndZoom;
+using MouseLabAvaloniaDesktop.Models;
 using MouseLabAvaloniaDesktop.Models.Settings;
 using MouseLabAvaloniaDesktop.Services.Implementations;
 using MouseLabAvaloniaDesktop.ViewModels.Worktop;
@@ -242,5 +243,43 @@ public class WorkspaceInteractionTests
         Assert.Equal(100, connection.ArrowTo.X);
         Assert.Equal(4, connection.ArrowTo.Y);
         Assert.True(connection.ArrowFrom.X < connection.ArrowTo.X);
+    }
+
+    [Fact]
+    public void SelectedKindOptionChangesSelectedConnectionKind()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        vm.OnCanvasPressed(new ModelsPoint(1, 1));
+        vm.OnCanvasPressed(new ModelsPoint(50, 50));
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        var connection = Assert.Single(vm.Connections);
+        vm.SelectConnection(connection);
+
+        Assert.True(vm.HasSelectedConnection);
+        Assert.Equal(ConnectionKinds.Straight, vm.SelectedConnectionKindOption!.Kind);
+
+        ConnectionKindOption curved = Assert.Single(
+            vm.ConnectionKindOptions, option => option.Kind == ConnectionKinds.Curved);
+        vm.SelectedConnectionKindOption = curved;
+
+        Assert.Equal(ConnectionKinds.Curved, connection.Kind);
+        Assert.True(connection.ShowHandles);
+        Assert.Same(curved, vm.SelectedConnectionKindOption);
+
+        vm.ClearSelection();
+        Assert.False(vm.HasSelectedConnection);
+        Assert.Null(vm.SelectedConnectionKindOption);
+    }
+
+    [Fact]
+    public void KindOptionWithoutSelectedConnectionIsIgnored()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        ConnectionKindOption curved = Assert.Single(
+            vm.ConnectionKindOptions, option => option.Kind == ConnectionKinds.Curved);
+
+        vm.SelectedConnectionKindOption = curved;
+
+        Assert.Null(vm.SelectedConnectionKindOption);
     }
 }
