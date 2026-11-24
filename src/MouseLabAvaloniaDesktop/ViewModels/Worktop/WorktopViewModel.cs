@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Collections.Specialized;
 using Avalonia.Controls.PanAndZoom;
 using Vector = Avalonia.Vector;
+using System.Linq;
 
 namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 {
@@ -157,6 +158,13 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    if (e.NewItems is not null && e.NewItems.Count == 1)
+                    {
+                        if (e.NewItems[0] is NodeViewModel nodeVM && Nodes.Count != 1)
+                        {
+                            AddConnection(Nodes[^2], nodeVM);
+                        }
+                    }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     break;
@@ -244,6 +252,14 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             };
 
             Nodes.Add(nodeViewModel);
+        }
+
+        public ObservableCollection<ConnectionViewModel> Connections = new();
+
+        private void AddConnection(NodeViewModel source, NodeViewModel target)
+        {
+            var conn = new ConnectionViewModel(source, target);
+            Connections.Add(conn);
         }
     }
 }

@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:ConnectionViewModel"
+             x:Class="MouseLabAvaloniaDesktop.Views.ConnectionView"
+             ClipToBounds="False">
+
+  <UserControl.Styles>
+        <Style Selector="Path.edge">
+            <Setter Property="Stroke" Value="#5A6672" />
+            <Setter Property="StrokeThickness" Value="2" />
+        </Style>
+        <Style Selector="Path.edge.selected">
+            <Setter Property="Stroke" Value="#FF3D7EFF" />
+            <Setter Property="StrokeThickness" Value="3" />
+        </Style>
+        <Style Selector="Path.arrow">
+            <Setter Property="Fill" Value="#5A6672" />
+        </Style>
+        <Style Selector="Path.arrow.selected">
+            <Setter Property="Fill" Value="#FF3D7EFF" />
+        </Style>
+        <Style Selector="Line.guide">
+            <Setter Property="Stroke" Value="#883D7EFF" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="StrokeDashArray" Value="3,3" />
+        </Style>
+        <Style Selector="Ellipse.handle">
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Height" Value="12" />
+            <Setter Property="Fill" Value="White" />
+            <Setter Property="Stroke" Value="#FF3D7EFF" />
+            <Setter Property="StrokeThickness" Value="2" />
+            <Setter Property="Cursor" Value="SizeAll" />
+        </Style>
+    </UserControl.Styles>
+
+  <Canvas>
+    <!-- Основная линия -->
+    <Panel>
+      <Path Classes="edge"
+            Classes.selected="{Binding IsSelected}"
+            Data="{Binding #hitPath.Data}"
+            IsHitTestVisible="False"/>
+
+      <!-- Стрелка -->
+      <Path Classes="arrow"
+            Classes.selected="{Binding IsSelected}"
+            IsHitTestVisible="False">
+        <Path.Data>
+          <MultiBinding Converter="{StaticResource ArrowGeometry}">
+            <Binding Path="ArrowFrom" />
+            <Binding Path="ArrowTo" />
+          </MultiBinding>
+        </Path.Data>
+      </Path>
+
+      <!-- Прозрачная область для клика -->
+      <Path Name="hitPath"
+            Stroke="Transparent"
+            StrokeThickness="14"
+            Cursor="Hand">
+        <Path.Data>
+          <MultiBinding Converter="{StaticResource ConnectionGeometry}">
+            <Binding Path="Start" />
+            <Binding Path="End" />
+            <Binding Path="Control1" />
+            <Binding Path="Control2" />
+            <Binding Path="Kind" />
+          </MultiBinding>
+        </Path.Data>
+      </Path>
+    </Panel>
+
+      <!-- Направляющие линии к контрольным точкам -->
+      <Line Classes="guide"
+            IsVisible="{Binding ShowHandles}"
+            IsHitTestVisible="False"
+            StartPoint="{Binding Start}"
+            EndPoint="{Binding Control1}" />
+      <Line Classes="guide"
+            IsVisible="{Binding ShowHandles}"
+            IsHitTestVisible="False"
+            StartPoint="{Binding End}"
+            EndPoint="{Binding Control2}" />
+
+      <!-- Ручки Безье -->
+      <Ellipse Classes="handle"
+               IsVisible="{Binding ShowHandles}"
+               Canvas.Left="{Binding Control1.X}"
+               Canvas.Top="{Binding Control1.Y}">
+        <Ellipse.RenderTransform>
+          <TranslateTransform X="-6" Y="-6" />
+        </Ellipse.RenderTransform>
+      </Ellipse>
+      <Ellipse Classes="handle"
+               IsVisible="{Binding ShowHandles}"
+               Canvas.Left="{Binding Control2.X}"
+               Canvas.Top="{Binding Control2.Y}">
+        <Ellipse.RenderTransform>
+          <TranslateTransform X="-6" Y="-6" />
+        </Ellipse.RenderTransform>
+      </Ellipse>
+  </Canvas>
+</UserControl>
