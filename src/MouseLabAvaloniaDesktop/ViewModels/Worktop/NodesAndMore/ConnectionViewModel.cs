@@ -79,6 +79,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     private void Recompute()
     {
         const double nodeRadius = NodeViewModel.DefaultSize / 2d;
+        const double connectorOverlap = 1d;
         const double arrowDirectionLength = 10d;
 
         var s = new PointD(Source.X + nodeRadius, Source.Y + nodeRadius);
@@ -103,10 +104,15 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
             return;
         }
 
-        Start = new PointD(s.X + ux * nodeRadius,
-                          s.Y + uy * nodeRadius);
-        End = new PointD(t.X - ux * nodeRadius,
-                        t.Y - uy * nodeRadius);
+        double connectorRadius = nodeRadius - connectorOverlap;
+
+        Start = new PointD(s.X + ux * connectorRadius,
+                           s.Y + uy * connectorRadius);
+        End = new PointD(t.X - ux * connectorRadius,
+                         t.Y - uy * connectorRadius);
+
+        PointD arrowTip = new(t.X - ux * nodeRadius, t.Y - uy * nodeRadius);
+
 
         if (Kind == ConnectionKinds.Curved)
         {
@@ -120,17 +126,17 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                 End.X + dx * (-0.4) + nx * offset * 0.25,
                 End.Y + dy * (-0.4) + ny * offset * 0.25);
 
-            ArrowFrom = new PointD(End.X - ux * arrowDirectionLength,
-                                   End.Y - uy * arrowDirectionLength);
-            ArrowTo = End;
+            ArrowFrom = new PointD(arrowTip.X - ux * arrowDirectionLength,
+                                   arrowTip.Y - uy * arrowDirectionLength);
+            ArrowTo = arrowTip;
         }
         else
         {
             Control1 = Start;
             Control2 = End;
-            ArrowFrom = new PointD(End.X - ux * arrowDirectionLength,
-                                   End.Y - uy * arrowDirectionLength);
-            ArrowTo = End;
+            ArrowFrom = new PointD(arrowTip.X - ux * arrowDirectionLength,
+                                   arrowTip.Y - uy * arrowDirectionLength);
+            ArrowTo = arrowTip;
         }
     }
 
