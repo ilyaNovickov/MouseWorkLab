@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Controls.PanAndZoom;
 using MouseLabAvaloniaDesktop.Models;
 using MouseLabAvaloniaDesktop.Models.Settings;
@@ -231,7 +232,7 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
-    public void CurvedArrowAlsoPointsToTargetCenter()
+    public void CurvedArrowTipRestsOnTargetCircle()
     {
         using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
         {
@@ -240,8 +241,9 @@ public class WorkspaceInteractionTests
 
         Assert.Equal(7, connection.Start.X);
         Assert.Equal(101, connection.End.X);
-        Assert.Equal(100, connection.ArrowTo.X);
-        Assert.Equal(4, connection.ArrowTo.Y);
+        double relX = connection.ArrowTo.X - 104;
+        double relY = connection.ArrowTo.Y - 4;
+        Assert.Equal(4d, Math.Sqrt(relX * relX + relY * relY), 6);
         Assert.True(connection.ArrowFrom.X < connection.ArrowTo.X);
     }
 
@@ -339,5 +341,39 @@ public class WorkspaceInteractionTests
         vm.SetConnectionControlPoint(connection, 0, new PointD(1, 1));
         Assert.Equal(25, connection.Control1.X);
         Assert.Equal(35, connection.Control1.Y);
+    }
+
+    [Fact]
+    public void CurvedArrowTipLiesOnTargetCircleAlongCurveTangent()
+    {
+        using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
+        {
+            Kind = ConnectionKinds.Curved
+        };
+
+        double relX = connection.ArrowTo.X - 104;
+        double relY = connection.ArrowTo.Y - 4;
+        double tipFromEndX = connection.ArrowTo.X - connection.End.X;
+        double tipFromEndY = connection.ArrowTo.Y - connection.End.Y;
+        double tangentX = connection.End.X - connection.Control2.X;
+        double tangentY = connection.End.Y - connection.Control2.Y;
+
+        Assert.Equal(4d, Math.Sqrt(relX * relX + relY * relY), 6);
+        Assert.Equal(0d, tangentX * tipFromEndY - tangentY * tipFromEndX, 6);
+    }
+
+    [Fact]
+    public void DraggingControlPointRotatesCurvedArrow()
+    {
+        using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
+        {
+            Kind = ConnectionKinds.Curved
+        };
+        double originalTipY = connection.ArrowTo.Y;
+
+        connection.SetControlPoint(1, new PointD(61, 50));
+
+        Assert.True(connection.ArrowTo.Y < originalTipY);
+        Assert.True(connection.ArrowTo.Y < connection.ArrowFrom.Y);
     }
 }

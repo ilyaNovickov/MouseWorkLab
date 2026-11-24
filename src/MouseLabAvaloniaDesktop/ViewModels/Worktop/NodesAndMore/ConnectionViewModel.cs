@@ -87,6 +87,38 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
             return;
 
         _manualControlPoints = true;
+        Recompute();
+    }
+
+    private void SetCurvedArrow(PointD targetCenter, PointD end, double nodeRadius)
+    {
+        const double arrowDirectionLength = 10d;
+
+        double vx = end.X - Control2.X;
+        double vy = end.Y - Control2.Y;
+        double vlen = Math.Sqrt(vx * vx + vy * vy);
+
+        if (vlen < 1e-6)
+        {
+            ArrowFrom = end;
+            ArrowTo = end;
+            return;
+        }
+
+        double dx = vx / vlen;
+        double dy = vy / vlen;
+
+        double relX = end.X - targetCenter.X;
+        double relY = end.Y - targetCenter.Y;
+        double b = relX * dx + relY * dy;
+        double c = relX * relX + relY * relY - nodeRadius * nodeRadius;
+        double distance = -b + Math.Sqrt(Math.Max(0d, b * b - c));
+
+        var tip = new PointD(end.X + dx * distance, end.Y + dy * distance);
+
+        ArrowFrom = new PointD(tip.X - dx * arrowDirectionLength,
+                               tip.Y - dy * arrowDirectionLength);
+        ArrowTo = tip;
     }
 
     private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -120,9 +152,16 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                 Control1 = s;
                 Control2 = t;
             }
-            ArrowFrom = new PointD(t.X - ux * arrowDirectionLength,
-                                   t.Y - uy * arrowDirectionLength);
-            ArrowTo = t;
+            if (Kind == ConnectionKinds.Curved)
+            {
+                SetCurvedArrow(t, End, nodeRadius);
+            }
+            else
+            {
+                ArrowFrom = new PointD(t.X - ux * arrowDirectionLength,
+                                       t.Y - uy * arrowDirectionLength);
+                ArrowTo = t;
+            }
             return;
         }
 
@@ -151,9 +190,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                     End.Y + dy * (-0.4) + ny * offset * 0.25);
             }
 
-            ArrowFrom = new PointD(arrowTip.X - ux * arrowDirectionLength,
-                                   arrowTip.Y - uy * arrowDirectionLength);
-            ArrowTo = arrowTip;
+            SetCurvedArrow(t, End, nodeRadius);
         }
         else
         {
