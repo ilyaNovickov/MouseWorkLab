@@ -140,6 +140,8 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             get => _modelingEnv.Worktop;
         }
 
+        public event EventHandler? WorktopChanged;
+
         private void OnWorktopChanged()
         {
             IsNeedGeneration = false;
@@ -153,6 +155,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             //WorktopPosition = (AvailableResolution - _modelingEnv.Worktop.Width) / 2;
 
             OnPropertyChanged(nameof(Worktop));
+            WorktopChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public const int MaxNodes = 1024;

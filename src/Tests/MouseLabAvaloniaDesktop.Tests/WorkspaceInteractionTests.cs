@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using Avalonia.Controls.PanAndZoom;
 using MouseLabAvaloniaDesktop.Converters;
 using MouseLabAvaloniaDesktop.Models;
@@ -24,6 +25,18 @@ public class WorkspaceInteractionTests
         using WorktopViewModel vm = CreateViewModel();
 
         Assert.Equal(WorkspaceMode.Add, vm.WorkspaceMode);
+    }
+
+    [Fact]
+    public async Task GenerateWorktopRaisesWorktopChanged()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        bool raised = false;
+        vm.WorktopChanged += (_, _) => raised = true;
+
+        await vm.GenerateWorktopCommand.ExecuteAsync(null);
+
+        Assert.True(raised);
     }
 
     [Fact]

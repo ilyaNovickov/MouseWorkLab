@@ -46,11 +46,18 @@ namespace MouseLabAvaloniaDesktop.Views
 
         private WorktopViewModel? _worktopVM;
 
+        private void WorktopVM_WorktopChanged(object? sender, EventArgs e) =>
+            worktop.InvalidateVisual();
+
         private void this_DataContexChanged(object? sender, EventArgs e)
         {
             if (this.DataContext != _worktopVM)
             {
-                _worktopVM?.Dispose();
+                if (_worktopVM is not null)
+                {
+                    _worktopVM.WorktopChanged -= WorktopVM_WorktopChanged;
+                    _worktopVM.Dispose();
+                }
 
                 if (this.DataContext is not WorktopViewModel worktopViewModel)
                 {
@@ -58,6 +65,7 @@ namespace MouseLabAvaloniaDesktop.Views
                     return;
                 }
                 _worktopVM = worktopViewModel;
+                _worktopVM.WorktopChanged += WorktopVM_WorktopChanged;
             }
         }
     }
