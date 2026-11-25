@@ -44,6 +44,39 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
+    public void ModeSetsCursorFlagsOnNodesAndConnections()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        vm.OnCanvasPressed(new ModelsPoint(1, 2));
+        vm.OnCanvasPressed(new ModelsPoint(50, 60));
+        var node = vm.Nodes[0];
+        var connection = Assert.Single(vm.Connections);
+
+        Assert.False(node.CanInteract);
+        Assert.False(node.CanDelete);
+        Assert.False(connection.CanInteract);
+        Assert.False(connection.CanDelete);
+
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        Assert.True(node.CanInteract);
+        Assert.False(node.CanDelete);
+        Assert.True(connection.CanInteract);
+        Assert.False(connection.CanDelete);
+
+        vm.SetMode(WorkspaceMode.Delete);
+        Assert.False(node.CanInteract);
+        Assert.True(node.CanDelete);
+        Assert.False(connection.CanInteract);
+        Assert.True(connection.CanDelete);
+
+        vm.SetMode(WorkspaceMode.PanOnly);
+        Assert.False(node.CanInteract);
+        Assert.False(node.CanDelete);
+        Assert.False(connection.CanInteract);
+        Assert.False(connection.CanDelete);
+    }
+
+    [Fact]
     public void CanvasPressAddsNodeOnlyInAddMode()
     {
         using WorktopViewModel vm = CreateViewModel();

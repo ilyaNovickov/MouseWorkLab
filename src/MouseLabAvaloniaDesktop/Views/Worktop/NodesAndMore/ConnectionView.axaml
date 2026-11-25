@@ -71,9 +71,11 @@
 
       <!-- Прозрачная область для клика -->
       <Path Name="hitPath"
+            Classes="hit"
+            Classes.interactive="{Binding CanInteract}"
+            Classes.deleting="{Binding CanDelete}"
             Stroke="Transparent"
-            StrokeThickness="14"
-            Cursor="Hand">
+            StrokeThickness="14">
         <Path.Data>
           <MultiBinding Converter="{StaticResource ConnectionGeometry}">
             <Binding Path="Start" />
