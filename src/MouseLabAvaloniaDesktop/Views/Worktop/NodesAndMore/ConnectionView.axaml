@@ -30,7 +30,7 @@
         </Style>
         <Style Selector="Line.guide">
             <Setter Property="Stroke" Value="#883D7EFF" />
-            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="StrokeThickness" Value="2" />
             <Setter Property="StrokeDashArray" Value="3,3" />
         </Style>
         <Style Selector="Ellipse.handle">
@@ -104,14 +104,14 @@
           <TranslateTransform X="-6" Y="-6" />
         </Ellipse.RenderTransform>
       </Ellipse>
-       <Ellipse Classes="handle"
-                IsVisible="{Binding ShowHandles}"
-                Canvas.Left="{Binding Control2.X}"
-                Canvas.Top="{Binding Control2.Y}">
-         <i:Interaction.Behaviors>
-           <b:BezierHandleDragBehavior HandleIndex="1" CanDrag="{Binding ShowHandles}" />
-         </i:Interaction.Behaviors>
-         <Ellipse.RenderTransform>
+      <Ellipse Classes="handle"
+               IsVisible="{Binding ShowHandles}"
+               Canvas.Left="{Binding Control2.X}"
+               Canvas.Top="{Binding Control2.Y}">
+        <i:Interaction.Behaviors>
+          <b:BezierHandleDragBehavior HandleIndex="1" CanDrag="{Binding ShowHandles}" />
+        </i:Interaction.Behaviors>
+        <Ellipse.RenderTransform>
           <TranslateTransform X="-6" Y="-6" />
         </Ellipse.RenderTransform>
       </Ellipse>
