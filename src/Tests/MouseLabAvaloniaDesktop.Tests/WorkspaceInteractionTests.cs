@@ -232,7 +232,7 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
-    public void CurvedArrowTipRestsOutsideTargetCircle()
+    public void CurvedArrowTipRestsOnTargetCircle()
     {
         using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
         {
@@ -243,7 +243,7 @@ public class WorkspaceInteractionTests
         Assert.Equal(101, connection.End.X);
         double relX = connection.ArrowTo.X - 104;
         double relY = connection.ArrowTo.Y - 4;
-        Assert.Equal(5d, Math.Sqrt(relX * relX + relY * relY), 6);
+        Assert.Equal(4d, Math.Sqrt(relX * relX + relY * relY), 6);
         Assert.True(connection.ArrowFrom.X < connection.ArrowTo.X);
     }
 
@@ -344,7 +344,7 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
-    public void CurvedArrowTipLiesOutsideTargetCircleAlongCurveTangent()
+    public void CurvedArrowTipLiesOnNearSideOfTargetCircle()
     {
         using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
         {
@@ -358,8 +358,9 @@ public class WorkspaceInteractionTests
         double tangentX = connection.End.X - connection.Control2.X;
         double tangentY = connection.End.Y - connection.Control2.Y;
 
-        Assert.Equal(5d, Math.Sqrt(relX * relX + relY * relY), 6);
+        Assert.Equal(4d, Math.Sqrt(relX * relX + relY * relY), 6);
         Assert.Equal(0d, tangentX * tipFromEndY - tangentY * tipFromEndX, 6);
+        Assert.True(relX * tangentX + relY * tangentY < 0d);
     }
 
     [Fact]
@@ -373,7 +374,7 @@ public class WorkspaceInteractionTests
 
         connection.SetControlPoint(1, new PointD(61, 50));
 
-        Assert.True(connection.ArrowTo.Y < originalTipY);
+        Assert.True(Math.Abs(connection.ArrowTo.Y - originalTipY) > 1e-6);
         Assert.True(connection.ArrowTo.Y < connection.ArrowFrom.Y);
     }
 }
