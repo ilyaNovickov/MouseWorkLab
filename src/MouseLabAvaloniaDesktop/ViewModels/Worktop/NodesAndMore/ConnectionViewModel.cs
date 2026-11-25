@@ -93,6 +93,8 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     private void SetCurvedArrow(PointD targetCenter, PointD end, double nodeRadius)
     {
         const double arrowDirectionLength = 10d;
+        const double arrowTipOutset = 1d;
+        double tipRadius = nodeRadius + arrowTipOutset;
 
         double vx = end.X - Control2.X;
         double vy = end.Y - Control2.Y;
@@ -111,7 +113,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
         double relX = end.X - targetCenter.X;
         double relY = end.Y - targetCenter.Y;
         double b = relX * dx + relY * dy;
-        double c = relX * relX + relY * relY - nodeRadius * nodeRadius;
+        double c = relX * relX + relY * relY - tipRadius * tipRadius;
         double distance = -b + Math.Sqrt(Math.Max(0d, b * b - c));
 
         var tip = new PointD(end.X + dx * distance, end.Y + dy * distance);
