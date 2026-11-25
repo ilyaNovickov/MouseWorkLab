@@ -1,5 +1,7 @@
 using System;
+using System.Globalization;
 using Avalonia.Controls.PanAndZoom;
+using MouseLabAvaloniaDesktop.Converters;
 using MouseLabAvaloniaDesktop.Models;
 using MouseLabAvaloniaDesktop.Models.Settings;
 using MouseLabAvaloniaDesktop.Services.Implementations;
@@ -422,5 +424,19 @@ public class WorkspaceInteractionTests
         return new PointD(
             p0.X * a + p1.X * b + p2.X * c + p3.X * d,
             p0.Y * a + p1.Y * b + p2.Y * c + p3.Y * d);
+    }
+
+    [Fact]
+    public void PointDConverterConvertsBothDirections()
+    {
+        var converter = new PointDToPointConverter();
+
+        object? point = converter.Convert(
+            new PointD(3, 4), typeof(Avalonia.Point), null, CultureInfo.InvariantCulture);
+        Assert.Equal(new Avalonia.Point(3, 4), point);
+
+        object? back = converter.ConvertBack(
+            new Avalonia.Point(3, 4), typeof(PointD), null, CultureInfo.InvariantCulture);
+        Assert.Equal(new PointD(3, 4), back);
     }
 }

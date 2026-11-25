@@ -84,13 +84,13 @@
       <Line Classes="guide"
             IsVisible="{Binding ShowHandles}"
             IsHitTestVisible="False"
-            StartPoint="{Binding Start}"
-            EndPoint="{Binding Control1}" />
+            StartPoint="{Binding Start, Converter={StaticResource PointDToPoint}}"
+            EndPoint="{Binding Control1, Converter={StaticResource PointDToPoint}}" />
       <Line Classes="guide"
             IsVisible="{Binding ShowHandles}"
             IsHitTestVisible="False"
-            StartPoint="{Binding End}"
-            EndPoint="{Binding Control2}" />
+            StartPoint="{Binding End, Converter={StaticResource PointDToPoint}}"
+            EndPoint="{Binding Control2, Converter={StaticResource PointDToPoint}}" />
 
       <!-- Ручки Безье -->
        <Ellipse Classes="handle"

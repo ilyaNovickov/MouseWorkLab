@@ -13,6 +13,7 @@
     <Application.Resources>
         <conv:ReadOnlyMatrixConverter x:Key="MatrixToImage" />
         <conv:NumberToCornerRadiusConverter x:Key="NumberToCornerRadius" />
+        <conv:PointDToPointConverter x:Key="PointDToPoint" />
         <conv:ArrowGeometryConverter x:Key="ArrowGeometry" />
         <conv:ConnectionGeometryConverter x:Key="ConnectionGeometry" />
     </Application.Resources>

@@ -100,3 +100,21 @@ public class ArrowGeometryConverter : IMultiValueConverter
         return new Point(p.X, p.Y);
     }
 }
+
+public class PointDToPointConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is PointD point ? ToAvaloniaPoint(point) : null;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is Point point ? new PointD(point.X, point.Y) : null;
+    }
+
+    private static Point ToAvaloniaPoint(PointD p)
+    {
+        return new Point(p.X, p.Y);
+    }
+}
