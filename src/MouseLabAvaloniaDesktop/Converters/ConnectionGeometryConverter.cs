@@ -89,7 +89,7 @@ public class ArrowGeometryConverter : IMultiValueConverter
         double length = ArrowLength + outline;
         double halfWidth = ArrowWidth / 2d + outline;
 
-        var tip = to;
+        var tip = new Point(to.X + ux * outline, to.Y + uy * outline);
         var left = new Point(to.X - ux * length + px * halfWidth,
                              to.Y - uy * length + py * halfWidth);
         var right = new Point(to.X - ux * length - px * halfWidth,

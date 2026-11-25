@@ -30,7 +30,7 @@
             Classes.selected="{Binding IsSelected}"
             IsHitTestVisible="False">
         <Path.Data>
-          <MultiBinding Converter="{StaticResource ArrowBackGeometry}" ConverterParameter="1.5">
+          <MultiBinding Converter="{StaticResource ArrowBackGeometry}" ConverterParameter="0.75">
             <Binding Path="ArrowFrom" />
             <Binding Path="ArrowTo" />
           </MultiBinding>

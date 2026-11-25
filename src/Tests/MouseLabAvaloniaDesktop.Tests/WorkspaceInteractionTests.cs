@@ -608,7 +608,7 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
-    public void ArrowOutlineKeepsTipAndExpandsBackward()
+    public void ArrowOutlineExtendsTipAndExpandsBackward()
     {
         var from = new Avalonia.Point(100, 0);
         var to = new Avalonia.Point(110, 0);
@@ -618,7 +618,8 @@ public class WorkspaceInteractionTests
 
         Assert.NotNull(main);
         Assert.NotNull(outline);
-        Assert.Equal(main.Value.Tip, outline.Value.Tip);
+        Assert.Equal(main.Value.Tip.X + 2d, outline.Value.Tip.X);
+        Assert.Equal(main.Value.Tip.Y, outline.Value.Tip.Y);
         Assert.Equal(main.Value.Left.X - 2d, outline.Value.Left.X);
         Assert.True(outline.Value.Left.Y > main.Value.Left.Y);
         Assert.True(outline.Value.Right.Y < main.Value.Right.Y);
