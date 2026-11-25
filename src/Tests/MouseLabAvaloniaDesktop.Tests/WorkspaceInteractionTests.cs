@@ -344,7 +344,7 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
-    public void CurvedArrowTipLiesOnNearSideOfTargetCircle()
+    public void CurvedArrowTipLiesOnCurveAndNearSideOfTargetCircle()
     {
         using var connection = new ConnectionViewModel(new NodeViewModel(0, 0), new NodeViewModel(100, 0))
         {
@@ -353,14 +353,31 @@ public class WorkspaceInteractionTests
 
         double relX = connection.ArrowTo.X - 104;
         double relY = connection.ArrowTo.Y - 4;
-        double tipFromEndX = connection.ArrowTo.X - connection.End.X;
-        double tipFromEndY = connection.ArrowTo.Y - connection.End.Y;
-        double tangentX = connection.End.X - connection.Control2.X;
-        double tangentY = connection.End.Y - connection.Control2.Y;
 
         Assert.Equal(4d, Math.Sqrt(relX * relX + relY * relY), 6);
-        Assert.Equal(0d, tangentX * tipFromEndY - tangentY * tipFromEndX, 6);
-        Assert.True(relX * tangentX + relY * tangentY < 0d);
+        Assert.True(DistanceToCurve(connection, connection.ArrowTo) < 0.1d);
+        Assert.True((connection.ArrowTo.X - connection.ArrowFrom.X) * -relX
+                    + (connection.ArrowTo.Y - connection.ArrowFrom.Y) * -relY > 0d);
+    }
+
+    [Fact]
+    public void ArrowStaysOnCurveForStronglyBentConnection()
+    {
+        var target = new NodeViewModel(135, 456);
+        using var connection = new ConnectionViewModel(new NodeViewModel(102, 481), target)
+        {
+            Kind = ConnectionKinds.Curved
+        };
+        connection.SetControlPoint(0, new PointD(107.7486, 439.7789));
+        connection.SetControlPoint(1, new PointD(140.4384, 457.42638));
+
+        double relX = connection.ArrowTo.X - (target.X + 4);
+        double relY = connection.ArrowTo.Y - (target.Y + 4);
+
+        Assert.Equal(4d, Math.Sqrt(relX * relX + relY * relY), 6);
+        Assert.True(DistanceToCurve(connection, connection.ArrowTo) < 0.1d);
+        Assert.True((connection.ArrowTo.X - connection.ArrowFrom.X) * -relX
+                    + (connection.ArrowTo.Y - connection.ArrowFrom.Y) * -relY > 0d);
     }
 
     [Fact]
@@ -376,5 +393,34 @@ public class WorkspaceInteractionTests
 
         Assert.True(Math.Abs(connection.ArrowTo.Y - originalTipY) > 1e-6);
         Assert.True(connection.ArrowTo.Y < connection.ArrowFrom.Y);
+    }
+
+    private static double DistanceToCurve(ConnectionViewModel connection, PointD point)
+    {
+        double minimum = double.MaxValue;
+
+        for (int i = 0; i <= 2000; i++)
+        {
+            PointD sample = BezierPoint(connection.Start, connection.Control1,
+                                        connection.Control2, connection.End, i / 2000d);
+            double dx = sample.X - point.X;
+            double dy = sample.Y - point.Y;
+            minimum = Math.Min(minimum, Math.Sqrt(dx * dx + dy * dy));
+        }
+
+        return minimum;
+    }
+
+    private static PointD BezierPoint(PointD p0, PointD p1, PointD p2, PointD p3, double t)
+    {
+        double u = 1d - t;
+        double a = u * u * u;
+        double b = 3d * u * u * t;
+        double c = 3d * u * t * t;
+        double d = t * t * t;
+
+        return new PointD(
+            p0.X * a + p1.X * b + p2.X * c + p3.X * d,
+            p0.Y * a + p1.Y * b + p2.Y * c + p3.Y * d);
     }
 }

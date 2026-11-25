@@ -90,37 +90,113 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
         Recompute();
     }
 
-    private void SetCurvedArrow(PointD targetCenter, PointD end, double nodeRadius)
+    private void SetCurvedArrow(PointD start, PointD targetCenter, PointD end, double nodeRadius)
     {
         const double arrowDirectionLength = 10d;
+        double radiusSquared = nodeRadius * nodeRadius;
 
-        double vx = end.X - Control2.X;
-        double vy = end.Y - Control2.Y;
-        double vlen = Math.Sqrt(vx * vx + vy * vy);
-
-        if (vlen < 1e-6)
+        double CircleDistance(double t)
         {
-            ArrowFrom = end;
-            ArrowTo = end;
-            return;
+            PointD point = BezierPoint(start, Control1, Control2, end, t);
+            double dx = point.X - targetCenter.X;
+            double dy = point.Y - targetCenter.Y;
+            return dx * dx + dy * dy - radiusSquared;
         }
 
-        double dx = vx / vlen;
-        double dy = vy / vlen;
+        double crossing = -1d;
+        double previousT = 0d;
+        double previousDistance = CircleDistance(0d);
 
-        double relX = end.X - targetCenter.X;
-        double relY = end.Y - targetCenter.Y;
-        double backX = -dx;
-        double backY = -dy;
-        double b = relX * backX + relY * backY;
-        double c = relX * relX + relY * relY - nodeRadius * nodeRadius;
-        double distance = -b + Math.Sqrt(Math.Max(0d, b * b - c));
+        for (int i = 1; i <= 32; i++)
+        {
+            double t = i / 32d;
+            double distance = CircleDistance(t);
 
-        var tip = new PointD(end.X + backX * distance, end.Y + backY * distance);
+            if (previousDistance >= 0d && distance < 0d)
+            {
+                double low = previousT;
+                double high = t;
 
-        ArrowFrom = new PointD(tip.X - dx * arrowDirectionLength,
-                               tip.Y - dy * arrowDirectionLength);
+                for (int j = 0; j < 24; j++)
+                {
+                    double middle = (low + high) * 0.5d;
+                    if (CircleDistance(middle) >= 0d)
+                        low = middle;
+                    else
+                        high = middle;
+                }
+
+                crossing = (low + high) * 0.5d;
+            }
+
+            previousT = t;
+            previousDistance = distance;
+        }
+
+        PointD tip;
+        PointD direction;
+
+        if (crossing >= 0d)
+        {
+            tip = BezierPoint(start, Control1, Control2, end, crossing);
+            direction = BezierTangent(start, Control1, Control2, end, crossing);
+        }
+        else
+        {
+            double vx = targetCenter.X - end.X;
+            double vy = targetCenter.Y - end.Y;
+            double length = Math.Sqrt(vx * vx + vy * vy);
+            if (length < 1e-6)
+            {
+                vx = 1d;
+                vy = 0d;
+                length = 1d;
+            }
+
+            direction = new PointD(vx / length, vy / length);
+            tip = new PointD(targetCenter.X - direction.X * nodeRadius,
+                             targetCenter.Y - direction.Y * nodeRadius);
+        }
+
+        double directionLength = Math.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
+        if (directionLength < 1e-6)
+        {
+            direction = new PointD(1d, 0d);
+            directionLength = 1d;
+        }
+
+        var unit = new PointD(direction.X / directionLength, direction.Y / directionLength);
+        if (unit.X * (targetCenter.X - tip.X) + unit.Y * (targetCenter.Y - tip.Y) < 0d)
+            unit = new PointD(-unit.X, -unit.Y);
+
+        ArrowFrom = new PointD(tip.X - unit.X * arrowDirectionLength,
+                               tip.Y - unit.Y * arrowDirectionLength);
         ArrowTo = tip;
+    }
+
+    private static PointD BezierPoint(PointD p0, PointD p1, PointD p2, PointD p3, double t)
+    {
+        double u = 1d - t;
+        double a = u * u * u;
+        double b = 3d * u * u * t;
+        double c = 3d * u * t * t;
+        double d = t * t * t;
+
+        return new PointD(
+            p0.X * a + p1.X * b + p2.X * c + p3.X * d,
+            p0.Y * a + p1.Y * b + p2.Y * c + p3.Y * d);
+    }
+
+    private static PointD BezierTangent(PointD p0, PointD p1, PointD p2, PointD p3, double t)
+    {
+        double u = 1d - t;
+        double a = 3d * u * u;
+        double b = 6d * u * t;
+        double c = 3d * t * t;
+
+        return new PointD(
+            (p1.X - p0.X) * a + (p2.X - p1.X) * b + (p3.X - p2.X) * c,
+            (p1.Y - p0.Y) * a + (p2.Y - p1.Y) * b + (p3.Y - p2.Y) * c);
     }
 
     private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -156,7 +232,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
             }
             if (Kind == ConnectionKinds.Curved)
             {
-                SetCurvedArrow(t, End, nodeRadius);
+                SetCurvedArrow(Start, t, End, nodeRadius);
             }
             else
             {
@@ -192,7 +268,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                     End.Y + dy * (-0.4) + ny * offset * 0.25);
             }
 
-            SetCurvedArrow(t, End, nodeRadius);
+            SetCurvedArrow(Start, t, End, nodeRadius);
         }
         else
         {
