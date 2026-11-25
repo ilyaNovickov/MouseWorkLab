@@ -13,42 +13,6 @@
     <b:ConnectionPointerBehavior />
   </i:Interaction.Behaviors>
 
-  <UserControl.Styles>
-        <Style Selector="Path.edge">
-            <Setter Property="Stroke" Value="#5A6672" />
-            <Setter Property="StrokeThickness" Value="1" />
-        </Style>
-        <Style Selector="Path.edge.selected">
-            <Setter Property="Stroke" Value="#FF3D7EFF" />
-            <Setter Property="StrokeThickness" Value="3" />
-        </Style>
-        <Style Selector="Path.arrow">
-            <Setter Property="Fill" Value="#5A6672" />
-        </Style>
-        <Style Selector="Path.arrow.selected">
-            <Setter Property="Fill" Value="#FF3D7EFF" />
-        </Style>
-        <Style Selector="Path.hit.interactive">
-            <Setter Property="Cursor" Value="Hand" />
-        </Style>
-        <Style Selector="Path.hit.deleting">
-            <Setter Property="Cursor" Value="Hand" />
-        </Style>
-        <Style Selector="Line.guide">
-            <Setter Property="Stroke" Value="#883D7EFF" />
-            <Setter Property="StrokeThickness" Value="2" />
-            <Setter Property="StrokeDashArray" Value="3,3" />
-        </Style>
-        <Style Selector="Ellipse.handle">
-            <Setter Property="Width" Value="12" />
-            <Setter Property="Height" Value="12" />
-            <Setter Property="Fill" Value="White" />
-            <Setter Property="Stroke" Value="#FF3D7EFF" />
-            <Setter Property="StrokeThickness" Value="2" />
-            <Setter Property="Cursor" Value="SizeAll" />
-        </Style>
-    </UserControl.Styles>
-
   <Canvas>
     <!-- Основная линия -->
     <Panel>

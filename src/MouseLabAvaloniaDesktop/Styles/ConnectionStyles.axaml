@@ -1,0 +1,60 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <Canvas Width="400" Height="130">
+        <Path Classes="edge" Data="M 20,60 L 180,60" />
+        <Path Classes="arrow" Data="M 180,60 L 166,54 L 166,66 Z" />
+
+        <Path Classes="edge selected" Data="M 220,60 C 270,20 330,100 380,60" />
+        <Path Classes="arrow selected" Data="M 380,60 L 369,69 L 368,64 Z" />
+        <Line Classes="guide" StartPoint="220,60" EndPoint="270,20" />
+        <Line Classes="guide" StartPoint="380,60" EndPoint="330,100" />
+        <Ellipse Classes="handle" Canvas.Left="270" Canvas.Top="20">
+          <Ellipse.RenderTransform>
+            <TranslateTransform X="-6" Y="-6" />
+          </Ellipse.RenderTransform>
+        </Ellipse>
+        <Ellipse Classes="handle" Canvas.Left="330" Canvas.Top="100">
+          <Ellipse.RenderTransform>
+            <TranslateTransform X="-6" Y="-6" />
+          </Ellipse.RenderTransform>
+        </Ellipse>
+      </Canvas>
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="Path.edge">
+    <Setter Property="Stroke" Value="#5A6672" />
+    <Setter Property="StrokeThickness" Value="1" />
+  </Style>
+  <Style Selector="Path.edge.selected">
+    <Setter Property="Stroke" Value="#FF3D7EFF" />
+    <Setter Property="StrokeThickness" Value="3" />
+  </Style>
+  <Style Selector="Path.arrow">
+    <Setter Property="Fill" Value="#5A6672" />
+  </Style>
+  <Style Selector="Path.arrow.selected">
+    <Setter Property="Fill" Value="#FF3D7EFF" />
+  </Style>
+  <Style Selector="Path.hit.interactive">
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Path.hit.deleting">
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Line.guide">
+    <Setter Property="Stroke" Value="#883D7EFF" />
+    <Setter Property="StrokeThickness" Value="2" />
+    <Setter Property="StrokeDashArray" Value="3,3" />
+  </Style>
+  <Style Selector="Ellipse.handle">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+    <Setter Property="Fill" Value="White" />
+    <Setter Property="Stroke" Value="#FF3D7EFF" />
+    <Setter Property="StrokeThickness" Value="2" />
+    <Setter Property="Cursor" Value="SizeAll" />
+  </Style>
+</Styles>
