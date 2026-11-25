@@ -191,7 +191,6 @@ public class ConnectionPointerBehavior : Behavior<Control>
         if (AssociatedObject.FindAncestorOfType<ItemsControl>()?.DataContext is not WorktopViewModel worktop)
             return;
 
-        e.Handled = true;
         worktop.SelectConnection(connection);
     }
 }
