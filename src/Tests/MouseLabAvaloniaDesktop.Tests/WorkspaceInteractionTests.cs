@@ -606,4 +606,28 @@ public class WorkspaceInteractionTests
             new Avalonia.Point(3, 4), typeof(PointD), null, CultureInfo.InvariantCulture);
         Assert.Equal(new PointD(3, 4), back);
     }
+
+    [Fact]
+    public void ArrowOutlineKeepsTipAndExpandsBackward()
+    {
+        var from = new Avalonia.Point(100, 0);
+        var to = new Avalonia.Point(110, 0);
+
+        var main = ArrowGeometryConverter.TryBuildTriangle(from, to, 0d);
+        var outline = ArrowGeometryConverter.TryBuildTriangle(from, to, 2d);
+
+        Assert.NotNull(main);
+        Assert.NotNull(outline);
+        Assert.Equal(main.Value.Tip, outline.Value.Tip);
+        Assert.Equal(main.Value.Left.X - 2d, outline.Value.Left.X);
+        Assert.True(outline.Value.Left.Y > main.Value.Left.Y);
+        Assert.True(outline.Value.Right.Y < main.Value.Right.Y);
+    }
+
+    [Fact]
+    public void ArrowBackConverterAcceptsNumericParameter()
+    {
+        Assert.Equal(2d, ArrowBackGeometryConverter.GetOutline("2"));
+        Assert.Equal(1.5d, ArrowBackGeometryConverter.GetOutline(null));
+    }
 }

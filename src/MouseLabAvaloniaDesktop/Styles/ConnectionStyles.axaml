@@ -3,10 +3,14 @@
   <Design.PreviewWith>
     <Border Padding="20">
       <Canvas Width="400" Height="130">
+        <Path Classes="edge back" Data="M 20,60 L 180,60" />
         <Path Classes="edge" Data="M 20,60 L 180,60" />
+        <Path Classes="arrow back" Data="M 180,60 L 164,56 L 164,64 Z" />
         <Path Classes="arrow" Data="M 180,60 L 166,54 L 166,66 Z" />
 
+        <Path Classes="edge back selected" Data="M 220,60 C 270,20 330,100 380,60" />
         <Path Classes="edge selected" Data="M 220,60 C 270,20 330,100 380,60" />
+        <Path Classes="arrow back selected" Data="M 380,60 L 366,71 L 366,62 Z" />
         <Path Classes="arrow selected" Data="M 380,60 L 369,69 L 368,64 Z" />
         <Line Classes="guide" StartPoint="220,60" EndPoint="270,20" />
         <Line Classes="guide" StartPoint="380,60" EndPoint="330,100" />

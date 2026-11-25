@@ -57,8 +57,8 @@ public class ArrowGeometryConverter : IMultiValueConverter
     private static ArrowGeometryConverter? _instance;
     public static ArrowGeometryConverter Instance => _instance ??= new();
 
-    private const double ArrowLength = 7d;
-    private const double ArrowWidth = 4.5d;
+    internal const double ArrowLength = 7d;
+    internal const double ArrowWidth = 4.5d;
 
     public object? Convert(IList<object?> values, Type targetType,
                            object? parameter, CultureInfo culture)
@@ -69,27 +69,46 @@ public class ArrowGeometryConverter : IMultiValueConverter
         var from = ToAvaloniaPoint((PointD)values[0]!);
         var to = ToAvaloniaPoint((PointD)values[1]!);
 
+        return CreateGeometry(from, to, 0d);
+    }
+
+    public static (Point Tip, Point Left, Point Right)? TryBuildTriangle(
+        Point from, Point to, double outline)
+    {
         double dx = to.X - from.X;
         double dy = to.Y - from.Y;
         double len = Math.Sqrt(dx * dx + dy * dy);
-        if (len < 1) return null;
+        if (len < 1d)
+            return null;
 
-        double ux = dx / len, uy = dy / len;
-        double px = -uy, py = ux;
+        double ux = dx / len;
+        double uy = dy / len;
+        double px = -uy;
+        double py = ux;
+
+        double length = ArrowLength + outline;
+        double halfWidth = ArrowWidth / 2d + outline;
 
         var tip = to;
-        var left = new Point(
-            to.X - ux * ArrowLength + px * ArrowWidth / 2,
-            to.Y - uy * ArrowLength + py * ArrowWidth / 2);
-        var right = new Point(
-            to.X - ux * ArrowLength - px * ArrowWidth / 2,
-            to.Y - uy * ArrowLength - py * ArrowWidth / 2);
+        var left = new Point(to.X - ux * length + px * halfWidth,
+                             to.Y - uy * length + py * halfWidth);
+        var right = new Point(to.X - ux * length - px * halfWidth,
+                              to.Y - uy * length - py * halfWidth);
+
+        return (tip, left, right);
+    }
+
+    public static StreamGeometry? CreateGeometry(Point from, Point to, double outline)
+    {
+        var triangle = TryBuildTriangle(from, to, outline);
+        if (triangle is null)
+            return null;
 
         var sg = new StreamGeometry();
         using var ctx = sg.Open();
-        ctx.BeginFigure(tip, true);
-        ctx.LineTo(left);
-        ctx.LineTo(right);
+        ctx.BeginFigure(triangle.Value.Tip, true);
+        ctx.LineTo(triangle.Value.Left);
+        ctx.LineTo(triangle.Value.Right);
         ctx.EndFigure(true);
 
         return sg;
@@ -106,8 +125,7 @@ public class ArrowBackGeometryConverter : IMultiValueConverter
     private static ArrowBackGeometryConverter? _instance;
     public static ArrowBackGeometryConverter Instance => _instance ??= new();
 
-    private const double ArrowLength = 8d;
-    private const double ArrowWidth = 6d;
+    private const double DefaultOutline = 1.5d;
 
     public object? Convert(IList<object?> values, Type targetType,
                            object? parameter, CultureInfo culture)
@@ -116,36 +134,21 @@ public class ArrowBackGeometryConverter : IMultiValueConverter
         if (values.Any(v => v is UnsetValueType)) return null;
 
         var from = ToAvaloniaPoint((PointD)values[0]!);
-        from = new Point(from.X, from.Y);
         var to = ToAvaloniaPoint((PointD)values[1]!);
-        to = new Point(to.X, to.Y);
 
-        double dx = to.X - from.X;
-        double dy = to.Y - from.Y;
-        double len = Math.Sqrt(dx * dx + dy * dy);
-        if (len < 1) return null;
+        return ArrowGeometryConverter.CreateGeometry(from, to, GetOutline(parameter));
+    }
 
-        double ux = dx / len, uy = dy / len;
-        double px = -uy, py = ux;
+    public static double GetOutline(object? parameter)
+    {
+        if (parameter is double value)
+            return value;
 
-        var tip = new Point(
-            to.X + ux * 0.5d * ArrowLength,
-            to.Y + uy * 0.5d * ArrowLength);
-        var left = new Point(
-            to.X - ux * 1d * ArrowLength + px * 1d * ArrowWidth / 2,
-            to.Y - uy * 1d * ArrowLength + py * 1d * ArrowWidth / 2);
-        var right = new Point(
-            to.X - ux * 1d * ArrowLength - px * 1d * ArrowWidth / 2,
-            to.Y - uy * 1d * ArrowLength - py * 1d * ArrowWidth / 2);
+        if (parameter is string text
+            && double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsed))
+            return parsed;
 
-        var sg = new StreamGeometry();
-        using var ctx = sg.Open();
-        ctx.BeginFigure(tip, true);
-        ctx.LineTo(left);
-        ctx.LineTo(right);
-        ctx.EndFigure(true);
-
-        return sg;
+        return DefaultOutline;
     }
 
     private static Point ToAvaloniaPoint(PointD p)
