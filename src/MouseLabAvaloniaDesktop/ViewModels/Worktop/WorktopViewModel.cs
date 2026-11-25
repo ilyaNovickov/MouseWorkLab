@@ -351,6 +351,42 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         [ObservableProperty]
         private ObservableCollection<ConnectionViewModel> connections = new();
 
+        public void DeleteNode(NodeViewModel node)
+        {
+            if (WorkspaceMode != WorkspaceMode.Delete || !Nodes.Contains(node))
+                return;
+
+            ConnectionViewModel? incoming = Connections.FirstOrDefault(c => c.Target == node);
+            ConnectionViewModel? outgoing = Connections.FirstOrDefault(c => c.Source == node);
+
+            if (SelectedNode == node
+                || (incoming is not null && SelectedConnection == incoming)
+                || (outgoing is not null && SelectedConnection == outgoing))
+            {
+                ClearSelection();
+            }
+
+            RemoveConnection(incoming);
+            RemoveConnection(outgoing);
+
+            Nodes.Remove(node);
+
+            if (incoming is not null && outgoing is not null)
+                AddConnection(incoming.Source, outgoing.Target);
+
+            for (int i = 0; i < Nodes.Count; i++)
+                Nodes[i].Label = i.ToString();
+        }
+
+        private void RemoveConnection(ConnectionViewModel? connection)
+        {
+            if (connection is null)
+                return;
+
+            Connections.Remove(connection);
+            connection.Dispose();
+        }
+
         private void AddConnection(NodeViewModel source, NodeViewModel target)
         {
             var conn = new ConnectionViewModel(source, target)

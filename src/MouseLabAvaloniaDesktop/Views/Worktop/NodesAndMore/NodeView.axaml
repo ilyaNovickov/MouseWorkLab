@@ -11,6 +11,7 @@
              ClipToBounds="False">
   <i:Interaction.Behaviors>
     <b:NodeDragBehavior CanDrag="{Binding CanInteract}" />
+    <b:NodeDeleteBehavior CanDelete="{Binding CanDelete}" />
   </i:Interaction.Behaviors>
   <Border Classes="node"
           Classes.selected="{Binding IsSelected}"

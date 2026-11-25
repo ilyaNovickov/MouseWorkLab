@@ -443,6 +443,127 @@ public class WorkspaceInteractionTests
         Assert.True(connection.ArrowTo.Y < connection.ArrowFrom.Y);
     }
 
+    [Fact]
+    public void DeletingTailNodeRemovesItsLink()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        AddChain(vm, 3);
+        var first = vm.Nodes[0];
+        var second = vm.Nodes[1];
+        var third = vm.Nodes[2];
+        vm.SetMode(WorkspaceMode.Delete);
+
+        vm.DeleteNode(third);
+
+        Assert.Equal(2, vm.Nodes.Count);
+        var link = Assert.Single(vm.Connections);
+        Assert.Same(first, link.Source);
+        Assert.Same(second, link.Target);
+    }
+
+    [Fact]
+    public void DeletingHeadNodeRemovesItsLink()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        AddChain(vm, 3);
+        var first = vm.Nodes[0];
+        var second = vm.Nodes[1];
+        var third = vm.Nodes[2];
+        vm.SetMode(WorkspaceMode.Delete);
+
+        vm.DeleteNode(first);
+
+        Assert.Equal(2, vm.Nodes.Count);
+        var link = Assert.Single(vm.Connections);
+        Assert.Same(second, link.Source);
+        Assert.Same(third, link.Target);
+    }
+
+    [Fact]
+    public void DeletingMiddleNodeRewiresChain()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        AddChain(vm, 3);
+        var first = vm.Nodes[0];
+        var second = vm.Nodes[1];
+        var third = vm.Nodes[2];
+        vm.SetMode(WorkspaceMode.Delete);
+
+        vm.DeleteNode(second);
+
+        Assert.Equal(2, vm.Nodes.Count);
+        var link = Assert.Single(vm.Connections);
+        Assert.Same(first, link.Source);
+        Assert.Same(third, link.Target);
+        Assert.Equal(ConnectionKinds.Straight, link.Kind);
+        Assert.Equal("0", first.Label);
+        Assert.Equal("1", third.Label);
+    }
+
+    [Fact]
+    public void RemovedConnectionsStopTrackingNodes()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        AddChain(vm, 3);
+        var third = vm.Nodes[2];
+        var removed = vm.Connections[1];
+        double startX = removed.Start.X;
+        vm.SetMode(WorkspaceMode.Delete);
+
+        vm.DeleteNode(vm.Nodes[1]);
+        third.X += 10;
+
+        Assert.Equal(startX, removed.Start.X);
+    }
+
+    [Fact]
+    public void DeletingOnlyNodeLeavesNoConnections()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        AddChain(vm, 1);
+        vm.SetMode(WorkspaceMode.Delete);
+
+        vm.DeleteNode(vm.Nodes[0]);
+
+        Assert.Empty(vm.Nodes);
+        Assert.Empty(vm.Connections);
+    }
+
+    [Fact]
+    public void DeleteNodeIgnoredOutsideDeleteMode()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        AddChain(vm, 3);
+
+        vm.DeleteNode(vm.Nodes[1]);
+
+        Assert.Equal(3, vm.Nodes.Count);
+        Assert.Equal(2, vm.Connections.Count);
+    }
+
+    [Fact]
+    public void NodeAddedAfterDeletionUsesRenumberedLabel()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+        AddChain(vm, 3);
+        var third = vm.Nodes[2];
+        vm.SetMode(WorkspaceMode.Delete);
+        vm.DeleteNode(vm.Nodes[1]);
+        vm.SetMode(WorkspaceMode.Add);
+
+        vm.OnCanvasPressed(new ModelsPoint(200, 10));
+
+        Assert.Equal("2", vm.Nodes[2].Label);
+        Assert.Equal(2, vm.Connections.Count);
+        Assert.Same(third, vm.Connections[1].Source);
+    }
+
+    private static void AddChain(WorktopViewModel vm, int count)
+    {
+        for (int i = 0; i < count; i++)
+            vm.OnCanvasPressed(new ModelsPoint(10 + i * 50, 10));
+    }
+
     private static double DistanceToCurve(ConnectionViewModel connection, PointD point)
     {
         double minimum = double.MaxValue;

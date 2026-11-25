@@ -310,3 +310,45 @@ public class BezierHandleDragBehavior : Behavior<Control>
         _canvas = null;
     }
 }
+
+public class NodeDeleteBehavior : Behavior<Control>
+{
+    public static readonly StyledProperty<bool> CanDeleteProperty =
+        AvaloniaProperty.Register<NodeDeleteBehavior, bool>(nameof(CanDelete));
+
+    public bool CanDelete
+    {
+        get => GetValue(CanDeleteProperty);
+        set => SetValue(CanDeleteProperty, value);
+    }
+
+    protected override void OnAttachedToVisualTree()
+    {
+        if (AssociatedObject is not null)
+            AssociatedObject.AddHandler(InputElement.PointerPressedEvent, OnPressed, RoutingStrategies.Tunnel);
+    }
+
+    protected override void OnDetachedFromVisualTree()
+    {
+        if (AssociatedObject is not null)
+            AssociatedObject.RemoveHandler(InputElement.PointerPressedEvent, OnPressed);
+    }
+
+    private void OnPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!CanDelete || AssociatedObject is null)
+            return;
+
+        if (!e.GetCurrentPoint(AssociatedObject).Properties.IsLeftButtonPressed)
+            return;
+
+        if (AssociatedObject.DataContext is not NodeViewModel node)
+            return;
+
+        if (AssociatedObject.FindAncestorOfType<ItemsControl>()?.DataContext is not WorktopViewModel worktop)
+            return;
+
+        e.Handled = true;
+        worktop.DeleteNode(node);
+    }
+}
