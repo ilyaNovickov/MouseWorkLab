@@ -15,6 +15,7 @@
         <conv:NumberToCornerRadiusConverter x:Key="NumberToCornerRadius" />
         <conv:PointDToPointConverter x:Key="PointDToPoint" />
         <conv:ArrowGeometryConverter x:Key="ArrowGeometry" />
+        <conv:ArrowBackGeometryConverter x:Key="ArrowBackGeometry" />
         <conv:ConnectionGeometryConverter x:Key="ConnectionGeometry" />
     </Application.Resources>
 

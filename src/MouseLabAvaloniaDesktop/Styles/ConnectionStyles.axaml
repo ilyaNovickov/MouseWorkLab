@@ -12,12 +12,12 @@
         <Line Classes="guide" StartPoint="380,60" EndPoint="330,100" />
         <Ellipse Classes="handle" Canvas.Left="270" Canvas.Top="20">
           <Ellipse.RenderTransform>
-            <TranslateTransform X="-6" Y="-6" />
+            <TranslateTransform X="-3" Y="-3" />
           </Ellipse.RenderTransform>
         </Ellipse>
         <Ellipse Classes="handle" Canvas.Left="330" Canvas.Top="100">
           <Ellipse.RenderTransform>
-            <TranslateTransform X="-6" Y="-6" />
+            <TranslateTransform X="-3" Y="-3" />
           </Ellipse.RenderTransform>
         </Ellipse>
       </Canvas>
@@ -25,18 +25,32 @@
   </Design.PreviewWith>
 
   <Style Selector="Path.edge">
-    <Setter Property="Stroke" Value="#5A6672" />
+    <Setter Property="Stroke" Value="White" />
     <Setter Property="StrokeThickness" Value="1" />
+  </Style>
+  <Style Selector="Path.edge.back">
+    <Setter Property="Stroke" Value="Black" />
+    <Setter Property="StrokeThickness" Value="2" />
   </Style>
   <Style Selector="Path.edge.selected">
     <Setter Property="Stroke" Value="#FF3D7EFF" />
-    <Setter Property="StrokeThickness" Value="3" />
+    <Setter Property="StrokeThickness" Value="1" />
+  </Style>
+  <Style Selector="Path.edge.back.selected">
+    <Setter Property="Stroke" Value="Black" />
+    <Setter Property="StrokeThickness" Value="2" />
   </Style>
   <Style Selector="Path.arrow">
-    <Setter Property="Fill" Value="#5A6672" />
+    <Setter Property="Fill" Value="White" />
+  </Style>
+  <Style Selector="Path.arrow.back">
+    <Setter Property="Fill" Value="Black" />
   </Style>
   <Style Selector="Path.arrow.selected">
     <Setter Property="Fill" Value="#FF3D7EFF" />
+  </Style>
+  <Style Selector="Path.arrow.back.selected">
+    <Setter Property="Fill" Value="Black" />
   </Style>
   <Style Selector="Path.hit.interactive">
     <Setter Property="Cursor" Value="Hand" />
@@ -45,16 +59,16 @@
     <Setter Property="Cursor" Value="Hand" />
   </Style>
   <Style Selector="Line.guide">
-    <Setter Property="Stroke" Value="#883D7EFF" />
-    <Setter Property="StrokeThickness" Value="2" />
-    <Setter Property="StrokeDashArray" Value="3,3" />
+    <Setter Property="Stroke" Value="#FF1077CB" />
+    <Setter Property="StrokeThickness" Value="1.5" />
+    <Setter Property="StrokeDashArray" Value="1.5,1.5" />
   </Style>
   <Style Selector="Ellipse.handle">
-    <Setter Property="Width" Value="12" />
-    <Setter Property="Height" Value="12" />
+    <Setter Property="Width" Value="6" />
+    <Setter Property="Height" Value="6" />
     <Setter Property="Fill" Value="White" />
     <Setter Property="Stroke" Value="#FF3D7EFF" />
-    <Setter Property="StrokeThickness" Value="2" />
+    <Setter Property="StrokeThickness" Value="1.5" />
     <Setter Property="Cursor" Value="SizeAll" />
   </Style>
 </Styles>

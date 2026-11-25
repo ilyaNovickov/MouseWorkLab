@@ -16,12 +16,26 @@
   <Canvas>
     <!-- Основная линия -->
     <Panel>
+      <Path Classes="edge back"
+            Classes.selected="{Binding IsSelected}"
+            Data="{Binding #hitPath.Data}"
+            IsHitTestVisible="False"/>
       <Path Classes="edge"
             Classes.selected="{Binding IsSelected}"
             Data="{Binding #hitPath.Data}"
             IsHitTestVisible="False"/>
 
       <!-- Стрелка -->
+       <Path Classes="arrow back"
+            Classes.selected="{Binding IsSelected}"
+            IsHitTestVisible="False">
+        <Path.Data>
+          <MultiBinding Converter="{StaticResource ArrowBackGeometry}">
+            <Binding Path="ArrowFrom" />
+            <Binding Path="ArrowTo" />
+          </MultiBinding>
+        </Path.Data>
+      </Path>
       <Path Classes="arrow"
             Classes.selected="{Binding IsSelected}"
             IsHitTestVisible="False">
@@ -39,7 +53,7 @@
             Classes.interactive="{Binding CanInteract}"
             Classes.deleting="{Binding CanDelete}"
             Stroke="Transparent"
-            StrokeThickness="14">
+            StrokeThickness="4">
         <Path.Data>
           <MultiBinding Converter="{StaticResource ConnectionGeometry}">
             <Binding Path="Start" />
@@ -73,7 +87,7 @@
            <b:BezierHandleDragBehavior HandleIndex="0" CanDrag="{Binding ShowHandles}" />
          </i:Interaction.Behaviors>
          <Ellipse.RenderTransform>
-          <TranslateTransform X="-6" Y="-6" />
+          <TranslateTransform X="-3" Y="-3" />
         </Ellipse.RenderTransform>
       </Ellipse>
       <Ellipse Classes="handle"
@@ -84,7 +98,7 @@
           <b:BezierHandleDragBehavior HandleIndex="1" CanDrag="{Binding ShowHandles}" />
         </i:Interaction.Behaviors>
         <Ellipse.RenderTransform>
-          <TranslateTransform X="-6" Y="-6" />
+          <TranslateTransform X="-3" Y="-3" />
         </Ellipse.RenderTransform>
       </Ellipse>
   </Canvas>

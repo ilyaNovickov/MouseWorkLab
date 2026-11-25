@@ -101,6 +101,59 @@ public class ArrowGeometryConverter : IMultiValueConverter
     }
 }
 
+public class ArrowBackGeometryConverter : IMultiValueConverter
+{
+    private static ArrowBackGeometryConverter? _instance;
+    public static ArrowBackGeometryConverter Instance => _instance ??= new();
+
+    private const double ArrowLength = 8d;
+    private const double ArrowWidth = 6d;
+
+    public object? Convert(IList<object?> values, Type targetType,
+                           object? parameter, CultureInfo culture)
+    {
+        if (values.Count < 2) return null;
+        if (values.Any(v => v is UnsetValueType)) return null;
+
+        var from = ToAvaloniaPoint((PointD)values[0]!);
+        from = new Point(from.X, from.Y);
+        var to = ToAvaloniaPoint((PointD)values[1]!);
+        to = new Point(to.X, to.Y);
+
+        double dx = to.X - from.X;
+        double dy = to.Y - from.Y;
+        double len = Math.Sqrt(dx * dx + dy * dy);
+        if (len < 1) return null;
+
+        double ux = dx / len, uy = dy / len;
+        double px = -uy, py = ux;
+
+        var tip = new Point(
+            to.X + ux * 0.5d * ArrowLength,
+            to.Y + uy * 0.5d * ArrowLength);
+        var left = new Point(
+            to.X - ux * 1d * ArrowLength + px * 1d * ArrowWidth / 2,
+            to.Y - uy * 1d * ArrowLength + py * 1d * ArrowWidth / 2);
+        var right = new Point(
+            to.X - ux * 1d * ArrowLength - px * 1d * ArrowWidth / 2,
+            to.Y - uy * 1d * ArrowLength - py * 1d * ArrowWidth / 2);
+
+        var sg = new StreamGeometry();
+        using var ctx = sg.Open();
+        ctx.BeginFigure(tip, true);
+        ctx.LineTo(left);
+        ctx.LineTo(right);
+        ctx.EndFigure(true);
+
+        return sg;
+    }
+
+    private static Point ToAvaloniaPoint(PointD p)
+    {
+        return new Point(p.X, p.Y);
+    }
+}
+
 public class PointDToPointConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
