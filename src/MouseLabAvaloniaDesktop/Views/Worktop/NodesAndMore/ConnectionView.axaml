@@ -28,6 +28,12 @@
         <Style Selector="Path.arrow.selected">
             <Setter Property="Fill" Value="#FF3D7EFF" />
         </Style>
+        <Style Selector="Path.hit.interactive">
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Path.hit.deleting">
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
         <Style Selector="Line.guide">
             <Setter Property="Stroke" Value="#883D7EFF" />
             <Setter Property="StrokeThickness" Value="2" />

@@ -14,6 +14,8 @@
   </i:Interaction.Behaviors>
   <Border Classes="node"
           Classes.selected="{Binding IsSelected}"
+          Classes.interactive="{Binding CanInteract}"
+          Classes.deleting="{Binding CanDelete}"
           Width="{Binding Width}"
           Height="{Binding Height}"
           CornerRadius="{Binding Height, Converter={StaticResource NumberToCornerRadius}}">

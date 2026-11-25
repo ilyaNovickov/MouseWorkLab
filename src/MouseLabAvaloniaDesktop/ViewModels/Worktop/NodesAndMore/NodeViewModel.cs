@@ -54,6 +54,9 @@ public partial class NodeViewModel : ViewModelBase
     [ObservableProperty]
     private bool _canInteract;
 
+    [ObservableProperty]
+    private bool _canDelete;
+
     public object ToModel()
     {
         return new object();

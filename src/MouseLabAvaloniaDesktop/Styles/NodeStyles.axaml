@@ -30,6 +30,12 @@
     <Setter Property="BorderThickness" Value="1.2"/>
     <Setter Property="BoxShadow" Value="0 1. 1.2 1.4 #fff00000"/>
   </Style>
+  <Style Selector="Border.node.interactive">
+    <Setter Property="Cursor" Value="SizeAll"/>
+  </Style>
+  <Style Selector="Border.node.deleting">
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
   <Style Selector="TextBlock.nodeId">
     <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="HorizontalAlignment" Value="Center"/>

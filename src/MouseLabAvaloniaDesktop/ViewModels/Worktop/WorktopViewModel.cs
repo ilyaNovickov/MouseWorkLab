@@ -238,8 +238,19 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             PanButton = mode == WorkspaceMode.PanOnly ? ButtonName.Left : ButtonName.Middle;
 
             bool canInteract = mode == WorkspaceMode.SelectAndMove;
+            bool canDelete = mode == WorkspaceMode.Delete;
+
             foreach (NodeViewModel node in Nodes)
+            {
                 node.CanInteract = canInteract;
+                node.CanDelete = canDelete;
+            }
+
+            foreach (ConnectionViewModel connection in Connections)
+            {
+                connection.CanInteract = canInteract;
+                connection.CanDelete = canDelete;
+            }
 
             if (!canInteract)
                 ClearSelection();
@@ -327,7 +338,8 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
                         point.Y - (NodeViewModel.DefaultSize / 2) + 1,
                         Nodes.Count.ToString())
             {
-                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove
+                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove,
+                CanDelete = WorkspaceMode == WorkspaceMode.Delete
             };
 
             Nodes.Add(nodeViewModel);
@@ -338,7 +350,11 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 
         private void AddConnection(NodeViewModel source, NodeViewModel target)
         {
-            var conn = new ConnectionViewModel(source, target);
+            var conn = new ConnectionViewModel(source, target)
+            {
+                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove,
+                CanDelete = WorkspaceMode == WorkspaceMode.Delete
+            };
             Connections.Add(conn);
         }
     }

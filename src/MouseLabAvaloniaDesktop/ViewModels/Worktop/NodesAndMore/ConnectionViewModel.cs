@@ -43,6 +43,12 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     private bool _isSelected;
 
     [ObservableProperty]
+    private bool _canInteract;
+
+    [ObservableProperty]
+    private bool _canDelete;
+
+    [ObservableProperty]
     private ConnectionKinds _kind;
 
     [ObservableProperty]
