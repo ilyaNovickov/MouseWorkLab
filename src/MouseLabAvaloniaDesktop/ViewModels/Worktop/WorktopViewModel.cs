@@ -47,6 +47,7 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 
             _modelingSettings.PropertyChanged += _modelingSettings_PropertyChanged;
 
+            OnSeedChanged();
             OnWorktopChanged();
         }
 
@@ -66,6 +67,10 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 
         [ObservableProperty]
         private bool isSeedNumber;
+
+        public bool IsSeedInvalid => !IsSeedNumber;
+
+        private int? parsedSeed;
 
         [ObservableProperty]
         private bool isNeedGeneration;
@@ -170,11 +175,11 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         #region OnPropertiesChanged
         private void OnSeedChanged()
         {
-            IsSeedNumber = Seed switch
-            {
-                null => true,
-                not null => int.TryParse(Seed, out _)
-            };
+            bool isEmpty = string.IsNullOrWhiteSpace(Seed);
+            parsedSeed = !isEmpty && int.TryParse(Seed, out int value) ? value : null;
+
+            IsSeedNumber = isEmpty || parsedSeed is not null;
+            OnPropertyChanged(nameof(IsSeedInvalid));
         }
 
         public event EventHandler? WorktopChanged;
@@ -214,23 +219,11 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             await Task.Run(() =>
             {
                 _modelingEnv.GenerateNewWorktop(
-                    _modelingSettings.WorktopResolution, 
-                    GetSeedFromString(Seed)
-                    );
+                    _modelingSettings.WorktopResolution,
+                    parsedSeed);
             });
 
             OnWorktopChanged();
-        }
-
-        private static int? GetSeedFromString(string? seed)
-        {
-            if (seed is null)
-                return null;
-
-            if (int.TryParse(seed, out int result))
-                return result;
-            else
-                return null;
         }
 
         [RelayCommand]

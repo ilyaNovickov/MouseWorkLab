@@ -8,7 +8,8 @@
     "ModePanOnlyTip": "Pan the workspace",
     "ModeSelectAndMoveTip": "Select and move nodes and connections",
     "ModeDeleteTip": "Delete nodes by clicking them",
-    "ModeAddTip": "Add nodes by clicking empty space"
+    "ModeAddTip": "Add nodes by clicking empty space",
+    "SeedInvalid": "Seed must be an integer"
   },
 
 

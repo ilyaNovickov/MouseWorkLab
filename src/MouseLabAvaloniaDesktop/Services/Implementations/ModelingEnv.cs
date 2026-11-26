@@ -23,13 +23,9 @@ namespace MouseLabAvaloniaDesktop.Services.Implementations
 
         public int? Seed { get; private set; }
 
-        public void GenerateNewWorktop(int resolution, int? seed = null)
+        public void GenerateNewWorktop(int resolution, int? requestedSeed = null)
         {
-            if (seed is null)
-            {
-                seed = Random.Shared.Next();
-            }
-            Seed = seed;
+            Seed = requestedSeed ?? Random.Shared.Next();
 
             if (_worktop.Width != resolution)
             {
@@ -38,7 +34,7 @@ namespace MouseLabAvaloniaDesktop.Services.Implementations
                 old.Dispose();
             }
 
-            _matrixRandomizer.Randomize(_worktop.SpanBytes, Seed);
+            _matrixRandomizer.Randomize(_worktop.SpanBytes, Seed.Value);
         }
 
 

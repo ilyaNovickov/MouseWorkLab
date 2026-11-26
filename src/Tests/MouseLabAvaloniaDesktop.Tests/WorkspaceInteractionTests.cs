@@ -29,6 +29,53 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
+    public void SeedValidationTreatsEmptyAsValid()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+
+        Assert.True(vm.IsSeedNumber);
+        Assert.False(vm.IsSeedInvalid);
+
+        vm.Seed = string.Empty;
+        Assert.True(vm.IsSeedNumber);
+
+        vm.Seed = "   ";
+        Assert.True(vm.IsSeedNumber);
+
+        vm.Seed = "123";
+        Assert.True(vm.IsSeedNumber);
+        Assert.False(vm.IsSeedInvalid);
+
+        vm.Seed = "abc";
+        Assert.False(vm.IsSeedNumber);
+        Assert.True(vm.IsSeedInvalid);
+    }
+
+    [Fact]
+    public async Task GenerateUsesParsedSeed()
+    {
+        var env = new ModelingEnv(new MatrixRandomizer());
+        using var vm = new WorktopViewModel(new FakeTranslationService(), env, new ModelingSettings());
+        vm.Seed = "42";
+
+        await vm.GenerateWorktopCommand.ExecuteAsync(null);
+
+        Assert.Equal(42, env.Seed);
+    }
+
+    [Fact]
+    public async Task GenerateWithInvalidSeedUsesGeneratedSeed()
+    {
+        var env = new ModelingEnv(new MatrixRandomizer());
+        using var vm = new WorktopViewModel(new FakeTranslationService(), env, new ModelingSettings());
+        vm.Seed = "abc";
+
+        await vm.GenerateWorktopCommand.ExecuteAsync(null);
+
+        Assert.NotNull(env.Seed);
+    }
+
+    [Fact]
     public void ModeFlagsAreExclusive()
     {
         using WorktopViewModel vm = CreateViewModel();

@@ -16,6 +16,10 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="1,0,1,0"/>
         </Style>
+        <Style Selector="TextBox.seed.error">
+            <Setter Property="BorderBrush" Value="#FFE81123"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
     </UserControl.Styles>
     <DockPanel LastChildFill="True">
         <Border DockPanel.Dock="Top">
@@ -79,6 +83,10 @@
                 BorderBrush="Red"
                 BorderThickness="0">
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -88,8 +96,10 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Classes="center" Grid.Column="0" Text="Сид"/>
-                <TextBox Grid.Column="1"
+                <TextBlock Classes="center" Grid.Row="0" Grid.Column="0" Text="Сид"/>
+                <TextBox Grid.Row="0" Grid.Column="1"
+                         Classes="seed"
+                         Classes.error="{Binding IsSeedInvalid}"
                          Name="seedTextBox"
                          Margin="3,5,0,5"
                          Width="120"
@@ -105,17 +115,19 @@
                                 Command="{Binding #seedTextBox.Clear}" />
                     </TextBox.InnerRightContent>
                 </TextBox>
-                <Button Grid.Column="2"
+                <Button Grid.Row="0" Grid.Column="2"
                         Margin="3,3,3,3"
                         Content="Генерация"
                         Command="{Binding GenerateWorktopCommand}" />
-                <TextBlock Classes="center" 
-                            Grid.Column="4" 
+                <TextBlock Classes="center"
+                           Grid.Row="0"
+                            Grid.Column="4"
                             Text="Масштаб"/>
-                <TextBlock Classes="center" 
-                           Grid.Column="5" 
+                <TextBlock Classes="center"
+                           Grid.Row="0"
+                           Grid.Column="5"
                            Text="{Binding #zoomBorder.ZoomX, StringFormat={}{0:0.00}}"/>
-                <StackPanel Grid.Column="6" 
+                <StackPanel Grid.Row="0" Grid.Column="6"
                             Orientation="Horizontal" 
                             Margin="3,3,3,3">
                     <Button Content="+" 
@@ -125,7 +137,12 @@
                     <Button Content="Сброс"
                             Command="{Binding #zoomBorder.FitCommand}" />
                 </StackPanel>
-                
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="3,0,0,2"
+                           Foreground="#FFE81123"
+                           Text="{Binding Strings.WorktopSeedInvalid}"
+                           IsVisible="{Binding IsSeedInvalid}" />
             </Grid>
         </Border>
         <ScrollViewer VerticalScrollBarVisibility="Auto"
