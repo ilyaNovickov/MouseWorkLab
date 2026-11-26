@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls.PanAndZoom;
 using MouseLabAvaloniaDesktop.Converters;
@@ -44,7 +45,7 @@ public class WorkspaceInteractionTests
     {
         using WorktopViewModel vm = CreateViewModel();
         vm.OnCanvasPressed(new ModelsPoint(1, 2));
-        var first = vm.Nodes[0];
+        var first = vm.Nodes.ElementAt(0);
 
         vm.SetMode(WorkspaceMode.SelectAndMove);
         Assert.True(first.CanInteract);
@@ -53,7 +54,7 @@ public class WorkspaceInteractionTests
         Assert.False(first.CanInteract);
 
         vm.OnCanvasPressed(new ModelsPoint(3, 4));
-        Assert.False(vm.Nodes[1].CanInteract);
+        Assert.False(vm.Nodes.ElementAt(1).CanInteract);
     }
 
     [Fact]
@@ -62,7 +63,7 @@ public class WorkspaceInteractionTests
         using WorktopViewModel vm = CreateViewModel();
         vm.OnCanvasPressed(new ModelsPoint(1, 2));
         vm.OnCanvasPressed(new ModelsPoint(50, 60));
-        var node = vm.Nodes[0];
+        var node = vm.Nodes.ElementAt(0);
         var connection = Assert.Single(vm.Connections);
 
         Assert.False(node.CanInteract);
@@ -110,8 +111,8 @@ public class WorkspaceInteractionTests
         vm.OnCanvasPressed(new ModelsPoint(2, 2));
         vm.SetMode(WorkspaceMode.SelectAndMove);
 
-        var first = vm.Nodes[0];
-        var second = vm.Nodes[1];
+        var first = vm.Nodes.ElementAt(0);
+        var second = vm.Nodes.ElementAt(1);
 
         vm.SelectNode(first);
         Assert.Same(first, vm.SelectedNode);
@@ -212,7 +213,7 @@ public class WorkspaceInteractionTests
         vm.OnCanvasPressed(new ModelsPoint(1, 1));
         vm.OnCanvasPressed(new ModelsPoint(50, 50));
         vm.SetMode(WorkspaceMode.SelectAndMove);
-        var node = vm.Nodes[0];
+        var node = vm.Nodes.ElementAt(0);
         var connection = Assert.Single(vm.Connections);
 
         vm.SelectNode(node);
@@ -233,7 +234,7 @@ public class WorkspaceInteractionTests
         vm.OnCanvasPressed(new ModelsPoint(1, 1));
         vm.OnCanvasPressed(new ModelsPoint(50, 50));
         vm.SetMode(WorkspaceMode.SelectAndMove);
-        var node = vm.Nodes[0];
+        var node = vm.Nodes.ElementAt(0);
         var connection = Assert.Single(vm.Connections);
 
         vm.SelectConnection(connection);
@@ -448,9 +449,9 @@ public class WorkspaceInteractionTests
     {
         using WorktopViewModel vm = CreateViewModel();
         AddChain(vm, 3);
-        var first = vm.Nodes[0];
-        var second = vm.Nodes[1];
-        var third = vm.Nodes[2];
+        var first = vm.Nodes.ElementAt(0);
+        var second = vm.Nodes.ElementAt(1);
+        var third = vm.Nodes.ElementAt(2);
         vm.SetMode(WorkspaceMode.Delete);
 
         vm.DeleteNode(third);
@@ -466,9 +467,9 @@ public class WorkspaceInteractionTests
     {
         using WorktopViewModel vm = CreateViewModel();
         AddChain(vm, 3);
-        var first = vm.Nodes[0];
-        var second = vm.Nodes[1];
-        var third = vm.Nodes[2];
+        var first = vm.Nodes.ElementAt(0);
+        var second = vm.Nodes.ElementAt(1);
+        var third = vm.Nodes.ElementAt(2);
         vm.SetMode(WorkspaceMode.Delete);
 
         vm.DeleteNode(first);
@@ -484,9 +485,9 @@ public class WorkspaceInteractionTests
     {
         using WorktopViewModel vm = CreateViewModel();
         AddChain(vm, 3);
-        var first = vm.Nodes[0];
-        var second = vm.Nodes[1];
-        var third = vm.Nodes[2];
+        var first = vm.Nodes.ElementAt(0);
+        var second = vm.Nodes.ElementAt(1);
+        var third = vm.Nodes.ElementAt(2);
         vm.SetMode(WorkspaceMode.Delete);
 
         vm.DeleteNode(second);
@@ -505,12 +506,12 @@ public class WorkspaceInteractionTests
     {
         using WorktopViewModel vm = CreateViewModel();
         AddChain(vm, 3);
-        var third = vm.Nodes[2];
-        var removed = vm.Connections[1];
+        var third = vm.Nodes.ElementAt(2);
+        var removed = vm.Connections.ElementAt(1);
         double startX = removed.Start.X;
         vm.SetMode(WorkspaceMode.Delete);
 
-        vm.DeleteNode(vm.Nodes[1]);
+        vm.DeleteNode(vm.Nodes.ElementAt(1));
         third.X += 10;
 
         Assert.Equal(startX, removed.Start.X);
@@ -523,7 +524,7 @@ public class WorkspaceInteractionTests
         AddChain(vm, 1);
         vm.SetMode(WorkspaceMode.Delete);
 
-        vm.DeleteNode(vm.Nodes[0]);
+        vm.DeleteNode(vm.Nodes.ElementAt(0));
 
         Assert.Empty(vm.Nodes);
         Assert.Empty(vm.Connections);
@@ -535,7 +536,7 @@ public class WorkspaceInteractionTests
         using WorktopViewModel vm = CreateViewModel();
         AddChain(vm, 3);
 
-        vm.DeleteNode(vm.Nodes[1]);
+        vm.DeleteNode(vm.Nodes.ElementAt(1));
 
         Assert.Equal(3, vm.Nodes.Count);
         Assert.Equal(2, vm.Connections.Count);
@@ -546,16 +547,16 @@ public class WorkspaceInteractionTests
     {
         using WorktopViewModel vm = CreateViewModel();
         AddChain(vm, 3);
-        var third = vm.Nodes[2];
+        var third = vm.Nodes.ElementAt(2);
         vm.SetMode(WorkspaceMode.Delete);
-        vm.DeleteNode(vm.Nodes[1]);
+        vm.DeleteNode(vm.Nodes.ElementAt(1));
         vm.SetMode(WorkspaceMode.Add);
 
         vm.OnCanvasPressed(new ModelsPoint(200, 10));
 
-        Assert.Equal("2", vm.Nodes[2].Label);
+        Assert.Equal("2", vm.Nodes.ElementAt(2).Label);
         Assert.Equal(2, vm.Connections.Count);
-        Assert.Same(third, vm.Connections[1].Source);
+        Assert.Same(third, vm.Connections.ElementAt(1).Source);
     }
 
     private static void AddChain(WorktopViewModel vm, int count)

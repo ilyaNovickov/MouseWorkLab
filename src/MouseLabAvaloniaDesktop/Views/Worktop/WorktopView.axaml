@@ -106,12 +106,14 @@
                             MinZoomX="0.2"
                             MinZoomY="0.2"
                             Background="DimGray"
-                            MinimumVisibleContentPercentage="0.5"
                             AutoCalculateMaxZoom="True"
-                            MaxZoomPixelSize="200" >
+                            MaxZoomPixelSize="100" >
 
 
-
+                <Border BorderBrush="Black"
+                        BorderThickness="1"
+                        Width="{Binding AvailableResolution}"
+                        Height="{Binding AvailableResolution}">
                     <Canvas Name="mainCanvas"
                             Width="{Binding AvailableResolution}"
                             Height="{Binding AvailableResolution}"
@@ -119,11 +121,11 @@
                         <i:Interaction.Behaviors>
                             <b:CanvasPointerBehavior Viewport="{Binding #zoomBorder}" />
                         </i:Interaction.Behaviors>
-                         <Image Name="worktop"
-                                RenderOptions.BitmapInterpolationMode="None"
-                                Source="{Binding Worktop, Converter={StaticResource MatrixToImage}, Mode=OneWay}"
-                                Canvas.Left="{Binding WorktopPosition}"
-                                Canvas.Top="{Binding WorktopPosition}" />
+                        <Image Name="worktop"
+                               RenderOptions.BitmapInterpolationMode="LowQuality"
+                               Source="{Binding Worktop, Converter={StaticResource MatrixToImage}, Mode=OneWay}"
+                               Canvas.Left="{Binding WorktopPosition}"
+                               Canvas.Top="{Binding WorktopPosition}" />
 
                             <ItemsControl ItemsSource="{Binding Connections}">
                                 <ItemsControl.ItemsPanel>
@@ -166,7 +168,7 @@
                             </ItemsControl>
 
                     </Canvas>
-
+                </Border>
             </paz:ZoomBorder>
         </ScrollViewer>
     </DockPanel>

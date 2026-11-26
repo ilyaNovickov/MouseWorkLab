@@ -10,7 +10,7 @@ namespace MouseLabAvaloniaDesktop.Models.Settings
 {
     public partial class ModelingSettings : ObservableObject, IDataTransferObject<ModelingSettingsDto>
     {
-        public const int DefaultWorktopResolution = 1024;
+        public const int DefaultWorktopResolution = 64;
 
         public bool IsExperimentalSettings
         {

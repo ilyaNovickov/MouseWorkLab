@@ -8,8 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="10" d:DesignHeight="10"
              x:Class="MouseLabAvaloniaDesktop.Views.NodeView"
              x:DataType="vm:NodeViewModel"
-             ClipToBounds="False"
-             Background="Red">
+              ClipToBounds="False">
   <i:Interaction.Behaviors>
     <b:NodeDragBehavior CanDrag="{Binding CanInteract}" />
     <b:NodeDeleteBehavior CanDelete="{Binding CanDelete}" />
