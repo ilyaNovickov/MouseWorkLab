@@ -29,6 +29,43 @@ public class WorkspaceInteractionTests
     }
 
     [Fact]
+    public void ModeFlagsAreExclusive()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+
+        Assert.True(vm.IsAddMode);
+        Assert.False(vm.IsPanOnlyMode);
+        Assert.False(vm.IsSelectAndMoveMode);
+        Assert.False(vm.IsDeleteMode);
+
+        vm.SetMode(WorkspaceMode.SelectAndMove);
+        Assert.True(vm.IsSelectAndMoveMode);
+        Assert.False(vm.IsAddMode);
+
+        vm.SetMode(WorkspaceMode.Delete);
+        Assert.True(vm.IsDeleteMode);
+        Assert.False(vm.IsSelectAndMoveMode);
+
+        vm.SetMode(WorkspaceMode.PanOnly);
+        Assert.True(vm.IsPanOnlyMode);
+        Assert.False(vm.IsDeleteMode);
+    }
+
+    [Fact]
+    public void ModeFlagSetterOnlyReactsToTrue()
+    {
+        using WorktopViewModel vm = CreateViewModel();
+
+        vm.IsAddMode = false;
+        Assert.Equal(WorkspaceMode.Add, vm.WorkspaceMode);
+        Assert.True(vm.IsAddMode);
+
+        vm.IsDeleteMode = true;
+        Assert.Equal(WorkspaceMode.Delete, vm.WorkspaceMode);
+        Assert.True(vm.IsDeleteMode);
+    }
+
+    [Fact]
     public async Task GenerateWorktopRaisesWorktopChanged()
     {
         using WorktopViewModel vm = CreateViewModel();

@@ -4,7 +4,11 @@
     "Generate": "Generate",
     "ConnectionKind": "Type",
     "ConnectionKindStraight": "Straight",
-    "ConnectionKindCurved": "Curved"
+    "ConnectionKindCurved": "Curved",
+    "ModePanOnlyTip": "Pan the workspace",
+    "ModeSelectAndMoveTip": "Select and move nodes and connections",
+    "ModeDeleteTip": "Delete nodes by clicking them",
+    "ModeAddTip": "Add nodes by clicking empty space"
   },
 
 

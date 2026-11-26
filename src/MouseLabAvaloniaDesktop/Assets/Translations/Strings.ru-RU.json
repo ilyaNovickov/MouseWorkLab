@@ -4,7 +4,11 @@
     "Generate": "Сгенерировать",
     "ConnectionKind": "Тип",
     "ConnectionKindStraight": "Прямая",
-    "ConnectionKindCurved": "Кривая"
+    "ConnectionKindCurved": "Кривая",
+    "ModePanOnlyTip": "Перемещение рабочей области",
+    "ModeSelectAndMoveTip": "Выбор и перемещение узлов и соединений",
+    "ModeDeleteTip": "Удаление узлов по клику",
+    "ModeAddTip": "Добавление узлов по клику по пустому месту"
   },
 
 

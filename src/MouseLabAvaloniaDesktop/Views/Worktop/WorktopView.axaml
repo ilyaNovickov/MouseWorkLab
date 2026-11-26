@@ -19,18 +19,18 @@
     </UserControl.Styles>
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
-            <Button Content="Панорама"
-                    Command="{Binding SetModeCommand}"
-                    CommandParameter="{x:Static vm:WorkspaceMode.PanOnly}" />
-            <Button Content="Выбор"
-                    Command="{Binding SetModeCommand}"
-                    CommandParameter="{x:Static vm:WorkspaceMode.SelectAndMove}" />
-            <Button Content="Удаление"
-                    Command="{Binding SetModeCommand}"
-                    CommandParameter="{x:Static vm:WorkspaceMode.Delete}" />
-            <Button Content="Добавление"
-                    Command="{Binding SetModeCommand}"
-                    CommandParameter="{x:Static vm:WorkspaceMode.Add}" />
+            <RadioButton Content="Панорама"
+                         GroupName="WorkspaceMode"
+                         IsChecked="{Binding IsPanOnlyMode, Mode=TwoWay}" />
+            <RadioButton Content="Выбор"
+                         GroupName="WorkspaceMode"
+                         IsChecked="{Binding IsSelectAndMoveMode, Mode=TwoWay}" />
+            <RadioButton Content="Удаление"
+                         GroupName="WorkspaceMode"
+                         IsChecked="{Binding IsDeleteMode, Mode=TwoWay}" />
+            <RadioButton Content="Добавление"
+                         GroupName="WorkspaceMode"
+                         IsChecked="{Binding IsAddMode, Mode=TwoWay}" />
             <TextBlock Classes="center"
                        Text="{Binding Strings.WorktopConnectionKind}" />
             <ComboBox ItemsSource="{Binding ConnectionKindOptions}"

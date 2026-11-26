@@ -111,6 +111,46 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 
         public bool HasSelectedConnection => SelectedConnection is not null;
 
+        public bool IsPanOnlyMode
+        {
+            get => WorkspaceMode == WorkspaceMode.PanOnly;
+            set
+            {
+                if (value)
+                    SetMode(WorkspaceMode.PanOnly);
+            }
+        }
+
+        public bool IsSelectAndMoveMode
+        {
+            get => WorkspaceMode == WorkspaceMode.SelectAndMove;
+            set
+            {
+                if (value)
+                    SetMode(WorkspaceMode.SelectAndMove);
+            }
+        }
+
+        public bool IsDeleteMode
+        {
+            get => WorkspaceMode == WorkspaceMode.Delete;
+            set
+            {
+                if (value)
+                    SetMode(WorkspaceMode.Delete);
+            }
+        }
+
+        public bool IsAddMode
+        {
+            get => WorkspaceMode == WorkspaceMode.Add;
+            set
+            {
+                if (value)
+                    SetMode(WorkspaceMode.Add);
+            }
+        }
+
         public ConnectionKindOption? SelectedConnectionKindOption
         {
             get => SelectedConnection is null
@@ -150,6 +190,14 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 
             OnPropertyChanged(nameof(Worktop));
             WorktopChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        partial void OnWorkspaceModeChanged(WorkspaceMode value)
+        {
+            OnPropertyChanged(nameof(IsPanOnlyMode));
+            OnPropertyChanged(nameof(IsSelectAndMoveMode));
+            OnPropertyChanged(nameof(IsDeleteMode));
+            OnPropertyChanged(nameof(IsAddMode));
         }
 
         partial void OnSelectedConnectionChanged(ConnectionViewModel? value)
