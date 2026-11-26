@@ -18,7 +18,8 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
 
         Recompute();
     }
-    
+
+    #region Properties
     /// <summary>
     /// Узел от куда идёт соединение
     /// </summary>
@@ -69,7 +70,22 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     public bool HasManualControlPoints => _manualControlPoints;
 
     public bool ShowHandles => IsSelected && Kind == ConnectionKinds.Curved;
+    #endregion
 
+    #region OnPropertiesChangedMethods
+    partial void OnKindChanged(ConnectionKinds value)
+    {
+        Recompute();
+        OnPropertyChanged(nameof(ShowHandles));
+    }
+
+    partial void OnCurvatureChanged(double value) => Recompute();
+
+    partial void OnIsSelectedChanged(bool value) =>
+        OnPropertyChanged(nameof(ShowHandles));
+    #endregion
+
+    #region PublicMethods
     public void SetControlPoint(int index, PointD point)
     {
         if (Kind != ConnectionKinds.Curved)
@@ -85,6 +101,20 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
         _manualControlPoints = true;
         Recompute();
     }
+
+    public void Dispose()
+    {
+        Source.PropertyChanged -= OnNodePropertyChanged;
+        Target.PropertyChanged -= OnNodePropertyChanged;
+    }
+
+    public object ToModel()
+    {
+        return new object();
+    }
+    #endregion
+
+    #region PrivateMethods
 
     private void SetCurvedArrow(PointD start, PointD targetCenter, PointD end, double nodeRadius)
     {
@@ -195,12 +225,20 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
             (p1.Y - p0.Y) * a + (p2.Y - p1.Y) * b + (p3.Y - p2.Y) * c);
     }
 
+    /// <summary>
+    /// Если узел переместился, то пересчитать соединение
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(NodeViewModel.X) or nameof(NodeViewModel.Y))
             Recompute();
     }
 
+    /// <summary>
+    /// Перерасчёт геометрии соединения
+    /// </summary>
     private void Recompute()
     {
         const double nodeRadius = NodeViewModel.DefaultSize / 2d;
@@ -226,6 +264,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                 Control1 = s;
                 Control2 = t;
             }
+
             if (Kind == ConnectionKinds.Curved)
             {
                 SetCurvedArrow(Start, t, End, nodeRadius);
@@ -236,6 +275,7 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
                                        t.Y - uy * arrowDirectionLength);
                 ArrowTo = t;
             }
+
             return;
         }
 
@@ -279,27 +319,9 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
         }
     }
 
-    partial void OnKindChanged(ConnectionKinds value)
-    {
-        Recompute();
-        OnPropertyChanged(nameof(ShowHandles));
-    }
+    #endregion
 
-    partial void OnCurvatureChanged(double value) => Recompute();
 
-    partial void OnIsSelectedChanged(bool value) =>
-        OnPropertyChanged(nameof(ShowHandles));
-
-    public void Dispose()
-    {
-        Source.PropertyChanged -= OnNodePropertyChanged;
-        Target.PropertyChanged -= OnNodePropertyChanged;
-    }
-
-    public object ToModel()
-    {
-        return new object();
-    }
 }
 
 

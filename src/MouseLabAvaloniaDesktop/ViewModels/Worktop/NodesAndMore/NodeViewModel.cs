@@ -30,7 +30,7 @@ public partial class NodeViewModel : ViewModelBase
         X = x;
         Y = y;
     }
-
+    #region Properties
     public Guid Id { get; }
 
     [ObservableProperty]
@@ -56,9 +56,14 @@ public partial class NodeViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _canDelete;
+    #endregion
 
+
+    #region PublicMethods
     public object ToModel()
     {
         return new object();
     }
+
+    #endregion
 }
