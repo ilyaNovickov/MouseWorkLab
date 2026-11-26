@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +27,27 @@ namespace MouseLabAvaloniaDesktop.Views
             else
 #endif
                 this.worktop.PropertyChanged += Image_PropertyChanged;
+#if DEBUG
+            saveDebugImageButton.IsVisible = true;
+#endif
+        }
+
+        private void SaveDebugImage_Click(object? sender, RoutedEventArgs e)
+        {
+#if DEBUG
+            Size size = mainCanvas.Bounds.Size;
+            if (size.Width < 1d || size.Height < 1d)
+                return;
+            int m = 100;
+            using var bitmap = new RenderTargetBitmap(
+                new PixelSize((int)size.Width * m, (int)size.Height * m), new Vector(96 * m, 96 * m));
+            bitmap.Render(mainCanvas);
+
+            string directory = Path.Combine(Path.GetTempPath(), "MouseLab");
+            Directory.CreateDirectory(directory);
+            bitmap.Save(Path.Combine(directory, "worktop-debug.png"),
+                        PngBitmapEncoderOptions.Default);
+#endif
         }
 
         private void Image_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
