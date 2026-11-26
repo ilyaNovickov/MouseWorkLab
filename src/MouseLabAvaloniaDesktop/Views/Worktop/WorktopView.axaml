@@ -18,19 +18,44 @@
         </Style>
     </UserControl.Styles>
     <DockPanel LastChildFill="True">
-        <Menu DockPanel.Dock="Top">
-            <RadioButton Content="Панорама"
+        <Border DockPanel.Dock="Top">
+            <StackPanel Orientation="Horizontal">
+            <RadioButton Theme="{StaticResource WorkspaceModeButtonTheme}"
                          GroupName="WorkspaceMode"
-                         IsChecked="{Binding IsPanOnlyMode, Mode=TwoWay}" />
-            <RadioButton Content="Выбор"
+                         IsChecked="{Binding IsPanOnlyMode, Mode=TwoWay}"
+                         ToolTip.Tip="{Binding Strings.WorktopModePanOnlyTip}">
+                <StackPanel Orientation="Vertical" Spacing="2" HorizontalAlignment="Center">
+                    <Image Source="/Assets/avalonia-logo.ico" Width="24" Height="24" />
+                    <TextBlock Text="Панорама" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Theme="{StaticResource WorkspaceModeButtonTheme}"
                          GroupName="WorkspaceMode"
-                         IsChecked="{Binding IsSelectAndMoveMode, Mode=TwoWay}" />
-            <RadioButton Content="Удаление"
+                         IsChecked="{Binding IsSelectAndMoveMode, Mode=TwoWay}"
+                         ToolTip.Tip="{Binding Strings.WorktopModeSelectAndMoveTip}">
+                <StackPanel Orientation="Vertical" Spacing="2" HorizontalAlignment="Center">
+                    <Image Source="/Assets/avalonia-logo.ico" Width="24" Height="24" />
+                    <TextBlock Text="Выбор" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Theme="{StaticResource WorkspaceModeButtonTheme}"
                          GroupName="WorkspaceMode"
-                         IsChecked="{Binding IsDeleteMode, Mode=TwoWay}" />
-            <RadioButton Content="Добавление"
+                         IsChecked="{Binding IsDeleteMode, Mode=TwoWay}"
+                         ToolTip.Tip="{Binding Strings.WorktopModeDeleteTip}">
+                <StackPanel Orientation="Vertical" Spacing="2" HorizontalAlignment="Center">
+                    <Image Source="/Assets/avalonia-logo.ico" Width="24" Height="24" />
+                    <TextBlock Text="Удаление" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Theme="{StaticResource WorkspaceModeButtonTheme}"
                          GroupName="WorkspaceMode"
-                         IsChecked="{Binding IsAddMode, Mode=TwoWay}" />
+                         IsChecked="{Binding IsAddMode, Mode=TwoWay}"
+                         ToolTip.Tip="{Binding Strings.WorktopModeAddTip}">
+                <StackPanel Orientation="Vertical" Spacing="2" HorizontalAlignment="Center">
+                    <Image Source="/Assets/avalonia-logo.ico" Width="24" Height="24" />
+                    <TextBlock Text="Добавление" />
+                </StackPanel>
+            </RadioButton>
             <TextBlock Classes="center"
                        Text="{Binding Strings.WorktopConnectionKind}" />
             <ComboBox ItemsSource="{Binding ConnectionKindOptions}"
@@ -47,7 +72,8 @@
                     Content="Снимок"
                     IsVisible="False"
                     Click="SaveDebugImage_Click" />
-        </Menu>
+            </StackPanel>
+        </Border>
         <Border DockPanel.Dock="Bottom"
                 Margin="5,5,5,5"
                 BorderBrush="Red"

@@ -25,5 +25,6 @@
         <StyleInclude Source="/Styles/SettingsStyles.axaml"/>
         <StyleInclude Source="/Styles/NodeStyles.axaml"/>
         <StyleInclude Source="/Styles/ConnectionStyles.axaml"/>
+        <StyleInclude Source="/Styles/WorkspaceModeButtonStyles.axaml"/>
     </Application.Styles>
 </Application>
