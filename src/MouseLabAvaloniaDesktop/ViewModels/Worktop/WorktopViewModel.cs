@@ -37,8 +37,8 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             _modelingSettings = modelingSettings;
             connectionKindOptions =
             [
-                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindStraight(), ConnectionKinds.Straight),
-                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindCurved(), ConnectionKinds.Curved)
+                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindStraight(), NodesAndMore.ConnectionKinds.Straight),
+                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindCurved(), NodesAndMore.ConnectionKinds.Curved)
             ];
 
             //RelayCommand<int, int> relayCommand = new RelayCommand<int, int>(AddNode);
@@ -292,11 +292,11 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             connection.IsSelected = true;
         }
 
-        public void SetConnectionControlPoint(ConnectionViewModel connection, int index, PointD point)
+        public void SetConnectionControlPoint(ConnectionViewModel connection, int index, NodesAndMore.PointD point)
         {
             if (WorkspaceMode != WorkspaceMode.SelectAndMove
                 || SelectedConnection != connection
-                || connection.Kind != ConnectionKinds.Curved)
+                || connection.Kind != NodesAndMore.ConnectionKinds.Curved)
                 return;
 
             connection.SetControlPoint(index, point);

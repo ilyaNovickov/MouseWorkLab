@@ -5,23 +5,6 @@ using MouseLabAvaloniaDesktop.Models;
 
 namespace MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 
-public struct PointD
-{
-    public PointD()
-    {
-
-    }
-
-    public PointD(double x, double y)
-    {
-        X = x;
-        Y = y;
-    }
-
-    public double X { get; set; }
-    public double Y { get; set; }
-}
-
 public partial class ConnectionViewModel : ViewModelBase, IDisposable
 {
     public ConnectionViewModel(NodeViewModel source, NodeViewModel target)
@@ -35,8 +18,15 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
 
         Recompute();
     }
-
+    
+    /// <summary>
+    /// Узел от куда идёт соединение
+    /// </summary>
     public NodeViewModel Source { get; }
+
+    /// <summary>
+    /// Узел к которому идёт соединение
+    /// </summary>
     public NodeViewModel Target { get; }
 
     [ObservableProperty]
@@ -312,8 +302,4 @@ public partial class ConnectionViewModel : ViewModelBase, IDisposable
     }
 }
 
-public enum ConnectionKinds
-{
-    Straight,
-    Curved,
-}
+
