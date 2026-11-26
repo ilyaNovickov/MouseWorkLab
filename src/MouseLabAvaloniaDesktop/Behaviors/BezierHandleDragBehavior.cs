@@ -37,7 +37,7 @@ namespace MouseLabAvaloniaDesktop.Behaviors
         private Canvas? _canvas;
         private IPointer? _pointer;
         private Point _originPointer;
-        private PointD _originControl;
+        private Models.PointD _originControl;
         private bool _captured;
 
         protected override void OnAttachedToVisualTree()
@@ -105,7 +105,7 @@ namespace MouseLabAvaloniaDesktop.Behaviors
             }
 
             Vector offset = e.GetPosition(_canvas) - _originPointer;
-            var point = new PointD(_originControl.X + offset.X, _originControl.Y + offset.Y);
+            var point = new Models.PointD(_originControl.X + offset.X, _originControl.Y + offset.Y);
 
             _worktop.SetConnectionControlPoint(_connection, HandleIndex, point);
         }

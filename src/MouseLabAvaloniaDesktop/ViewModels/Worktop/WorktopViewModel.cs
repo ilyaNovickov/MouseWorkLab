@@ -21,43 +21,36 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
 {
     public partial class WorktopViewModel : TranslatedViewModelBase
     {
+        public const int MaxNodes = 1024;
+        private const double Marging = 0.10d;
+
         private readonly ModelingEnv _modelingEnv;
         private readonly ModelingSettings _modelingSettings;
         private readonly List<ConnectionKindOption> connectionKindOptions;
 
         public WorktopViewModel(
             ITranslationService translation,
-            //WorktopCanvasViewModel worktopCanvasViewModel,
             ModelingEnv modelingEnv,
             ModelingSettings modelingSettings
             ) : base(translation)
-        {
-            //WorktopCanvasViewModel = worktopCanvasViewModel;
+        {;
             _modelingEnv = modelingEnv;
             _modelingSettings = modelingSettings;
+
             connectionKindOptions =
             [
-                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindStraight(), NodesAndMore.ConnectionKinds.Straight),
-                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindCurved(), NodesAndMore.ConnectionKinds.Curved)
+                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindStraight(), ConnectionKinds.Straight),
+                new ConnectionKindOption(Strings.Observe_WorktopConnectionKindCurved(), ConnectionKinds.Curved)
             ];
 
-            //RelayCommand<int, int> relayCommand = new RelayCommand<int, int>(AddNode);
-
-            Nodes.CollectionChanged += Nodes_CollectionChanged;
+            _nodes.CollectionChanged += Nodes_CollectionChanged;
 
             _modelingSettings.PropertyChanged += _modelingSettings_PropertyChanged;
 
             OnWorktopChanged();
         }
 
-        private void _modelingSettings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            IsNeedGeneration = _modelingEnv.Worktop.Width == _modelingEnv.Worktop.Height
-                && _modelingEnv.Worktop.Width == _modelingSettings.WorktopResolution;
-        }
-
-        //public WorktopCanvasViewModel WorktopCanvasViewModel { get; }
-
+        #region Properties
         public string? Seed
         {
             get;
@@ -74,44 +67,21 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
         [ObservableProperty]
         private bool isSeedNumber;
 
-        private void OnSeedChanged()
-        {
-            IsSeedNumber = Seed switch
-            {
-                null => true,
-                not null => int.TryParse(Seed, out _)
-            };
-        }
-
-        private static int? GetSeedFromString(string? seed)
-        {
-            if (seed is null)
-                return null;
-
-            if (int.TryParse(seed, out int result))
-                return result;
-            else
-                return null;
-        }
-
         [ObservableProperty]
         private bool isNeedGeneration;
 
-        [RelayCommand]
-        private async Task GenerateWorktop()
+        // использовать double ?
+        [ObservableProperty]
+        public partial int WorktopPosition
         {
-            await Task.Run(() =>
-            {
-                _modelingEnv.GenerateNewWorktop(_modelingSettings.WorktopResolution, GetSeedFromString(Seed));
-                //Thread.Sleep(2000);
-            });
-
-
-            //OnPropertyChanged(nameof(Worktop));
-            OnWorktopChanged();
+            get;
+            private set;
         }
 
-        private const double Marging = 0.10d;
+        public IReadOnlyMatrix Worktop
+        {
+            get => _modelingEnv.Worktop;
+        }
 
         public int AvailableResolution
         {
@@ -122,67 +92,6 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
                 {
                     //WorktopCanvasViewModel.SetCanvasDiff(field, _modelingEnv.Worktop.Size.Width);
                 }
-            }
-        }
-
-        // использовать double ?
-        [ObservableProperty]
-        public partial int WorktopPosition
-        {
-            get;
-            private set;
-        }
-
-        //private Matrix matrix = new(500, 500);
-        public IReadOnlyMatrix Worktop
-        {
-            //get => matrix;
-            get => _modelingEnv.Worktop;
-        }
-
-        public event EventHandler? WorktopChanged;
-
-        private void OnWorktopChanged()
-        {
-            IsNeedGeneration = false;
-
-            int diff = (int)(_modelingEnv.Worktop.Size.Width * Marging);
-
-            AvailableResolution = _modelingEnv.Worktop.Width + (2 * diff);
-            WorktopPosition = diff;
-
-            //AvailableResolution = (int)(_modelingEnv.Worktop.Size.Width * (1.00d + 2d * Marging));
-            //WorktopPosition = (AvailableResolution - _modelingEnv.Worktop.Width) / 2;
-
-            OnPropertyChanged(nameof(Worktop));
-            WorktopChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        public const int MaxNodes = 1024;
-
-        public ObservableCollection<NodeViewModel> Nodes { get; } = new();
-
-        private void Nodes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems is not null && e.NewItems.Count == 1)
-                    {
-                        if (e.NewItems[0] is NodeViewModel nodeVM && Nodes.Count != 1)
-                        {
-                            AddConnection(Nodes[^2], nodeVM);
-                        }
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    break;
             }
         }
 
@@ -216,22 +125,64 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
                 OnPropertyChanged();
             }
         }
+        #endregion
+
+        #region OnPropertiesChanged
+        private void OnSeedChanged()
+        {
+            IsSeedNumber = Seed switch
+            {
+                null => true,
+                not null => int.TryParse(Seed, out _)
+            };
+        }
+
+        public event EventHandler? WorktopChanged;
+
+        private void OnWorktopChanged()
+        {
+            IsNeedGeneration = false;
+
+            int diff = (int)(_modelingEnv.Worktop.Size.Width * Marging);
+
+            AvailableResolution = _modelingEnv.Worktop.Width + (2 * diff);
+            WorktopPosition = diff;
+
+            OnPropertyChanged(nameof(Worktop));
+            WorktopChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         partial void OnSelectedConnectionChanged(ConnectionViewModel? value)
         {
             OnPropertyChanged(nameof(SelectedConnectionKindOption));
             OnPropertyChanged(nameof(HasSelectedConnection));
         }
+        #endregion
 
-        protected override void Dispose(bool disposing)
+        #region Commands
+        [RelayCommand]
+        private async Task GenerateWorktop()
         {
-            if (disposing)
+            await Task.Run(() =>
             {
-                foreach (ConnectionKindOption option in connectionKindOptions)
-                    option.Dispose();
-            }
+                _modelingEnv.GenerateNewWorktop(
+                    _modelingSettings.WorktopResolution, 
+                    GetSeedFromString(Seed)
+                    );
+            });
 
-            base.Dispose(disposing);
+            OnWorktopChanged();
+        }
+
+        private static int? GetSeedFromString(string? seed)
+        {
+            if (seed is null)
+                return null;
+
+            if (int.TryParse(seed, out int result))
+                return result;
+            else
+                return null;
         }
 
         [RelayCommand]
@@ -258,13 +209,75 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             if (!canInteract)
                 ClearSelection();
         }
+        #endregion
 
-        public void OnCanvasPressed(Point point)
+        #region EventHandlers
+        private void _modelingSettings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (WorkspaceMode == WorkspaceMode.Add)
-                AddNode(point);
-            else
+            IsNeedGeneration = _modelingEnv.Worktop.Width == _modelingEnv.Worktop.Height
+                && _modelingEnv.Worktop.Width == _modelingSettings.WorktopResolution;
+        }
+
+
+        #endregion
+
+        #region Nodes       
+
+        private readonly ObservableCollection<NodeViewModel> _nodes = new();
+
+        public IReadOnlyCollection<NodeViewModel> Nodes => _nodes;
+
+        [RelayCommand]
+        private void AddNode(Point point)
+        {
+            if (Nodes.Count >= MaxNodes)
+                return;
+
+            NodeViewModel nodeViewModel = new(point.X - (NodeViewModel.DefaultSize / 2) + 1,
+                        point.Y - (NodeViewModel.DefaultSize / 2) + 1,
+                        Nodes.Count.ToString())
+            {
+                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove,
+                CanDelete = WorkspaceMode == WorkspaceMode.Delete
+            };
+
+            _nodes.Add(nodeViewModel);
+        }
+
+        public void DeleteNode(NodeViewModel node)
+        {
+            if (WorkspaceMode != WorkspaceMode.Delete || !Nodes.Contains(node))
+                return;
+
+            ConnectionViewModel? incoming = Connections.FirstOrDefault(c => c.Target == node);
+            ConnectionViewModel? outgoing = Connections.FirstOrDefault(c => c.Source == node);
+
+            if (SelectedNode == node
+                || (incoming is not null && SelectedConnection == incoming)
+                || (outgoing is not null && SelectedConnection == outgoing))
+            {
                 ClearSelection();
+            }
+
+            RemoveConnection(incoming);
+            RemoveConnection(outgoing);
+
+            _nodes.Remove(node);
+
+            if (incoming is not null && outgoing is not null)
+                AddConnection(incoming.Source, outgoing.Target);
+
+            for (int i = 0; i < _nodes.Count; i++)
+                _nodes[i].Label = i.ToString();
+        }
+
+        public void MoveNodeFromOrigin(NodeViewModel node, int originX, int originY, Vector offset)
+        {
+            if (WorkspaceMode != WorkspaceMode.SelectAndMove)
+                return;
+
+            node.X = originX + (int)Math.Round(offset.X);
+            node.Y = originY + (int)Math.Round(offset.Y);
         }
 
         public void SelectNode(NodeViewModel node)
@@ -281,6 +294,57 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             node.IsSelected = true;
         }
 
+        private void Nodes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewItems is not null && e.NewItems.Count == 1)
+                    {
+                        if (e.NewItems[0] is NodeViewModel nodeVM && _nodes.Count != 1)
+                        {
+                            AddConnection(_nodes[^2], nodeVM);
+                        }
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    break;
+            }
+        }
+
+        #endregion
+
+
+        #region Connectionds
+        private readonly ObservableCollection<ConnectionViewModel> _connections = new();
+
+        public IReadOnlyCollection<ConnectionViewModel> Connections => _connections;
+
+        private void RemoveConnection(ConnectionViewModel? connection)
+        {
+            if (connection is null)
+                return;
+
+            _connections.Remove(connection);
+            connection.Dispose();
+        }
+
+        private void AddConnection(NodeViewModel source, NodeViewModel target)
+        {
+            var conn = new ConnectionViewModel(source, target)
+            {
+                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove,
+                CanDelete = WorkspaceMode == WorkspaceMode.Delete
+            };
+            _connections.Add(conn);
+        }
+
         public void SelectConnection(ConnectionViewModel connection)
         {
             if (WorkspaceMode != WorkspaceMode.SelectAndMove || SelectedConnection == connection)
@@ -292,11 +356,11 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             connection.IsSelected = true;
         }
 
-        public void SetConnectionControlPoint(ConnectionViewModel connection, int index, NodesAndMore.PointD point)
+        public void SetConnectionControlPoint(ConnectionViewModel connection, int index, PointD point)
         {
             if (WorkspaceMode != WorkspaceMode.SelectAndMove
                 || SelectedConnection != connection
-                || connection.Kind != NodesAndMore.ConnectionKinds.Curved)
+                || connection.Kind != ConnectionKinds.Curved)
                 return;
 
             connection.SetControlPoint(index, point);
@@ -321,80 +385,25 @@ namespace MouseLabAvaloniaDesktop.ViewModels.Worktop
             SelectedNode.IsSelected = false;
             SelectedNode = null;
         }
+        #endregion
 
-        public void MoveNodeFromOrigin(NodeViewModel node, int originX, int originY, Vector offset)
+        protected override void Dispose(bool disposing)
         {
-            if (WorkspaceMode != WorkspaceMode.SelectAndMove)
-                return;
-
-            node.X = originX + (int)Math.Round(offset.X);
-            node.Y = originY + (int)Math.Round(offset.Y);
-        }
-
-        [RelayCommand]
-        private void AddNode(Point point)
-        {
-            if (Nodes.Count >= MaxNodes)
-                return;
-
-            NodeViewModel nodeViewModel = new(point.X - (NodeViewModel.DefaultSize / 2) + 1,
-                        point.Y - (NodeViewModel.DefaultSize / 2) + 1,
-                        Nodes.Count.ToString())
+            if (disposing)
             {
-                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove,
-                CanDelete = WorkspaceMode == WorkspaceMode.Delete
-            };
-
-            Nodes.Add(nodeViewModel);
-        }
-
-        [ObservableProperty]
-        private ObservableCollection<ConnectionViewModel> connections = new();
-
-        public void DeleteNode(NodeViewModel node)
-        {
-            if (WorkspaceMode != WorkspaceMode.Delete || !Nodes.Contains(node))
-                return;
-
-            ConnectionViewModel? incoming = Connections.FirstOrDefault(c => c.Target == node);
-            ConnectionViewModel? outgoing = Connections.FirstOrDefault(c => c.Source == node);
-
-            if (SelectedNode == node
-                || (incoming is not null && SelectedConnection == incoming)
-                || (outgoing is not null && SelectedConnection == outgoing))
-            {
-                ClearSelection();
+                foreach (ConnectionKindOption option in connectionKindOptions)
+                    option.Dispose();
             }
 
-            RemoveConnection(incoming);
-            RemoveConnection(outgoing);
-
-            Nodes.Remove(node);
-
-            if (incoming is not null && outgoing is not null)
-                AddConnection(incoming.Source, outgoing.Target);
-
-            for (int i = 0; i < Nodes.Count; i++)
-                Nodes[i].Label = i.ToString();
+            base.Dispose(disposing);
         }
 
-        private void RemoveConnection(ConnectionViewModel? connection)
+        public void OnCanvasPressed(Point point)
         {
-            if (connection is null)
-                return;
-
-            Connections.Remove(connection);
-            connection.Dispose();
-        }
-
-        private void AddConnection(NodeViewModel source, NodeViewModel target)
-        {
-            var conn = new ConnectionViewModel(source, target)
-            {
-                CanInteract = WorkspaceMode == WorkspaceMode.SelectAndMove,
-                CanDelete = WorkspaceMode == WorkspaceMode.Delete
-            };
-            Connections.Add(conn);
+            if (WorkspaceMode == WorkspaceMode.Add)
+                AddNode(point);
+            else
+                ClearSelection();
         }
     }
 }

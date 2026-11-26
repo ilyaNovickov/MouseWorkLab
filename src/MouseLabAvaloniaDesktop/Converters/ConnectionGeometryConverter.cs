@@ -23,18 +23,18 @@ public class ConnectionGeometryConverter : IMultiValueConverter
         if (values.Count < 5) return null;
         if (values.Any(v => v is UnsetValueType)) return null;
 
-        var start = ToAvaloniaPoint((PointD)values[0]!);
-        var end = ToAvaloniaPoint((PointD)values[1]!);
-        var cp1 = ToAvaloniaPoint((PointD)values[2]!);
-        var cp2 = ToAvaloniaPoint((PointD)values[3]!);
-        var kind = (ConnectionKinds)values[4]!;
+        var start = ToAvaloniaPoint((Models.PointD)values[0]!);
+        var end = ToAvaloniaPoint((Models.PointD)values[1]!);
+        var cp1 = ToAvaloniaPoint((Models.PointD)values[2]!);
+        var cp2 = ToAvaloniaPoint((Models.PointD)values[3]!);
+        var kind = (Models.ConnectionKinds)values[4]!;
 
         var sg = new StreamGeometry();
         using var ctx = sg.Open();
 
         ctx.BeginFigure(start, false);
 
-        if (kind == ConnectionKinds.Curved)
+        if (kind == Models.ConnectionKinds.Curved)
             ctx.CubicBezierTo(cp1, cp2, end);
         else
             ctx.LineTo(end);
@@ -42,7 +42,7 @@ public class ConnectionGeometryConverter : IMultiValueConverter
         return sg;
     }
 
-    private static Point ToAvaloniaPoint(PointD p)
+    private static Point ToAvaloniaPoint(Models.PointD p)
     {
         return new Point(p.X, p.Y);
     }

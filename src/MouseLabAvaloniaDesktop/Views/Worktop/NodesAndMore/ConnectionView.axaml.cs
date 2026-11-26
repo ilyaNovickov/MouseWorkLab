@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using MouseLabAvaloniaDesktop.Models;
 using MouseLabAvaloniaDesktop.ViewModels.Worktop.NodesAndMore;
 
 namespace MouseLabAvaloniaDesktop.Views;

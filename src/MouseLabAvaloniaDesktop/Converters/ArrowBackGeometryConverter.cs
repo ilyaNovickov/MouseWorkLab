@@ -22,8 +22,8 @@ namespace MouseLabAvaloniaDesktop.Converters
             if (values.Count < 2) return null;
             if (values.Any(v => v is UnsetValueType)) return null;
 
-            var from = ToAvaloniaPoint((PointD)values[0]!);
-            var to = ToAvaloniaPoint((PointD)values[1]!);
+            var from = ToAvaloniaPoint((Models.PointD)values[0]!);
+            var to = ToAvaloniaPoint((Models.PointD)values[1]!);
 
             return ArrowGeometryConverter.CreateGeometry(from, to, GetOutline(parameter));
         }
@@ -40,7 +40,7 @@ namespace MouseLabAvaloniaDesktop.Converters
             return DefaultOutline;
         }
 
-        private static Point ToAvaloniaPoint(PointD p)
+        private static Point ToAvaloniaPoint(Models.PointD p)
         {
             return new Point(p.X, p.Y);
         }

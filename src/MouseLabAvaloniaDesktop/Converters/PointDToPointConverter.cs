@@ -13,15 +13,15 @@ namespace MouseLabAvaloniaDesktop.Converters
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            return value is PointD point ? ToAvaloniaPoint(point) : null;
+            return value is Models.PointD point ? ToAvaloniaPoint(point) : null;
         }
 
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            return value is Point point ? new PointD(point.X, point.Y) : null;
+            return value is Point point ? new Models.PointD(point.X, point.Y) : null;
         }
 
-        private static Point ToAvaloniaPoint(PointD p)
+        private static Point ToAvaloniaPoint(Models.PointD p)
         {
             return new Point(p.X, p.Y);
         }
