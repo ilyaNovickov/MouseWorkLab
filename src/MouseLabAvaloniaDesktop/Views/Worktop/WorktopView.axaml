@@ -106,14 +106,11 @@
                             MinZoomX="0.2"
                             MinZoomY="0.2"
                             Background="DimGray"
-                            MinimumVisibleContentPercentage="0.01"
+                            MinimumVisibleContentPercentage="0.5"
                             AutoCalculateMaxZoom="True"
                             MaxZoomPixelSize="200" >
 
-                <Border BorderBrush="Black" 
-                        BorderThickness="1" 
-                        Width="{Binding AvailableResolution}"
-                        Height="{Binding AvailableResolution}">
+
 
                     <Canvas Name="mainCanvas"
                             Width="{Binding AvailableResolution}"
@@ -170,7 +167,6 @@
 
                     </Canvas>
 
-                    </Border>
             </paz:ZoomBorder>
         </ScrollViewer>
     </DockPanel>
